@@ -78,6 +78,13 @@ select{
   font-family:'Inter'; background:var(--turf-light); color:var(--chalk);
   border:1px solid var(--line); border-radius:6px; padding:9px 10px; font-size:13px;
 }
+input#teamSearch{
+  font-family:'Inter'; background:var(--turf-light); color:var(--chalk);
+  border:1px solid var(--line); border-radius:6px; padding:9px 10px; font-size:13px;
+  width:170px;
+}
+input#teamSearch::placeholder{color:var(--muted);}
+input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .spacer{flex:1;}
 .subtoolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:20px; font-size:12px; color:var(--muted);}
 .tag-pill{
@@ -259,6 +266,40 @@ select{
 
 .susp-flag{font-size:11px; margin-left:4px; cursor:help;}
 
+.follow-star{
+  cursor:pointer; color:var(--muted); font-size:14px; line-height:1; flex-shrink:0;
+  padding:2px; border-radius:4px; transition:color .15s, transform .1s;
+}
+.follow-star:hover{color:var(--amber); transform:scale(1.15);}
+.follow-star.active{color:var(--amber);}
+
+.form-guide{display:inline-flex; gap:2px; margin-left:6px; flex-shrink:0;}
+.form-guide span{
+  width:14px; height:14px; border-radius:3px; font-size:9px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:'Space Mono';
+}
+.form-w{background:rgba(79,195,255,.22); color:var(--win);}
+.form-d{background:rgba(195,207,230,.18); color:var(--chalk-dim);}
+.form-l{background:rgba(239,61,84,.2); color:var(--flare);}
+
+.search-wrap{position:relative;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:30; min-width:230px; max-width:300px;
+  background:var(--turf); border:1px solid var(--line); border-radius:10px; padding:8px;
+  max-height:280px; overflow-y:auto; box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.search-result-row{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 8px;
+  border-radius:6px; font-size:12.5px;
+}
+.search-result-row:hover{background:var(--turf-light);}
+.search-result-row .sr-name{display:flex; align-items:center; gap:7px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;}
+.search-result-row button{font-size:10.5px; padding:4px 9px; flex-shrink:0;}
+.search-results-empty{padding:10px; color:var(--muted); font-size:12px; text-align:center;}
+
+.th-follow-row{margin-bottom:12px;}
+.th-follow-row button{width:100%;}
+
 .follow-chip{
   display:flex; align-items:center; justify-content:space-between; gap:8px;
   background:var(--turf-light); border:1px solid var(--line); border-radius:8px;
@@ -273,15 +314,26 @@ select{
 .follow-chip button:hover{color:var(--flare); background:rgba(239,61,84,.12);}
 
 /* ---------- group stage ---------- */
-.group-card{background:var(--turf); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px;}
-.group-card h3{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--amber); margin-bottom:10px;}
+.group-card{background:var(--turf); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; scroll-margin-top:70px;}
+.group-card.followed{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+.group-card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+.group-card h3{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--amber); margin:0; display:flex; align-items:center; gap:8px;}
+.group-progress{font-family:'Space Mono'; font-size:10px; color:var(--muted); text-transform:none; letter-spacing:0;}
+.group-card-actions{display:flex; gap:6px; flex-wrap:wrap;}
+.group-card-actions button{font-size:10.5px; padding:6px 10px;}
+.qual-note{font-size:10.5px; color:var(--muted); margin:-6px 0 12px; font-style:italic;}
 .group-table{width:100%; border-collapse:collapse; font-size:12px; margin-bottom:14px;}
 .group-table th{text-align:left; color:var(--muted); font-weight:500; font-size:10px; text-transform:uppercase; letter-spacing:.05em; padding:4px 6px; border-bottom:1px solid var(--line);}
 .group-table td{padding:5px 6px; border-bottom:1px solid var(--turf-light);}
 .group-table tr.qualified td{color:var(--win);}
+.group-table tr.third-line td{border-top:1px dashed var(--amber);}
+.best-third-tag{color:var(--amber); font-size:10px;}
 .group-table td.gt-name{display:flex; align-items:center; gap:6px; white-space:nowrap;}
+.gt-name-clickable{cursor:pointer;}
+.gt-name-clickable:hover{color:var(--win);}
 .group-table td.gt-num{font-family:'Space Mono'; text-align:center;}
 .group-fixtures{display:grid; gap:12px;}
+.group-fixtures.hidden{display:none;}
 .group-fixture{
   background:var(--turf-light); border:1px solid var(--line); border-radius:8px; padding:10px 12px;
   display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; font-size:12.5px;
@@ -294,6 +346,26 @@ select{
 .group-fixture .score{font-size:16px;}
 .groups-toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
 
+.group-nav{
+  display:flex; flex-wrap:wrap; gap:6px; padding:10px; margin-bottom:14px;
+  background:var(--turf); border:1px solid var(--line); border-radius:10px;
+  position:sticky; top:8px; z-index:5; max-height:120px; overflow-y:auto;
+}
+.group-nav-chip{
+  font-family:'Space Mono'; font-size:11px; padding:5px 9px; border-radius:6px;
+  background:var(--turf-light); border:1px solid var(--line); color:var(--chalk-dim); cursor:pointer;
+}
+.group-nav-chip:hover{border-color:var(--win); color:var(--chalk);}
+.group-nav-chip.followed{border-color:var(--amber); color:var(--amber);}
+
+.search-hit{box-shadow:0 0 0 2px var(--win) !important; }
+@keyframes jumpFlash{
+  0%{box-shadow:0 0 0 3px var(--amber);}
+  70%{box-shadow:0 0 0 3px var(--amber);}
+  100%{box-shadow:none;}
+}
+.jump-highlight{animation:jumpFlash 1.6s ease;}
+
 /* ---------- leaderboard ---------- */
 .leaderboard-table{width:100%; border-collapse:collapse; font-size:12.5px;}
 .leaderboard-table th{
@@ -304,6 +376,8 @@ select{
 .leaderboard-table th.sorted{color:var(--win);}
 .leaderboard-table td{padding:7px 8px; border-bottom:1px solid var(--turf-light); white-space:nowrap;}
 .leaderboard-table td.lb-name{display:flex; align-items:center; gap:7px;}
+.lb-name-clickable{cursor:pointer;}
+.lb-name-clickable:hover{color:var(--win);}
 .leaderboard-table td.lb-num{font-family:'Space Mono'; text-align:center;}
 .leaderboard-table tr.champion{background:rgba(77,141,253,.12);}
 .lb-status{font-size:10.5px; padding:2px 8px; border-radius:12px; background:var(--turf-light); color:var(--chalk-dim);}
@@ -312,6 +386,67 @@ select{
 .lb-status.out{color:var(--muted);}
 .leaderboard-modal{max-width:820px; width:92vw; max-height:88vh;}
 .leaderboard-scroll{max-height:60vh; overflow-y:auto; overflow-x:auto;}
+
+/* ---------- stats & records ---------- */
+.stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:6px;}
+.highlights-recap{
+  background:var(--turf-light); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+  margin-bottom:16px; font-size:13px; line-height:1.65; color:var(--chalk-dim);
+}
+.highlights-recap p{margin:0 0 8px;}
+.highlights-recap p:last-child{margin-bottom:0;}
+.highlights-recap .hr-champ{color:var(--amber); font-weight:600;}
+
+/* ---------- bracket tree view ---------- */
+.bracket-modal{max-width:1400px; width:95vw; max-height:92vh; display:flex; flex-direction:column;}
+.bracket-wrap{display:flex; overflow-x:auto; overflow-y:auto; padding:6px 4px 20px; flex:1; min-height:0;}
+.bracket-round{display:flex; flex-direction:column; justify-content:space-around; min-width:220px; padding:0 22px; flex-shrink:0;}
+.bracket-round-title{
+  text-align:center; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--amber);
+  margin-bottom:10px; position:sticky; top:0; background:var(--turf); padding:4px 0;
+}
+.bracket-match{
+  position:relative; background:var(--turf); border:1px solid var(--line); border-radius:8px;
+  padding:8px 10px; margin:10px 0; font-size:12px;
+}
+.bracket-match.clickable{cursor:pointer;}
+.bracket-match.clickable:hover{border-color:var(--win);}
+.bracket-match.tbd{opacity:.4; border-style:dashed;}
+.bracket-match::after{
+  content:''; position:absolute; top:50%; right:-22px; width:22px; height:1px; background:var(--line);
+}
+.bracket-round:last-child .bracket-match::after{content:none;}
+.bm-team{display:flex; align-items:center; gap:6px; padding:2px 0; white-space:nowrap; overflow:hidden;}
+.bm-team.winner{color:var(--win); font-weight:600;}
+.bm-team.loser{color:var(--muted); text-decoration:line-through; text-decoration-color:#3a5183;}
+.bm-name{cursor:pointer; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0;}
+.bm-name:hover{color:var(--win);}
+.bm-score{font-family:'Space Mono'; font-size:11px; flex-shrink:0;}
+@media (max-width:520px){ .stats-grid{grid-template-columns:1fr;} }
+.stat-card{background:var(--turf-light); border:1px solid var(--line); border-radius:10px; padding:14px;}
+.stat-card .stat-label{font-size:10px; text-transform:uppercase; color:var(--muted); letter-spacing:.06em; margin-bottom:6px;}
+.stat-card .stat-value{font-family:'Space Mono'; font-size:19px; font-weight:700; color:var(--amber); line-height:1.2;}
+.stat-card .stat-sub{font-size:11.5px; color:var(--chalk-dim); margin-top:5px; line-height:1.4;}
+.stats-empty{color:var(--muted); font-size:13px; padding:20px 0; text-align:center;}
+
+/* ---------- draw editing ---------- */
+.edit-draw-banner{
+  background:var(--turf-light); border:1px solid var(--amber); border-radius:10px; padding:12px 14px;
+  margin-bottom:14px; font-size:12.5px; color:var(--chalk-dim); display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.edit-draw-banner button{margin-left:auto; font-size:11px; padding:6px 12px;}
+#editDrawSelectionNote{color:var(--amber); font-weight:600;}
+.side.swap-selected{background:rgba(77,141,253,.18); border-radius:6px; box-shadow:0 0 0 1px var(--win) inset;}
+
+/* ---------- team strength adjust ---------- */
+.th-rating-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--turf-light); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:14px;
+}
+.th-rating-label{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);}
+.th-rating-controls{display:flex; align-items:center; gap:6px;}
+.th-rating-controls button{padding:5px 9px; font-size:11px;}
+.th-rating-value{font-family:'Space Mono'; font-size:17px; font-weight:700; color:var(--amber); min-width:28px; text-align:center;}
 
 footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; letter-spacing:.03em;}
 </style>
@@ -336,11 +471,17 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
 
   <div class="toolbar">
     <button class="primary" id="simRoundBtn">▶ Simulate Round</button>
+    <button id="simUnfollowedBtn" class="hidden">⏭ Simulate Unfollowed Groups</button>
     <button id="simAllBtn">⏭ Simulate Entire Cup</button>
     <button id="revealAllBtn" class="hidden">👁 Reveal All</button>
     <button id="nextRoundBtn" disabled>Advance to Next Round →</button>
+    <button class="ghost hidden" id="editDrawBtn">🔀 Edit Draw</button>
+    <button class="ghost hidden" id="undoBtn">↩ Undo Last Match</button>
     <div class="spacer"></div>
+    <button class="ghost hidden" id="thirdPlaceBtn">🥉 Third-Place Table</button>
     <button class="ghost" id="leaderboardBtn">🏅 Leaderboard</button>
+    <button class="ghost" id="statsBtn">📊 Stats & Records</button>
+    <button class="ghost" id="bracketBtn">🏆 Bracket View</button>
     <button class="ghost" id="predictBtn">🔮 Predict Champion</button>
     <button class="ghost" id="fullscreenBtn">⛶ Fullscreen</button>
     <button class="ghost" id="settingsBtn">⚙ Settings</button>
@@ -356,6 +497,10 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <span class="tag-pill" id="pillSpoiler">Instant reveal</span>
     <span class="tag-pill" id="pillNames">Real names</span>
     <div class="spacer"></div>
+    <div class="search-wrap">
+      <input type="text" id="teamSearch" placeholder="🔍 Search teams…">
+      <div id="searchResults" class="search-results hidden"></div>
+    </div>
     <select id="sortSelect">
       <option value="bracket">Sort: Bracket order</option>
       <option value="mismatch">Sort: Biggest mismatches</option>
@@ -366,6 +511,11 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
 
   <div class="layout">
     <div>
+      <div id="editDrawBanner" class="edit-draw-banner hidden">
+        🔀 Draw editing: click two teams to swap them in the bracket. <span id="editDrawSelectionNote"></span>
+        <button class="ghost" id="editDrawDoneBtn">Done</button>
+      </div>
+      <div id="groupNav" class="group-nav hidden"></div>
       <div class="fixtures" id="fixturesList"></div>
       <div id="groupsContainer" class="hidden"></div>
     </div>
@@ -373,6 +523,7 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <div>
       <div class="card" id="followingCard" style="display:none;">
         <h3>⭐ Following</h3>
+        <button class="ghost" id="jumpNextBtn" style="width:100%; margin-bottom:10px;">→ Jump to next match</button>
         <div id="followingList"></div>
       </div>
 
@@ -414,10 +565,13 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
       <label>Field size</label>
       <div class="opt-row" id="sizeRow">
         <div class="opt" data-size="16">16</div>
+        <div class="opt" data-size="24" data-groups-only="true" style="display:none;">24</div>
         <div class="opt" data-size="32">32</div>
+        <div class="opt" data-size="48" data-groups-only="true" style="display:none;">48</div>
         <div class="opt active" data-size="64">64</div>
         <div class="opt" data-size="128">128</div>
         <div class="opt" data-size="256">256</div>
+        <div class="opt" data-size="384" data-groups-only="true" style="display:none;">384</div>
       </div>
     </div>
 
@@ -427,7 +581,7 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
         <div class="opt active" data-format="knockout">Straight Knockout</div>
         <div class="opt" data-format="groups">Groups + Knockout</div>
       </div>
-      <div class="hint">Groups splits the field into 4-team round-robin groups; the top 2 from each group advance to a knockout bracket half the size of the field.</div>
+      <div class="hint">Groups splits the field into 4-team round-robin groups; the top 2 from each group advance automatically. When the group count doesn't divide evenly into a clean bracket (like 24, 48, or 384 team fields), the best-ranked 3rd-place teams across all groups fill the remaining knockout slots — just like a real World Cup or Euros.</div>
     </div>
 
     <div class="field" id="seedingField">
@@ -574,7 +728,24 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
 <div class="overlay hidden" id="teamHistoryOverlay">
   <div class="modal">
     <h2 id="thTitle">—</h2>
-    <p class="sub">Recent results this tournament</p>
+    <p class="sub">Full match history this tournament</p>
+    <div class="th-follow-row">
+      <button class="ghost" id="thFollowBtn">☆ Follow this team</button>
+    </div>
+    <div class="th-rating-row">
+      <span class="th-rating-label">Strength rating</span>
+      <div class="th-rating-controls">
+        <button class="ghost" data-rating-adj="-5">−5</button>
+        <button class="ghost" data-rating-adj="-1">−1</button>
+        <span id="thRatingValue" class="th-rating-value">—</span>
+        <button class="ghost" data-rating-adj="1">+1</button>
+        <button class="ghost" data-rating-adj="5">+5</button>
+      </div>
+    </div>
+    <div class="th-rating-row">
+      <span class="th-rating-label">Recent form</span>
+      <span id="thFormGuide"></span>
+    </div>
     <ul class="pulse-list" id="thList" style="max-height:320px;"></ul>
     <div class="modal-actions">
       <button class="ghost" id="thCloseBtn">Close</button>
@@ -609,6 +780,62 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <div class="modal-actions">
       <button class="ghost" id="leaderboardCloseBtn">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- Third-place table overlay -->
+<div class="overlay hidden" id="thirdPlaceOverlay">
+  <div class="modal leaderboard-modal">
+    <h2>Third-Place Table</h2>
+    <p class="sub" id="thirdPlaceSub">Every group's 3rd-place finisher, ranked head-to-head.</p>
+    <div class="leaderboard-scroll">
+      <table class="leaderboard-table" id="thirdPlaceTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nation</th>
+            <th>Group</th>
+            <th>P</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="thirdPlaceBody"></tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="thirdPlaceCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats & records overlay -->
+<div class="overlay hidden" id="statsOverlay">
+  <div class="modal" style="max-width:640px;">
+    <h2>Tournament Records</h2>
+    <p class="sub">Standout performances so far.</p>
+    <div id="highlightsRecap" class="highlights-recap"></div>
+    <div id="statsGrid" class="stats-grid"></div>
+    <div class="modal-actions">
+      <button class="ghost" id="statsCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bracket tree overlay -->
+<div class="overlay hidden" id="bracketOverlay">
+  <div class="modal bracket-modal">
+    <div class="watch-head" style="margin-bottom:10px;">
+      <h2>Bracket</h2>
+      <button class="ghost" id="bracketCloseBtn">Close</button>
+    </div>
+    <div id="bracketContainer"></div>
   </div>
 </div>
 
@@ -768,8 +995,48 @@ const LIVE_TACTICS = {
   allout:   {mult:2.1,  label:"All-Out Attack"}
 };
 
+/* ---- Commentary variety: small phrase pools so the feed doesn't read identically
+   every time. pick() grabs a random template and fills it in. ---- */
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+const GOAL_TEMPLATES = [
+  (team,scorer,minute)=>`⚽ GOAL! ${team} — ${scorer} (${minute}')`,
+  (team,scorer,minute)=>`⚽ ${scorer} finds the net for ${team}! (${minute}')`,
+  (team,scorer,minute)=>`⚽ ${team} strike! ${scorer} with the finish (${minute}')`,
+  (team,scorer,minute)=>`⚽ It's in! ${scorer} nets one for ${team} (${minute}')`,
+  (team,scorer,minute)=>`⚽ GOAL — ${team} through ${scorer} (${minute}')`,
+  (team,scorer,minute)=>`⚽ ${scorer} beats the keeper! ${team} score (${minute}')`,
+  (team,scorer,minute)=>`⚽ ${team} lead the celebrations — ${scorer} (${minute}')`,
+  (team,scorer,minute)=>`⚽ What a finish! ${scorer} for ${team} (${minute}')`,
+];
+function goalCommentary(teamName, scorer, minute){ return pick(GOAL_TEMPLATES)(teamName, scorer, minute); }
+
+const WIN_TEMPLATES = [
+  (w,l,s)=>`${w} beat ${l} ${s}`,
+  (w,l,s)=>`${w} see off ${l} ${s}`,
+  (w,l,s)=>`${w} get the job done against ${l}, ${s}`,
+  (w,l,s)=>`${w} edge past ${l} ${s}`,
+  (w,l,s)=>`${w} come out on top vs ${l} ${s}`,
+  (w,l,s)=>`${w} do enough to beat ${l} ${s}`,
+];
+function winCommentary(winnerName, loserName, scoreText){ return pick(WIN_TEMPLATES)(winnerName, loserName, scoreText); }
+
+const HALFTIME_TEMPLATES = [
+  (a,b,sa,sb)=>`⏸ Half-time: ${a} ${sa}-${sb} ${b}`,
+  (a,b,sa,sb)=>`⏸ The whistle goes for the break — ${a} ${sa}-${sb} ${b}`,
+  (a,b,sa,sb)=>`⏸ HT: ${a} ${sa}-${sb} ${b}`,
+  (a,b,sa,sb)=>`⏸ Sides go in level at ${sa}-${sb}, ${a} vs ${b}`,
+];
+function halftimeCommentary(aName, bName, sa, sb){
+  return pick(HALFTIME_TEMPLATES)(aName, bName, sa, sb);
+}
+
 /* ===================== STATE ===================== */
 let state = null;
+let matchUidCounter = 0;
+function makeMatch(a,b){
+  return {a, b, played:false, revealed:false, uid:matchUidCounter++};
+}
 
 function flagFor(t){
   if(t.flagOverride) return t.flagOverride;
@@ -819,6 +1086,9 @@ function seedOrder(n){
   return order;
 }
 
+function isPow2(n){ return n>0 && (n & (n-1))===0; }
+function nextPow2(n){ let p=1; while(p<n) p*=2; return p; }
+
 function buildField(size, seeded){
   const seededPool = shuffle(buildPool());
   const guestPool = shuffle(buildGuestPool());
@@ -830,7 +1100,11 @@ function buildField(size, seeded){
   let fi=0;
   while(teams.length<size){ teams.push(makeFictionalTeam(fi++)); }
 
-  if(seeded){
+  /* seedOrder's doubling bracket only makes sense for power-of-two fields (straight
+     knockout, or group formats where 2*groupCount already lands on a power of two).
+     Non-power-of-two group sizes (24, 48) get their seeding from assignGroups' own
+     pot-based logic instead, so a plain shuffle here is fine — and safe. */
+  if(seeded && isPow2(size)){
     const ranked = teams.slice().sort((a,b)=>b.rating-a.rating);
     const order = seedOrder(size);
     return order.map((seedNum,idx)=>({...ranked[seedNum-1], id:idx, players:[]}));
@@ -858,11 +1132,32 @@ function assignGroups(teams, seeded){
     const matches = [];
     for(let i=0;i<teamList.length;i++){
       for(let j=i+1;j<teamList.length;j++){
-        matches.push({a:teamList[i], b:teamList[j], played:false, revealed:false});
+        matches.push(makeMatch(teamList[i], teamList[j]));
       }
     }
     return {name:`Group ${letters[gi]||gi+1}`, teams:teamList, matches};
   });
+}
+
+/* How many 3rd-place teams (if any) need to fill out the knockout bracket, given a
+   group count that may not divide evenly into a power-of-two field (e.g. 6 groups of 4
+   gives 12 automatic qualifiers, but a clean bracket needs 16 — so the best 4 third-place
+   teams across all groups take the remaining spots, exactly like a real World Cup/Euros). */
+function computeKnockoutSize(groupCount){
+  return nextPow2(groupCount*2);
+}
+function computeThirdsNeeded(groupCount){
+  return computeKnockoutSize(groupCount) - groupCount*2;
+}
+/* Ranks 3rd-place finishers across all groups the same way group standings are ranked:
+   points, then goal difference, then goals for, then rating as a last resort. */
+function rankThirdPlacedTeams(groups){
+  const thirds = groups.map((g,gi)=>{
+    const standings = computeGroupStandings(g);
+    return {...standings[2], groupIdx:gi};
+  });
+  thirds.sort((x,y)=> y.Pts-x.Pts || (y.GF-y.GA)-(x.GF-x.GA) || y.GF-x.GF || y.team.rating-x.team.rating);
+  return thirds;
 }
 
 function computeGroupStandings(group){
@@ -1034,14 +1329,17 @@ function computeMotm(m){
 function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format){
   const teams = buildField(size, seeded);
   const isGroups = format==='groups';
+  const groupCount = isGroups ? size/4 : 0;
+  const knockoutSize = isGroups ? computeKnockoutSize(groupCount) : size;
   state = {
     size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format,
     allTeams: teams,
     phase: isGroups ? 'groups' : 'knockout',
     groups: isGroups ? assignGroups(teams, seeded) : [],
+    knockoutSize,
     round: [],
     roundIndex:0,
-    totalRounds: Math.log2(isGroups ? size/2 : size),
+    totalRounds: Math.log2(knockoutSize),
     boot:{},
     upsets:0,
     matchesPlayed:0,
@@ -1053,20 +1351,71 @@ function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, see
     prediction:null,
     followIds: new Set(),
     sortMode:'bracket',
-    leaderboardSort:{key:'gd', dir:'desc'}
+    leaderboardSort:{key:'gd', dir:'desc'},
+    searchQuery:'',
+    editDrawMode:false,
+    swapSelection:null,
+    lastUndo:null
   };
   if(!isGroups){
     const matches = [];
     for(let i=0;i<teams.length;i+=2){
-      matches.push({a:teams[i], b:teams[i+1], played:false, revealed:false});
+      matches.push(makeMatch(teams[i], teams[i+1]));
     }
     state.round = matches;
   }
   render();
 }
 
+/* ---- Undo: a single-level safety net for the last INSTANT-simulated match (Play /
+   Simulate Round / Simulate Entire Cup). Watched matches aren't covered — you sat through
+   those on purpose. Cleared whenever a round transition "locks in" results that later
+   matches may already depend on (advancing a round, crowning a champion), since undoing
+   past that point would leave the bracket referencing a team that's technically unplayed
+   again. ---- */
+function captureMatchUndo(m){
+  return {
+    m,
+    prevPlayed:m.played, prevRevealed:m.revealed, prevScoreA:m.scoreA, prevScoreB:m.scoreB,
+    prevWinner:m.winner, prevPenalties:m.penalties, prevPenA:m.penA, prevPenB:m.penB, prevEvents:m.events,
+    matchesPlayed:state.matchesPlayed, totalMatchesPlayed:state.totalMatchesPlayed, upsets:state.upsets,
+    pulses:state.pulses.slice(),
+    followIds:new Set(state.followIds),
+    suspA:state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined,
+    suspB:state.suspensions[m.b.id] ? new Set(state.suspensions[m.b.id]) : undefined,
+    matchHistoryLen:state.matchHistory.length
+  };
+}
+function applyUndo(){
+  const u = state.lastUndo;
+  if(!u) return;
+  const m = u.m;
+  if(m.events){
+    m.events.forEach(e=>{
+      const key = `${e.scorer} (${e.teamRef.name})`;
+      if(state.boot[key]){
+        state.boot[key]--;
+        if(state.boot[key]<=0) delete state.boot[key];
+      }
+    });
+  }
+  m.played=u.prevPlayed; m.revealed=u.prevRevealed; m.scoreA=u.prevScoreA; m.scoreB=u.prevScoreB;
+  m.winner=u.prevWinner; m.penalties=u.prevPenalties; m.penA=u.prevPenA; m.penB=u.prevPenB; m.events=u.prevEvents;
+  state.matchesPlayed = u.matchesPlayed;
+  state.totalMatchesPlayed = u.totalMatchesPlayed;
+  state.upsets = u.upsets;
+  state.pulses = u.pulses;
+  state.followIds = u.followIds;
+  if(u.suspA) state.suspensions[m.a.id]=u.suspA; else delete state.suspensions[m.a.id];
+  if(u.suspB) state.suspensions[m.b.id]=u.suspB; else delete state.suspensions[m.b.id];
+  state.matchHistory.length = u.matchHistoryLen;
+  state.lastUndo = null;
+  render();
+}
+
 function playMatch(m){
   if(m.played) return;
+  const undoSnapshot = captureMatchUndo(m);
   const res = simulateMatch(m.a, m.b);
   m.played = true;
   m.revealed = !state.spoilerSafe;
@@ -1092,10 +1441,12 @@ function playMatch(m){
   if(!state.spoilerSafe){
     logPulse(res, m, upset, loser);
   }
+  state.lastUndo = undoSnapshot;
 }
 
 function playGroupMatch(m, groupName){
   if(m.played) return;
+  const undoSnapshot = captureMatchUndo(m);
   const res = simulateGroupMatch(m.a, m.b);
   m.played = true;
   m.revealed = !state.spoilerSafe;
@@ -1117,6 +1468,7 @@ function playGroupMatch(m, groupName){
   } else if(!state.spoilerSafe){
     state.pulses.unshift({text:`${m.a.name} and ${m.b.name} draw ${res.scoreA}-${res.scoreB} in ${groupName}`, hot:false});
   }
+  state.lastUndo = undoSnapshot;
 }
 
 function logPulse(res, m, upset, loser){
@@ -1129,7 +1481,7 @@ function logPulse(res, m, upset, loser){
   } else if(Math.abs(res.scoreA-res.scoreB)>=3){
     msg = {text:`💥 ${res.winner.name} thrash ${loser.name} ${scoreText}`, hot:true};
   } else {
-    msg = {text:`${res.winner.name} beat ${loser.name} ${scoreText}`, hot:false};
+    msg = {text: winCommentary(res.winner.name, loser.name, scoreText), hot:false};
   }
   state.pulses.unshift(msg);
   if(state.pulses.length>40) state.pulses.pop();
@@ -1207,39 +1559,57 @@ function advanceRound(){
   }
   const matches = [];
   for(let i=0;i<winners.length;i+=2){
-    matches.push({a:winners[i], b:winners[i+1], played:false, revealed:false});
+    matches.push(makeMatch(winners[i], winners[i+1]));
   }
   state.round = matches;
   state.roundIndex++;
   state.matchesPlayed = 0;
+  state.lastUndo = null;
   render();
 }
 
-/* Pair each group winner against a runner-up from a DIFFERENT group where possible,
-   so group-mates don't immediately meet again in the knockout round. */
+/* Group winners and runners-up always qualify. If the group count doesn't divide evenly
+   into a power-of-two bracket, the best-ranked 3rd-place teams across all groups fill the
+   remaining slots — same idea as a real World Cup or Euros. Pairing then avoids putting
+   two teams from the same group together in the first knockout round wherever possible. */
 function advanceToKnockout(){
-  const winners=[], runnersUp=[];
-  state.groups.forEach(g=>{
+  const groupCount = state.groups.length;
+  const thirdsNeeded = computeThirdsNeeded(groupCount);
+
+  const qualifiers = []; // {team, groupIdx}
+  state.groups.forEach((g,gi)=>{
     const standings = computeGroupStandings(g);
-    winners.push(standings[0].team);
-    runnersUp.push({team:standings[1].team, groupIdx:state.groups.indexOf(g)});
+    qualifiers.push({team:standings[0].team, groupIdx:gi});
+    qualifiers.push({team:standings[1].team, groupIdx:gi});
   });
-  const pool = shuffle(runnersUp);
-  const used = new Set();
-  const qualifiers = [];
-  winners.forEach((w,gi)=>{
-    let pickIdx = pool.findIndex((r,ri)=>!used.has(ri) && r.groupIdx!==gi);
-    if(pickIdx===-1) pickIdx = pool.findIndex((r,ri)=>!used.has(ri));
-    used.add(pickIdx);
-    qualifiers.push(w, pool[pickIdx].team);
-  });
+
+  let bestThirds = [];
+  if(thirdsNeeded>0){
+    bestThirds = rankThirdPlacedTeams(state.groups).slice(0, thirdsNeeded);
+    bestThirds.forEach(row=> qualifiers.push({team:row.team, groupIdx:row.groupIdx}));
+    const names = bestThirds.map(r=>r.team.name).join(', ');
+    state.pulses.unshift({text:`🎟 Best third-place finishers through: ${names}`, hot:true});
+  }
+
+  // pair up qualifiers, preferring opponents from a different group
+  const pool = shuffle(qualifiers);
+  const used = new Array(pool.length).fill(false);
   const matches = [];
-  for(let i=0;i<qualifiers.length;i+=2) matches.push({a:qualifiers[i], b:qualifiers[i+1], played:false, revealed:false});
+  for(let i=0;i<pool.length;i++){
+    if(used[i]) continue;
+    used[i] = true;
+    let j = pool.findIndex((q,idx)=>!used[idx] && q.groupIdx!==pool[i].groupIdx);
+    if(j===-1) j = pool.findIndex((q,idx)=>!used[idx]);
+    used[j] = true;
+    matches.push(makeMatch(pool[i].team, pool[j].team));
+  }
+
   state.phase = 'knockout';
   state.round = matches;
   state.roundIndex = 0;
   state.totalRounds = Math.log2(qualifiers.length);
   state.matchesPlayed = 0;
+  state.lastUndo = null;
   state.pulses.unshift({text:`⚽ Group stage complete — the knockout stage begins!`, hot:true});
   render();
 }
@@ -1258,7 +1628,7 @@ function simulateEntireCup(){
     }
     const winners = state.round.map(m=>m.winner);
     const matches = [];
-    for(let i=0;i<winners.length;i+=2) matches.push({a:winners[i], b:winners[i+1], played:false, revealed:false});
+    for(let i=0;i<winners.length;i+=2) matches.push(makeMatch(winners[i], winners[i+1]));
     state.round = matches;
     state.roundIndex++;
     state.matchesPlayed = 0;
@@ -1267,6 +1637,7 @@ function simulateEntireCup(){
 
 function crownChampion(team){
   state.champion = team;
+  state.lastUndo = null;
   render();
   showChampion(team);
 }
@@ -1290,6 +1661,16 @@ const sortSelect = document.getElementById('sortSelect');
 const spectateSelect = document.getElementById('spectateSelect');
 const followingCard = document.getElementById('followingCard');
 const followingList = document.getElementById('followingList');
+const groupNav = document.getElementById('groupNav');
+const teamSearch = document.getElementById('teamSearch');
+const searchResults = document.getElementById('searchResults');
+const jumpNextBtn = document.getElementById('jumpNextBtn');
+const simUnfollowedBtn = document.getElementById('simUnfollowedBtn');
+const thirdPlaceBtn = document.getElementById('thirdPlaceBtn');
+const editDrawBtn = document.getElementById('editDrawBtn');
+const undoBtn = document.getElementById('undoBtn');
+const editDrawBanner = document.getElementById('editDrawBanner');
+const editDrawSelectionNote = document.getElementById('editDrawSelectionNote');
 const pillStyle = document.getElementById('pillStyle');
 const pillGoal = document.getElementById('pillGoal');
 const pillTactic = document.getElementById('pillTactic');
@@ -1308,8 +1689,78 @@ function suspFlag(team){
   return `<span class="susp-flag" title="Out this match: ${names.join(', ')}">🚑</span>`;
 }
 
+/* A clickable star that follows/unfollows a team directly, wherever a team name appears.
+   Always call wireFollowStars() on the containing element after inserting this markup. */
+function followStarHtml(team){
+  const following = state.followIds.has(team.id);
+  return `<span class="follow-star${following?' active':''}" data-follow-team="${team.id}" title="${following?'Unfollow':'Follow'} ${team.name}">${following?'★':'☆'}</span>`;
+}
+function wireFollowStars(container){
+  container.querySelectorAll('.follow-star').forEach(starEl=>{
+    starEl.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = +starEl.dataset.followTeam;
+      if(state.followIds.has(id)) state.followIds.delete(id);
+      else state.followIds.add(id);
+      render();
+    });
+  });
+}
+
+/* Last 5 results as compact W/D/L badges, oldest to newest left-to-right. Only counts
+   revealed matches so it never leaks a hidden spoiler-safe result. */
+function formGuide(team){
+  const entries = state.matchHistory.filter(h=>(h.m.a.id===team.id||h.m.b.id===team.id) && h.m.revealed).slice(-5);
+  if(!entries.length) return '';
+  const letters = entries.map(h=>{
+    if(!h.m.winner) return 'D';
+    return h.m.winner.id===team.id ? 'W' : 'L';
+  });
+  return `<span class="form-guide">${letters.map(l=>`<span class="form-${l.toLowerCase()}">${l}</span>`).join('')}</span>`;
+}
+
 function isFollowedMatch(m){
   return state.followIds.has(m.a.id) || state.followIds.has(m.b.id);
+}
+
+/* Manual draw editing is only allowed before a single match has been played — swapping
+   teams around mid-tournament would corrupt history and stats. */
+function canEditDraw(){
+  if(state.phase==='groups'){
+    return state.groups.every(g=>g.matches.every(m=>!m.played));
+  }
+  if(state.format==='groups') return false; // knockout bracket here came from group results
+  return state.roundIndex===0 && state.matchesPlayed===0;
+}
+
+function swapTeams(teamA, teamB){
+  if(teamA.id===teamB.id) return;
+  if(state.phase==='groups'){
+    state.groups.forEach(g=>{
+      g.teams = g.teams.map(t=> t.id===teamA.id ? teamB : t.id===teamB.id ? teamA : t);
+      g.matches.forEach(m=>{
+        if(m.a.id===teamA.id) m.a=teamB; else if(m.a.id===teamB.id) m.a=teamA;
+        if(m.b.id===teamA.id) m.b=teamB; else if(m.b.id===teamB.id) m.b=teamA;
+      });
+    });
+  } else {
+    state.round.forEach(m=>{
+      if(m.a.id===teamA.id) m.a=teamB; else if(m.a.id===teamB.id) m.a=teamA;
+      if(m.b.id===teamA.id) m.b=teamB; else if(m.b.id===teamB.id) m.b=teamA;
+    });
+  }
+}
+
+function handleSwapClick(team){
+  if(!state.swapSelection){
+    state.swapSelection = team;
+  } else if(state.swapSelection.id===team.id){
+    state.swapSelection = null;
+  } else {
+    swapTeams(state.swapSelection, team);
+    state.swapSelection = null;
+  }
+  render();
 }
 
 function getDisplayOrder(){
@@ -1342,8 +1793,10 @@ function render(){
     roundProgressLabel.textContent = `${playedGroupMatches} / ${totalGroupMatches} group matches played`;
     const pct = totalGroupMatches ? (playedGroupMatches/totalGroupMatches)*50 : 0;
     progressFill.style.width = Math.min(100,pct)+"%";
-    const totalTies = totalGroupMatches + (state.size/2 - 1);
-    fieldInfo.textContent = `${state.size} teams · ${state.groups.length} groups of 4 · ${totalTies} ties · Road to final: ${Math.round(pct)}%`;
+    const totalTies = totalGroupMatches + (state.knockoutSize - 1);
+    const thirdsNeeded = computeThirdsNeeded(state.groups.length);
+    const qualNote = thirdsNeeded>0 ? ` · top 2 + best ${thirdsNeeded} third-place teams advance` : '';
+    fieldInfo.textContent = `${state.size} teams · ${state.groups.length} groups of 4${qualNote} · ${totalTies} ties · Road to final: ${Math.round(pct)}%`;
   } else {
     const nInRound = state.round.length*2;
     roundNameEl.textContent = roundNameFor(nInRound);
@@ -1353,7 +1806,7 @@ function render(){
     const overallPct = state.format==='groups' ? 50 + knockoutPct/2 : knockoutPct;
     progressFill.style.width = Math.min(100, overallPct)+"%";
     const totalTies = state.format==='groups'
-      ? state.groups.reduce((s,g)=>s+g.matches.length,0) + (state.size/2 - 1)
+      ? state.groups.reduce((s,g)=>s+g.matches.length,0) + (state.knockoutSize - 1)
       : state.size-1;
     fieldInfo.textContent = `${state.size} teams · ${totalTies} ties · Road to final: ${Math.round(overallPct)}%`;
   }
@@ -1374,6 +1827,9 @@ function render(){
     nextRoundBtn.disabled = !canAdvanceGroups();
     const anyHidden = state.spoilerSafe && state.groups.some(g=>g.matches.some(m=>m.played && !m.revealed));
     revealAllBtn.classList.toggle('hidden', !anyHidden);
+    groupNav.classList.toggle('hidden', state.groups.length<3);
+    const anyUnfollowedUnplayed = state.followIds.size>0 && state.groups.some(g=>!isFollowedGroup(g) && g.matches.some(m=>!m.played));
+    simUnfollowedBtn.classList.toggle('hidden', !anyUnfollowedUnplayed);
   } else {
     simRoundBtn.textContent = "▶ Simulate Round";
     simRoundBtn.disabled = state.matchesPlayed===state.round.length;
@@ -1381,8 +1837,23 @@ function render(){
     nextRoundBtn.disabled = !canAdvance() || !!state.champion;
     const anyHidden = state.spoilerSafe && state.round.some(m=>m.played && !m.revealed);
     revealAllBtn.classList.toggle('hidden', !anyHidden);
+    groupNav.classList.add('hidden');
+    simUnfollowedBtn.classList.add('hidden');
   }
+  thirdPlaceBtn.classList.toggle('hidden', state.format!=='groups');
   simAllBtn.disabled = !!state.champion;
+
+  const editable = canEditDraw();
+  if(!editable && state.editDrawMode){ state.editDrawMode=false; state.swapSelection=null; }
+  editDrawBtn.classList.toggle('hidden', !editable);
+  editDrawBtn.textContent = state.editDrawMode ? '✓ Editing Draw' : '🔀 Edit Draw';
+  editDrawBanner.classList.toggle('hidden', !state.editDrawMode);
+  editDrawSelectionNote.textContent = state.swapSelection ? `Selected: ${state.swapSelection.name} — pick another team to swap with.` : 'Pick a first team.';
+
+  undoBtn.classList.toggle('hidden', !state.lastUndo);
+  if(state.lastUndo){
+    undoBtn.title = `Undo ${state.lastUndo.m.a.name} vs ${state.lastUndo.m.b.name}`;
+  }
 
   const pct2 = state.totalMatchesPlayed ? Math.round(100*state.upsets/state.totalMatchesPlayed) : 0;
   upsetPct.textContent = pct2+"%";
@@ -1439,6 +1910,12 @@ function render(){
   }
 }
 
+function matchesSearch(m){
+  if(!state.searchQuery) return false;
+  const q = state.searchQuery;
+  return m.a.name.toLowerCase().includes(q) || m.b.name.toLowerCase().includes(q);
+}
+
 function renderKnockoutFixtures(){
   fixturesList.innerHTML = "";
   getDisplayOrder().forEach(idx=>{
@@ -1446,7 +1923,8 @@ function renderKnockoutFixtures(){
     const div = document.createElement('div');
     const tag = matchTag(m);
     const isFollowed = isFollowedMatch(m);
-    div.className = 'fixture'+(isFollowed?' followed':'');
+    div.className = 'fixture'+(isFollowed?' followed':'')+(matchesSearch(m)?' search-hit':'');
+    div.dataset.matchUid = m.uid;
     const aWin = m.revealed && m.winner===m.a;
     const bWin = m.revealed && m.winner===m.b;
 
@@ -1463,18 +1941,21 @@ function renderKnockoutFixtures(){
 
     div.innerHTML = `
       ${tag ? `<span class="ribbon tag-${tag}">${TAG_LABELS[tag]}</span>` : ''}
-      <div class="side clickable" data-team="a" data-idx="${idx}">
+      <div class="side clickable${state.swapSelection && state.swapSelection.id===m.a.id?' swap-selected':''}" data-team="a" data-idx="${idx}">
         <span class="flag">${flagFor(m.a)}</span>
-        <span class="tname ${m.revealed?(aWin?'winner':'loser'):''}">${state.followIds.has(m.a.id)?'<span class="star">★</span>':''}${m.a.name}</span>${suspFlag(m.a)}
+        ${followStarHtml(m.a)}
+        <span class="tname ${m.revealed?(aWin?'winner':'loser'):''}">${m.a.name}</span>${suspFlag(m.a)}${formGuide(m.a)}
       </div>
       <div class="mid${m.revealed?' clickable':''}" data-idx="${idx}">${midHtml}</div>
-      <div class="side right clickable" data-team="b" data-idx="${idx}">
+      <div class="side right clickable${state.swapSelection && state.swapSelection.id===m.b.id?' swap-selected':''}" data-team="b" data-idx="${idx}">
         <span class="flag">${flagFor(m.b)}</span>
-        <span class="tname ${m.revealed?(bWin?'winner':'loser'):''}">${state.followIds.has(m.b.id)?'<span class="star">★</span>':''}${m.b.name}</span>${suspFlag(m.b)}
+        ${followStarHtml(m.b)}
+        <span class="tname ${m.revealed?(bWin?'winner':'loser'):''}">${m.b.name}</span>${suspFlag(m.b)}${formGuide(m.b)}
       </div>
     `;
     fixturesList.appendChild(div);
   });
+  wireFollowStars(fixturesList);
   fixturesList.querySelectorAll('.playbtn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -1498,7 +1979,9 @@ function renderKnockoutFixtures(){
   fixturesList.querySelectorAll('.side').forEach(sideEl=>{
     sideEl.addEventListener('click', ()=>{
       const m = state.round[+sideEl.dataset.idx];
-      openTeamHistory(sideEl.dataset.team==='a' ? m.a : m.b);
+      const team = sideEl.dataset.team==='a' ? m.a : m.b;
+      if(state.editDrawMode) handleSwapClick(team);
+      else openTeamHistory(team);
     });
   });
   fixturesList.querySelectorAll('.mid.clickable').forEach(midEl=>{
@@ -1510,16 +1993,53 @@ function renderKnockoutFixtures(){
   });
 }
 
+function isFollowedGroup(g){
+  return g.teams.some(t=>state.followIds.has(t.id));
+}
+
 function renderGroupsView(){
   groupsContainer.innerHTML = "";
-  state.groups.forEach((g, gi)=>{
+  const thirdsNeeded = computeThirdsNeeded(state.groups.length);
+  const bestThirdIds = thirdsNeeded>0
+    ? new Set(rankThirdPlacedTeams(state.groups).slice(0,thirdsNeeded).map(r=>r.team.id))
+    : new Set();
+
+  // group nav chips — jump straight to a group, handy once there are a lot of them
+  groupNav.innerHTML = state.groups.map((g,gi)=>
+    `<button class="group-nav-chip${isFollowedGroup(g)?' followed':''}" data-jump-group="${gi}">${g.name.replace('Group ','')}</button>`
+  ).join('');
+  groupNav.querySelectorAll('[data-jump-group]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const el = document.getElementById('group-card-'+btn.dataset.jumpGroup);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // followed groups float to the top, otherwise keep natural group order
+  const order = state.groups.map((_,gi)=>gi).sort((i,j)=>{
+    const fi = isFollowedGroup(state.groups[i]) ? 1 : 0;
+    const fj = isFollowedGroup(state.groups[j]) ? 1 : 0;
+    if(fi!==fj) return fj-fi;
+    return i-j;
+  });
+
+  order.forEach(gi=>{
+    const g = state.groups[gi];
+    if(g.collapsed===undefined){
+      g.collapsed = g.matches.every(m=>m.played && m.revealed);
+    }
     const card = document.createElement('div');
-    card.className = 'group-card';
+    card.className = 'group-card'+(isFollowedGroup(g)?' followed':'');
+    card.id = 'group-card-'+gi;
     const standings = computeGroupStandings(g);
-    const rowsHtml = standings.map((row,pos)=>`
-      <tr class="${pos<2?'qualified':''}">
-        <td class="gt-num">${pos+1}</td>
-        <td class="gt-name">${flagFor(row.team)} ${row.team.name}${suspFlag(row.team)}</td>
+    const rowsHtml = standings.map((row,pos)=>{
+      const qualified = pos<2 || (pos===2 && bestThirdIds.has(row.team.id));
+      const thirdTag = (pos===2 && qualified) ? ' <span class="best-third-tag" title="Among the best 3rd-place teams so far">★</span>' : '';
+      const qLine = (pos===2 && thirdsNeeded>0) ? ' third-line' : '';
+      return `
+      <tr class="${qualified?'qualified':''}${qLine}">
+        <td class="gt-num">${pos+1}${thirdTag}</td>
+        <td class="gt-name">${followStarHtml(row.team)}<span class="gt-name-clickable" data-team-id="${row.team.id}">${flagFor(row.team)} ${row.team.name}</span>${suspFlag(row.team)}</td>
         <td class="gt-num">${row.P}</td>
         <td class="gt-num">${row.W}</td>
         <td class="gt-num">${row.D}</td>
@@ -1528,7 +2048,12 @@ function renderGroupsView(){
         <td class="gt-num">${row.GA}</td>
         <td class="gt-num">${row.GF-row.GA}</td>
         <td class="gt-num">${row.Pts}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
+    const playedCount = g.matches.filter(m=>m.played).length;
+    const allDone = playedCount===g.matches.length;
+    const anyHiddenInGroup = state.spoilerSafe && g.matches.some(m=>m.played && !m.revealed);
+
     const fixturesHtml = g.matches.map((m,mi)=>({m,mi})).sort((x,y)=>{
       const fx = isFollowedMatch(x.m) ? 1 : 0;
       const fy = isFollowedMatch(y.m) ? 1 : 0;
@@ -1548,30 +2073,48 @@ function renderGroupsView(){
       }
       const aWin = m.revealed && m.winner===m.a;
       const bWin = m.revealed && m.winner===m.b;
-      return `<div class="group-fixture${isFollowed?' followed':''}">
+      return `<div class="group-fixture${isFollowed?' followed':''}${matchesSearch(m)?' search-hit':''}" data-match-uid="${m.uid}">
         ${tag?`<span class="ribbon tag-${tag}">${TAG_LABELS[tag]}</span>`:''}
-        <div class="side clickable" data-team="a" data-g="${gi}" data-m="${mi}">
+        <div class="side clickable${state.swapSelection && state.swapSelection.id===m.a.id?' swap-selected':''}" data-team="a" data-g="${gi}" data-m="${mi}">
           <span class="flag">${flagFor(m.a)}</span>
-          <span class="tname ${m.revealed?(aWin?'winner':'loser'):''}">${state.followIds.has(m.a.id)?'<span class="star">★</span>':''}${m.a.name}</span>
+          ${followStarHtml(m.a)}
+          <span class="tname ${m.revealed?(aWin?'winner':'loser'):''}">${m.a.name}</span>
         </div>
         <div class="mid${m.revealed?' clickable':''}" data-g="${gi}" data-m="${mi}">${midHtml}</div>
-        <div class="side right clickable" data-team="b" data-g="${gi}" data-m="${mi}">
+        <div class="side right clickable${state.swapSelection && state.swapSelection.id===m.b.id?' swap-selected':''}" data-team="b" data-g="${gi}" data-m="${mi}">
           <span class="flag">${flagFor(m.b)}</span>
-          <span class="tname ${m.revealed?(bWin?'winner':'loser'):''}">${state.followIds.has(m.b.id)?'<span class="star">★</span>':''}${m.b.name}</span>
+          ${followStarHtml(m.b)}
+          <span class="tname ${m.revealed?(bWin?'winner':'loser'):''}">${m.b.name}</span>
         </div>
       </div>`;
     }).join('');
+
     card.innerHTML = `
-      <h3>${g.name}</h3>
+      <div class="group-card-head">
+        <h3>${g.name} ${isFollowedGroup(g)?'<span class="star">★</span>':''}<span class="group-progress">${playedCount}/${g.matches.length} played</span></h3>
+        <div class="group-card-actions">
+          ${!allDone?`<button class="ghost group-sim-btn" data-g="${gi}">▶ Simulate Group</button>`:''}
+          ${anyHiddenInGroup?`<button class="ghost group-reveal-btn" data-g="${gi}">👁 Reveal Group</button>`:''}
+          <button class="ghost group-collapse-btn" data-g="${gi}">${g.collapsed?'▸ Expand':'▾ Collapse'}</button>
+        </div>
+      </div>
       <table class="group-table">
         <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
         <tbody>${rowsHtml}</tbody>
       </table>
-      <div class="group-fixtures">${fixturesHtml}</div>
+      ${thirdsNeeded>0?'<div class="qual-note">Top 2 advance automatically · 3rd place may advance — see the Third-Place Table</div>':''}
+      <div class="group-fixtures${g.collapsed?' hidden':''}">${fixturesHtml}</div>
     `;
     groupsContainer.appendChild(card);
   });
 
+  wireFollowStars(groupsContainer);
+  groupsContainer.querySelectorAll('.gt-name-clickable').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const team = state.allTeams.find(t=>t.id===+el.dataset.teamId);
+      if(team) openTeamHistory(team);
+    });
+  });
   groupsContainer.querySelectorAll('.playbtn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -1598,7 +2141,9 @@ function renderGroupsView(){
     sideEl.addEventListener('click', ()=>{
       const g = state.groups[+sideEl.dataset.g];
       const m = g.matches[+sideEl.dataset.m];
-      openTeamHistory(sideEl.dataset.team==='a' ? m.a : m.b);
+      const team = sideEl.dataset.team==='a' ? m.a : m.b;
+      if(state.editDrawMode) handleSwapClick(team);
+      else openTeamHistory(team);
     });
   });
   groupsContainer.querySelectorAll('.mid.clickable').forEach(midEl=>{
@@ -1609,6 +2154,47 @@ function renderGroupsView(){
       openMatchDetail(m, g.name);
     });
   });
+  groupsContainer.querySelectorAll('.group-sim-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      simulateGroup(+btn.dataset.g);
+    });
+  });
+  groupsContainer.querySelectorAll('.group-reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      revealGroup(+btn.dataset.g);
+    });
+  });
+  groupsContainer.querySelectorAll('.group-collapse-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const g = state.groups[+btn.dataset.g];
+      g.collapsed = !g.collapsed;
+      render();
+    });
+  });
+}
+
+function simulateGroup(gi){
+  const g = state.groups[gi];
+  g.matches.forEach(m=>{ if(!m.played) playGroupMatch(m, g.name); });
+  render();
+}
+
+function revealGroup(gi){
+  const g = state.groups[gi];
+  g.matches.forEach(m=>{ if(m.played && !m.revealed) revealMatch(m); });
+  render();
+}
+
+function simulateUnfollowedGroups(){
+  state.groups.forEach(g=>{
+    if(!isFollowedGroup(g)){
+      g.matches.forEach(m=>{ if(!m.played) playGroupMatch(m, g.name); });
+    }
+  });
+  render();
 }
 
 sortSelect.addEventListener('change', ()=>{
@@ -1673,8 +2259,22 @@ function openMatchDetail(m, roundLabel){
 document.getElementById('mdCloseBtn').addEventListener('click', ()=>matchDetailOverlay.classList.add('hidden'));
 
 function openTeamHistory(team){
+  thCurrentTeam = team;
   document.getElementById('thTitle').textContent = `${flagFor(team)} ${team.name}`;
-  const entries = state.matchHistory.filter(h=>h.m.a.id===team.id || h.m.b.id===team.id).slice(-5).reverse();
+  document.getElementById('thRatingValue').textContent = team.rating;
+  document.getElementById('thFormGuide').innerHTML = formGuide(team) || '<span style="color:var(--muted); font-size:12px;">No results yet</span>';
+  const followBtn = document.getElementById('thFollowBtn');
+  const syncFollowBtn = ()=>{
+    followBtn.textContent = state.followIds.has(team.id) ? '★ Following' : '☆ Follow this team';
+  };
+  syncFollowBtn();
+  followBtn.onclick = ()=>{
+    if(state.followIds.has(team.id)) state.followIds.delete(team.id);
+    else state.followIds.add(team.id);
+    syncFollowBtn();
+    render();
+  };
+  const entries = state.matchHistory.filter(h=>h.m.a.id===team.id || h.m.b.id===team.id).reverse();
   const listEl = document.getElementById('thList');
   if(!entries.length){
     listEl.innerHTML = `<li>No matches played yet this tournament.</li>`;
@@ -1703,6 +2303,19 @@ function openTeamHistory(team){
   teamHistoryOverlay.classList.remove('hidden');
 }
 document.getElementById('thCloseBtn').addEventListener('click', ()=>teamHistoryOverlay.classList.add('hidden'));
+
+/* team strength (rating) adjustment — the team object is shared by reference everywhere
+   (fixtures, groups, leaderboard, future match simulation), so changing it here updates
+   the whole app immediately */
+let thCurrentTeam = null;
+document.querySelectorAll('[data-rating-adj]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(!thCurrentTeam) return;
+    const delta = +btn.dataset.ratingAdj;
+    thCurrentTeam.rating = Math.max(20, Math.min(99, thCurrentTeam.rating + delta));
+    document.getElementById('thRatingValue').textContent = thCurrentTeam.rating;
+  });
+});
 
 /* ===================== LEADERBOARD ===================== */
 const leaderboardOverlay = document.getElementById('leaderboardOverlay');
@@ -1772,7 +2385,7 @@ function renderLeaderboard(){
   leaderboardBody.innerHTML = rows.map(r=>`
     <tr class="${r.statusClass==='champion'?'champion':''}">
       <td class="lb-num">${r.team.rating}</td>
-      <td class="lb-name">${flagFor(r.team)} ${r.team.name}${suspFlag(r.team)}</td>
+      <td class="lb-name">${followStarHtml(r.team)}<span class="lb-name-clickable" data-team-id="${r.team.id}">${flagFor(r.team)} ${r.team.name}</span>${suspFlag(r.team)}</td>
       <td class="lb-num">${r.played}</td>
       <td class="lb-num">${r.wins}</td>
       <td class="lb-num">${r.draws}</td>
@@ -1782,6 +2395,17 @@ function renderLeaderboard(){
       <td class="lb-num">${r.gd}</td>
       <td><span class="lb-status ${r.statusClass}">${r.status}</span></td>
     </tr>`).join('');
+
+  wireFollowStars(leaderboardBody);
+  leaderboardBody.querySelectorAll('.lb-name-clickable').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const team = state.allTeams.find(t=>t.id===+el.dataset.teamId);
+      if(team){
+        leaderboardOverlay.classList.add('hidden');
+        openTeamHistory(team);
+      }
+    });
+  });
 }
 
 document.getElementById('leaderboardBtn').addEventListener('click', ()=>{
@@ -1800,6 +2424,326 @@ document.querySelectorAll('#leaderboardTable th').forEach(th=>{
     renderLeaderboard();
   });
 });
+
+/* ===================== THIRD-PLACE TABLE ===================== */
+const thirdPlaceOverlay = document.getElementById('thirdPlaceOverlay');
+const thirdPlaceBody = document.getElementById('thirdPlaceBody');
+
+function renderThirdPlaceTable(){
+  const groupCount = state.groups.length;
+  const thirdsNeeded = computeThirdsNeeded(groupCount);
+  const thirds = rankThirdPlacedTeams(state.groups);
+  document.getElementById('thirdPlaceSub').textContent = thirdsNeeded>0
+    ? `Best ${thirdsNeeded} of ${groupCount} third-place finishers advance — ranked by points, then goal difference, then goals scored.`
+    : `This field's group count divides evenly into the bracket, so no third-place teams are needed to fill it.`;
+
+  thirdPlaceBody.innerHTML = thirds.map((row,i)=>{
+    const qualifies = i<thirdsNeeded;
+    const groupName = state.groups[row.groupIdx].name;
+    return `<tr class="${qualifies?'qualified':''}">
+      <td class="lb-num">${i+1}</td>
+      <td class="lb-name">${followStarHtml(row.team)}<span class="lb-name-clickable" data-team-id="${row.team.id}">${flagFor(row.team)} ${row.team.name}</span></td>
+      <td class="lb-num">${groupName.replace('Group ','')}</td>
+      <td class="lb-num">${row.P}</td>
+      <td class="lb-num">${row.W}</td>
+      <td class="lb-num">${row.D}</td>
+      <td class="lb-num">${row.L}</td>
+      <td class="lb-num">${row.GF}</td>
+      <td class="lb-num">${row.GA}</td>
+      <td class="lb-num">${row.GF-row.GA}</td>
+      <td class="lb-num">${row.Pts}</td>
+      <td><span class="lb-status ${qualifies?'alive':'out'}">${qualifies?'Qualifying':'Short'}</span></td>
+    </tr>`;
+  }).join('');
+
+  wireFollowStars(thirdPlaceBody);
+  thirdPlaceBody.querySelectorAll('.lb-name-clickable').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const team = state.allTeams.find(t=>t.id===+el.dataset.teamId);
+      if(team){
+        thirdPlaceOverlay.classList.add('hidden');
+        openTeamHistory(team);
+      }
+    });
+  });
+}
+
+document.getElementById('thirdPlaceBtn').addEventListener('click', ()=>{
+  renderThirdPlaceTable();
+  thirdPlaceOverlay.classList.remove('hidden');
+});
+document.getElementById('thirdPlaceCloseBtn').addEventListener('click', ()=>thirdPlaceOverlay.classList.add('hidden'));
+
+/* ===================== BRACKET TREE VIEW ===================== */
+const bracketOverlay = document.getElementById('bracketOverlay');
+const bracketContainer = document.getElementById('bracketContainer');
+
+/* Builds every knockout round from round index 0 up to the final, purely from
+   state.totalRounds/knockoutSize — so it works identically whether we're still in the
+   group stage (everything shows as TBD), mid-knockout (past rounds filled in from
+   matchHistory, current round live, future rounds TBD), or fully finished. */
+function buildBracketRounds(){
+  const rounds = [];
+  const effectiveRoundIndex = state.phase==='groups' ? -1 : state.roundIndex;
+  for(let r=0; r<state.totalRounds; r++){
+    const teams = state.knockoutSize / Math.pow(2, r);
+    const label = roundNameFor(teams);
+    if(r < effectiveRoundIndex){
+      const matches = state.matchHistory.filter(h=>h.roundLabel===label && !h.roundLabel.startsWith('Group ')).map(h=>h.m);
+      rounds.push({label, matches});
+    } else if(r === effectiveRoundIndex){
+      rounds.push({label, matches: state.round.slice()});
+    } else {
+      rounds.push({label, matches: Array(teams/2).fill(null)});
+    }
+  }
+  return rounds;
+}
+
+function renderBracketMatch(m, roundLabel){
+  if(!m){
+    return `<div class="bracket-match tbd">
+      <div class="bm-team"><span class="bm-name">TBD</span></div>
+      <div class="bm-team"><span class="bm-name">TBD</span></div>
+    </div>`;
+  }
+  const aWin = m.revealed && m.winner===m.a;
+  const bWin = m.revealed && m.winner===m.b;
+  const scoreA = m.revealed ? m.scoreA : (m.played ? '?' : '');
+  const scoreB = m.revealed ? m.scoreB : (m.played ? '?' : '');
+  return `<div class="bracket-match${m.revealed?' clickable':''}" data-match-uid="${m.uid}" data-round-label="${roundLabel}">
+    <div class="bm-team ${m.revealed?(aWin?'winner':'loser'):''}">
+      ${followStarHtml(m.a)}<span class="bm-name" data-team-id="${m.a.id}">${flagFor(m.a)} ${m.a.name}</span><span class="bm-score">${scoreA}</span>
+    </div>
+    <div class="bm-team ${m.revealed?(bWin?'winner':'loser'):''}">
+      ${followStarHtml(m.b)}<span class="bm-name" data-team-id="${m.b.id}">${flagFor(m.b)} ${m.b.name}</span><span class="bm-score">${scoreB}</span>
+    </div>
+  </div>`;
+}
+
+function renderBracketView(){
+  const rounds = buildBracketRounds();
+  const uidMap = {};
+  bracketContainer.innerHTML = `<div class="bracket-wrap">${rounds.map(rnd=>{
+    const matchesHtml = rnd.matches.map(m=>{
+      if(m) uidMap[m.uid] = m;
+      return renderBracketMatch(m, rnd.label);
+    }).join('');
+    return `<div class="bracket-round">
+      <div class="bracket-round-title">${rnd.label}</div>
+      ${matchesHtml}
+    </div>`;
+  }).join('')}</div>`;
+
+  wireFollowStars(bracketContainer);
+  bracketContainer.querySelectorAll('.bm-name').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const team = state.allTeams.find(t=>t.id===+el.dataset.teamId);
+      if(team) openTeamHistory(team);
+    });
+  });
+  bracketContainer.querySelectorAll('.bracket-match[data-match-uid]').forEach(boxEl=>{
+    boxEl.addEventListener('click', (e)=>{
+      if(e.target.closest('.follow-star') || e.target.closest('.bm-name')) return;
+      const m = uidMap[+boxEl.dataset.matchUid];
+      if(m && m.revealed) openMatchDetail(m, boxEl.dataset.roundLabel);
+    });
+  });
+}
+
+document.getElementById('bracketBtn').addEventListener('click', ()=>{
+  renderBracketView();
+  bracketOverlay.classList.remove('hidden');
+});
+document.getElementById('bracketCloseBtn').addEventListener('click', ()=>bracketOverlay.classList.add('hidden'));
+
+/* ===================== STATS & RECORDS ===================== */
+const statsOverlay = document.getElementById('statsOverlay');
+const statsGrid = document.getElementById('statsGrid');
+
+function computeTournamentStats(){
+  const history = state.matchHistory.filter(h=>h.m.played);
+  if(!history.length) return null;
+
+  let biggestWin=null, highestScoring=null, biggestUpset=null;
+  const goalsFor={}, goalsAgainst={}, cleanSheets={}, played={}, resultsSeq={};
+
+  history.forEach(h=>{
+    const m = h.m;
+    const margin = Math.abs(m.scoreA-m.scoreB);
+    const total = m.scoreA+m.scoreB;
+    if(m.winner && (!biggestWin || margin>biggestWin.margin)){
+      biggestWin = {margin, m, roundLabel:h.roundLabel};
+    }
+    if(!highestScoring || total>highestScoring.total){
+      highestScoring = {total, m, roundLabel:h.roundLabel};
+    }
+    if(m.winner){
+      const loser = m.winner===m.a?m.b:m.a;
+      const gap = loser.rating - m.winner.rating;
+      if(gap>0 && (!biggestUpset || gap>biggestUpset.gap)){
+        biggestUpset = {gap, m, roundLabel:h.roundLabel, winner:m.winner, loser};
+      }
+    }
+    [[m.a,m.scoreA,m.scoreB],[m.b,m.scoreB,m.scoreA]].forEach(([team,gf,ga])=>{
+      goalsFor[team.id]=(goalsFor[team.id]||0)+gf;
+      goalsAgainst[team.id]=(goalsAgainst[team.id]||0)+ga;
+      played[team.id]=(played[team.id]||0)+1;
+      if(ga===0) cleanSheets[team.id]=(cleanSheets[team.id]||0)+1;
+      if(!resultsSeq[team.id]) resultsSeq[team.id]=[];
+      let result = !m.winner ? 'D' : (m.winner.id===team.id ? 'W' : 'L');
+      resultsSeq[team.id].push(result);
+    });
+  });
+
+  const teamById = id => state.allTeams.find(t=>t.id===+id);
+
+  const topScorerEntry = Object.entries(goalsFor).sort((a,b)=>b[1]-a[1])[0];
+
+  /* Best defense uses goals-conceded PER MATCH, not the raw total — otherwise a team
+     knocked out after 2 matches with 1 goal against looks "better" than a side that
+     went 6 matches deep conceding just 4, purely because they played less football.
+     Require a minimum sample size, falling back only if the field is too small/early
+     to have any team clear that bar yet. */
+  const defenseList = Object.entries(goalsAgainst).map(([id,ga])=>({id, ga, p:played[id], avg:ga/played[id]}));
+  let minPlayed = 3;
+  let defensePool = defenseList.filter(e=>e.p>=minPlayed);
+  if(!defensePool.length){ minPlayed=2; defensePool = defenseList.filter(e=>e.p>=minPlayed); }
+  if(!defensePool.length){ minPlayed=1; defensePool = defenseList.filter(e=>e.p>=minPlayed); }
+  defensePool.sort((a,b)=> a.avg-b.avg || b.p-a.p);
+  const bestDefenseEntry = defensePool[0];
+
+  const cleanSheetEntry = Object.entries(cleanSheets).sort((a,b)=>b[1]-a[1])[0];
+
+  let longestStreak = {teamId:null, length:0};
+  Object.entries(resultsSeq).forEach(([id,seq])=>{
+    let cur=0, best=0;
+    seq.forEach(r=>{ if(r==='W'){ cur++; best=Math.max(best,cur); } else cur=0; });
+    if(best>longestStreak.length) longestStreak = {teamId:id, length:best};
+  });
+
+  return {
+    biggestWin, highestScoring, biggestUpset,
+    topScorer: topScorerEntry ? {team:teamById(topScorerEntry[0]), goals:topScorerEntry[1]} : null,
+    bestDefense: bestDefenseEntry ? {team:teamById(bestDefenseEntry.id), conceded:bestDefenseEntry.ga, played:bestDefenseEntry.p, avg:bestDefenseEntry.avg} : null,
+    cleanSheets: cleanSheetEntry ? {team:teamById(cleanSheetEntry[0]), count:cleanSheetEntry[1]} : null,
+    longestStreak: longestStreak.teamId!=null ? {team:teamById(longestStreak.teamId), length:longestStreak.length} : null
+  };
+}
+
+/* Stitches the same underlying stats into a short readable recap instead of raw cards —
+   a quick "story so far" rather than a table to parse. */
+function generateHighlightsRecap(){
+  const totalPlayed = state.matchHistory.filter(h=>h.m.played).length;
+  if(!totalPlayed) return null;
+  const stats = computeTournamentStats();
+  const lines = [];
+
+  lines.push(`${totalPlayed} match${totalPlayed===1?'':'es'} played so far${state.champion?', and a champion has been crowned.':'.'}`);
+
+  if(stats.biggestUpset){
+    lines.push(`The biggest shock came when ${stats.biggestUpset.winner.name} stunned ${stats.biggestUpset.loser.name} in the ${stats.biggestUpset.roundLabel}.`);
+  }
+  if(stats.biggestWin){
+    const m = stats.biggestWin.m;
+    const loserName = m.winner===m.a ? m.b.name : m.a.name;
+    lines.push(`${m.winner.name} delivered the heaviest beating of the tournament, putting ${stats.biggestWin.margin} past ${loserName} (${stats.biggestWin.roundLabel}).`);
+  }
+  if(stats.topScorer){
+    lines.push(`${stats.topScorer.team.name} have been the most potent attack, with ${stats.topScorer.goals} goals scored.`);
+  }
+  if(stats.longestStreak && stats.longestStreak.length>1){
+    lines.push(`${stats.longestStreak.team.name} are riding the tournament's longest winning streak at ${stats.longestStreak.length} straight wins.`);
+  }
+
+  if(state.followIds.size){
+    const followedTeams = Array.from(state.followIds).map(id=>state.allTeams.find(t=>t.id===id)).filter(Boolean);
+    if(followedTeams.length){
+      const aliveCount = followedTeams.filter(t=>{
+        if(state.champion) return state.champion.id===t.id;
+        if(state.phase==='knockout') return state.round.some(m=>m.a.id===t.id||m.b.id===t.id);
+        return state.groups.some(g=>g.teams.some(x=>x.id===t.id)); // groups: everyone "alive" until knockout
+      }).length;
+      lines.push(`Following ${followedTeams.map(t=>t.name).join(', ')} — ${aliveCount} of ${followedTeams.length} still alive.`);
+    }
+  }
+
+  if(state.champion){
+    lines.push(`<span class="hr-champ">🏆 ${state.champion.name} are the champions.</span>`);
+  }
+
+  return lines;
+}
+
+function renderStats(){
+  const recap = generateHighlightsRecap();
+  const recapEl = document.getElementById('highlightsRecap');
+  recapEl.innerHTML = recap ? recap.map(l=>`<p>${l}</p>`).join('') : `<p>No matches played yet — the story starts once the action does.</p>`;
+
+  const stats = computeTournamentStats();
+  if(!stats){
+    statsGrid.innerHTML = `<div class="stats-empty">No matches played yet — records will appear here once the action starts.</div>`;
+    return;
+  }
+  const cards = [];
+  if(stats.biggestWin){
+    const m = stats.biggestWin.m;
+    cards.push({label:'Biggest Win Margin', value:`${stats.biggestWin.margin} goals`,
+      sub:`${m.winner.name} ${m.scoreA}-${m.scoreB} ${m.winner===m.a?m.b.name:m.a.name} (${stats.biggestWin.roundLabel})`});
+  }
+  if(stats.highestScoring){
+    const m = stats.highestScoring.m;
+    cards.push({label:'Highest-Scoring Match', value:`${stats.highestScoring.total} goals`,
+      sub:`${m.a.name} ${m.scoreA}-${m.scoreB} ${m.b.name} (${stats.highestScoring.roundLabel})`});
+  }
+  if(stats.biggestUpset){
+    cards.push({label:'Biggest Upset', value:`${stats.biggestUpset.gap}pt gap`,
+      sub:`${stats.biggestUpset.winner.name} beat ${stats.biggestUpset.loser.name} (${stats.biggestUpset.roundLabel})`});
+  }
+  if(stats.topScorer){
+    cards.push({label:'Most Team Goals', value:`${stats.topScorer.goals} goals`,
+      sub:`${flagFor(stats.topScorer.team)} ${stats.topScorer.team.name}`});
+  }
+  if(stats.bestDefense){
+    cards.push({label:'Best Defensive Record', value:`${stats.bestDefense.avg.toFixed(2)}/match`,
+      sub:`${flagFor(stats.bestDefense.team)} ${stats.bestDefense.team.name} — ${stats.bestDefense.conceded} conceded in ${stats.bestDefense.played} matches`});
+  }
+  if(stats.cleanSheets){
+    cards.push({label:'Most Clean Sheets', value:`${stats.cleanSheets.count}`,
+      sub:`${flagFor(stats.cleanSheets.team)} ${stats.cleanSheets.team.name}`});
+  }
+  if(stats.longestStreak && stats.longestStreak.length>1){
+    cards.push({label:'Longest Win Streak', value:`${stats.longestStreak.length} in a row`,
+      sub:`${flagFor(stats.longestStreak.team)} ${stats.longestStreak.team.name}`});
+  }
+  statsGrid.innerHTML = cards.map(c=>`
+    <div class="stat-card">
+      <div class="stat-label">${c.label}</div>
+      <div class="stat-value">${c.value}</div>
+      <div class="stat-sub">${c.sub}</div>
+    </div>`).join('');
+}
+
+document.getElementById('statsBtn').addEventListener('click', ()=>{
+  renderStats();
+  statsOverlay.classList.remove('hidden');
+});
+document.getElementById('statsCloseBtn').addEventListener('click', ()=>statsOverlay.classList.add('hidden'));
+
+/* ===================== DRAW EDITING ===================== */
+editDrawBtn.addEventListener('click', ()=>{
+  state.editDrawMode = !state.editDrawMode;
+  state.swapSelection = null;
+  render();
+});
+document.getElementById('editDrawDoneBtn').addEventListener('click', ()=>{
+  state.editDrawMode = false;
+  state.swapSelection = null;
+  render();
+});
+
+undoBtn.addEventListener('click', applyUndo);
 
 /* ===================== LIVE WATCH ENGINE ===================== */
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
@@ -1983,7 +2927,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     if(ev.teamRef===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
     matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer});
-    addFeed(`⚽ GOAL! ${ev.teamRef.name} — ${scorer} (${ev.minute}')`, true);
+    addFeed(goalCommentary(ev.teamRef.name, scorer, ev.minute), true);
   }
   function maybeDrama(){
     if(Math.random()>=0.025) return;
@@ -2038,7 +2982,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   await playHalf([...h1EventsA,...h1EventsB], 1, 45+stoppage1);
 
   phaseEl.textContent = "Half-time";
-  addFeed(`⏸ Half-time: ${m.a.name} ${liveScoreA}-${liveScoreB} ${m.b.name}`, false);
+  addFeed(halftimeCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false);
   await wait(400);
 
   phaseEl.textContent = "2nd half";
@@ -2129,7 +3073,7 @@ function wireOptRow(rowId, dataAttr, onPick){
   });
 }
 wireOptRow('sizeRow','size', v=>pendingSize=+v);
-wireOptRow('formatRow','format', v=>pendingFormat=v);
+wireOptRow('formatRow','format', v=>{ pendingFormat=v; updateSizeOptionsForFormat(); });
 wireOptRow('seedingRow','seeding', v=>pendingSeeding=v);
 wireOptRow('styleRow','style', v=>pendingStyle=v);
 wireOptRow('goalRow','goal', v=>pendingGoal=v);
@@ -2139,11 +3083,26 @@ wireOptRow('dramaRow','drama', v=>pendingDrama=v);
 wireOptRow('spoilerRow','spoiler', v=>pendingSpoiler=v);
 wireOptRow('namesRow','names', v=>pendingNames=v);
 
+/* 24 and 48 team fields only make sense for Groups + Knockout (they need best-third-place
+   qualifiers to reach a clean bracket size) — hide them, and back out of them, for Straight
+   Knockout since that format needs a plain power-of-two field. */
+function updateSizeOptionsForFormat(){
+  document.querySelectorAll('#sizeRow .opt[data-groups-only]').forEach(opt=>{
+    opt.style.display = pendingFormat==='groups' ? '' : 'none';
+  });
+  if(pendingFormat!=='groups' && (pendingSize===24 || pendingSize===48 || pendingSize===384)){
+    pendingSize = 64;
+    document.querySelectorAll('#sizeRow .opt').forEach(o=>o.classList.remove('active'));
+    document.querySelector('#sizeRow .opt[data-size="64"]').classList.add('active');
+  }
+}
+
 document.getElementById('newTournamentBtn').addEventListener('click', ()=>{
   document.getElementById('modalTitle').textContent = "New Tournament";
   document.getElementById('sizeField').style.display = "";
   document.getElementById('formatField').style.display = "";
   document.getElementById('seedingField').style.display = "";
+  updateSizeOptionsForFormat();
   setupOverlay.classList.remove('hidden');
 });
 document.getElementById('settingsBtn').addEventListener('click', ()=>{
@@ -2194,6 +3153,76 @@ spectateSelect.addEventListener('change', ()=>{
   }
   render();
 });
+
+/* search highlights matching teams across the current view, and offers a quick-follow
+   dropdown so finding a specific nation among hundreds doesn't mean scrolling a <select> */
+function renderSearchResults(){
+  const q = state.searchQuery;
+  if(!q){ searchResults.classList.add('hidden'); searchResults.innerHTML=''; return; }
+  const matches = state.allTeams.filter(t=>t.name.toLowerCase().includes(q)).slice(0,8);
+  if(!matches.length){
+    searchResults.innerHTML = `<div class="search-results-empty">No nations match "${teamSearch.value}"</div>`;
+    searchResults.classList.remove('hidden');
+    return;
+  }
+  searchResults.innerHTML = matches.map(t=>{
+    const following = state.followIds.has(t.id);
+    return `<div class="search-result-row">
+      <span class="sr-name">${flagFor(t)} ${t.name}</span>
+      <button class="ghost" data-follow-toggle="${t.id}">${following?'★ Following':'☆ Follow'}</button>
+    </div>`;
+  }).join('');
+  searchResults.classList.remove('hidden');
+  searchResults.querySelectorAll('[data-follow-toggle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = +btn.dataset.followToggle;
+      if(state.followIds.has(id)) state.followIds.delete(id);
+      else state.followIds.add(id);
+      render();
+      renderSearchResults();
+    });
+  });
+}
+teamSearch.addEventListener('input', ()=>{
+  state.searchQuery = teamSearch.value.trim().toLowerCase();
+  render();
+  renderSearchResults();
+});
+teamSearch.addEventListener('focus', ()=>{
+  if(state.searchQuery) renderSearchResults();
+});
+teamSearch.addEventListener('blur', ()=>{
+  setTimeout(()=>searchResults.classList.add('hidden'), 150);
+});
+
+/* jump straight to the next unplayed match for any followed team */
+function jumpToNextFollowedMatch(){
+  let target = null;
+  if(state.phase==='groups'){
+    outer: for(const g of state.groups){
+      for(const m of g.matches){
+        if(!m.played && isFollowedMatch(m)){ target = m; break outer; }
+      }
+    }
+  } else {
+    target = state.round.find(m=>!m.played && isFollowedMatch(m));
+  }
+  if(!target){
+    state.pulses.unshift({text:'⭐ No unplayed matches for your followed teams right now.', hot:false});
+    render();
+    return;
+  }
+  const el = document.querySelector(`[data-match-uid="${target.uid}"]`);
+  if(el){
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.classList.add('jump-highlight');
+    setTimeout(()=>el.classList.remove('jump-highlight'), 1600);
+  }
+}
+jumpNextBtn.addEventListener('click', jumpToNextFollowedMatch);
+
+/* simulate every group that doesn't contain a followed team, leaving the rest for you */
+simUnfollowedBtn.addEventListener('click', simulateUnfollowedGroups);
 
 /* fullscreen toggle */
 document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
