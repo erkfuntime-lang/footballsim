@@ -129,6 +129,8 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .playbtn, .revealbtn, .watchbtn{font-size:11px; padding:6px 10px; margin:2px;}
 .watchbtn{background:var(--turf); border-color:var(--win); color:var(--win);}
 .watchbtn:hover{background:#132447;}
+.undobtn{font-size:10.5px !important; padding:5px 9px !important; margin-top:6px !important; border-color:var(--flare) !important; color:var(--flare) !important;}
+.undobtn:hover{background:rgba(239,61,84,.12) !important;}
 
 /* ---------- live watch modal ---------- */
 .watch-modal{max-width:1120px; width:94vw; max-height:94vh; display:flex; flex-direction:column;}
@@ -165,6 +167,15 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .watch-actions button{flex:1;}
 .vs-label{font-family:'Space Mono'; color:var(--muted); font-size:12px;}
 .hidden-score{font-family:'Space Mono'; color:var(--muted); font-size:18px; letter-spacing:.3em;}
+
+.momentum-wrap{margin-bottom:14px; flex-shrink:0;}
+.momentum-labels{display:flex; justify-content:space-between; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--chalk-dim); margin-bottom:5px;}
+.momentum-center-label{color:var(--muted);}
+.momentum-track{position:relative; height:10px; border-radius:6px; overflow:hidden; background:var(--turf-light); border:1px solid var(--line); display:flex;}
+.momentum-fill-a{background:linear-gradient(90deg,#ff8a6b,var(--flare)); height:100%; transition:width .6s ease;}
+.momentum-fill-b{background:linear-gradient(90deg,var(--win),#6ba2ff); height:100%; transition:width .6s ease;}
+.live-stats-row{display:flex; justify-content:space-between; align-items:center; font-family:'Space Mono'; font-size:12.5px; color:var(--chalk-dim); margin-top:6px;}
+.live-stats-label{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-family:'Inter';}
 
 .godmode-panel{
   background:var(--turf-light); border:1px solid #b23bff; border-radius:10px; padding:12px 14px; margin-bottom:14px;
@@ -236,7 +247,7 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .modal-actions button{flex:1;}
 
 /* champion screen */
-.champion-card{text-align:center; padding:40px 20px;}
+.champion-card{text-align:center; padding:40px 20px; position:relative; overflow:hidden;}
 .champion-card .trophy{font-size:56px;}
 .champion-card .flag-big{font-size:64px; margin:14px 0;}
 .champion-card h2{font-size:30px; margin-bottom:4px;}
@@ -448,6 +459,38 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .th-rating-controls button{padding:5px 9px; font-size:11px;}
 .th-rating-value{font-family:'Space Mono'; font-size:17px; font-weight:700; color:var(--amber); min-width:28px; text-align:center;}
 
+.th-squad-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+.th-squad-hint{font-size:10.5px; color:var(--muted); font-style:italic;}
+.th-squad-list{display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-height:220px; overflow-y:auto;}
+.th-player-row{
+  display:flex; align-items:center; gap:8px; background:var(--turf-light); border:1px solid var(--line);
+  border-radius:8px; padding:7px 10px; font-size:12.5px;
+}
+.th-player-pos-select{
+  font-family:'Space Mono'; font-size:10px; font-weight:700; letter-spacing:.03em; color:#06101f;
+  background:var(--chalk-dim); border:none; border-radius:4px; padding:3px 4px; flex-shrink:0; width:46px;
+  text-align:center; cursor:pointer; -webkit-appearance:none; appearance:none;
+}
+.th-player-pos-select.pos-fw{background:var(--flare); color:#170609;}
+.th-player-pos-select.pos-st{background:#ffcf3f; color:#170609;}
+.th-player-pos-select.pos-mf{background:var(--amber); color:#06101f;}
+.th-player-pos-select.pos-df{background:var(--win); color:#06101f;}
+.th-player-pos-select.pos-gk{background:#b23bff; color:#f6ecff;}
+.th-player-name-input{
+  flex:1; min-width:0; background:transparent; border:1px solid transparent; border-radius:4px;
+  color:var(--chalk); font-family:'Inter'; font-size:12.5px; padding:3px 5px;
+}
+.th-player-name-input:hover{border-color:var(--line);}
+.th-player-name-input:focus{outline:none; border-color:var(--amber); background:var(--turf);}
+.th-player-rating.god{color:#ffcf3f; text-shadow:0 0 6px rgba(255,207,63,.6);}
+.th-player-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.th-player-number{font-family:'Space Mono'; color:var(--muted); font-size:11px; flex-shrink:0;}
+.th-player-rating-controls{display:flex; align-items:center; gap:3px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end;}
+.th-player-rating-btn{padding:2px 6px !important; font-size:10.5px !important; min-width:0;}
+.th-player-rating{font-family:'Space Mono'; font-weight:700; color:var(--amber); flex-shrink:0; min-width:20px; text-align:center;}
+.th-player-row.suspended{opacity:.55;}
+.th-player-row .th-player-susp{font-size:10.5px; flex-shrink:0;}
+
 footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; letter-spacing:.03em;}
 </style>
 </head>
@@ -476,13 +519,13 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <button id="revealAllBtn" class="hidden">👁 Reveal All</button>
     <button id="nextRoundBtn" disabled>Advance to Next Round →</button>
     <button class="ghost hidden" id="editDrawBtn">🔀 Edit Draw</button>
-    <button class="ghost hidden" id="undoBtn">↩ Undo Last Match</button>
     <div class="spacer"></div>
     <button class="ghost hidden" id="thirdPlaceBtn">🥉 Third-Place Table</button>
     <button class="ghost" id="leaderboardBtn">🏅 Leaderboard</button>
     <button class="ghost" id="statsBtn">📊 Stats & Records</button>
     <button class="ghost" id="bracketBtn">🏆 Bracket View</button>
     <button class="ghost" id="predictBtn">🔮 Predict Champion</button>
+    <button class="ghost" id="customTeamsBtn">👤 Custom Teams</button>
     <button class="ghost" id="fullscreenBtn">⛶ Fullscreen</button>
     <button class="ghost" id="settingsBtn">⚙ Settings</button>
     <button class="ghost" id="newTournamentBtn">↻ New Tournament</button>
@@ -632,6 +675,15 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
       <div class="hint">With extra time on, level knockout matches play two 15-minute periods before any shootout.</div>
     </div>
 
+    <div class="field" id="goldenGoalField" style="display:none;">
+      <label>Extra time format</label>
+      <div class="opt-row" id="goldenGoalRow">
+        <div class="opt active" data-goldengoal="off">Full 30 Minutes</div>
+        <div class="opt" data-goldengoal="on">Golden Goal (Sudden Death)</div>
+      </div>
+      <div class="hint">Golden Goal ends extra time the instant either side scores — old-school sudden death drama instead of playing out the full 30.</div>
+    </div>
+
     <div class="field">
       <label>Match drama</label>
       <div class="opt-row" id="dramaRow">
@@ -639,6 +691,16 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
         <div class="opt" data-drama="on">Cards &amp; Niggles</div>
       </div>
       <div class="hint">Adds flavor moments — bookings, knocks, animated benches — to the live feed while watching. Cosmetic only.</div>
+    </div>
+
+    <div class="field">
+      <label>Chaos sensitivity</label>
+      <div class="opt-row" id="chaosRow">
+        <div class="opt" data-chaos="strict">Strict</div>
+        <div class="opt active" data-chaos="normal">Normal</div>
+        <div class="opt" data-chaos="loose">Loose</div>
+      </div>
+      <div class="hint">Controls how big a rating gap counts as an "upset" or "shocker" tag — Strict only flags the biggest gaps, Loose flags almost any lower-rated win.</div>
     </div>
 
     <div class="field">
@@ -681,9 +743,35 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
   </div>
 </div>
 
+<!-- Custom teams overlay -->
+<div class="overlay hidden" id="customTeamsOverlay">
+  <div class="modal">
+    <h2>Custom Teams</h2>
+    <p class="sub">Add your own fictional nations — they're guaranteed a spot in your next tournament (space permitting), ahead of the built-in field.</p>
+    <div id="customTeamsList" style="margin-bottom:18px;"></div>
+    <div class="field">
+      <label>Team name</label>
+      <input type="text" id="customTeamName" placeholder="e.g. Atlantis" style="width:100%; padding:10px; background:var(--turf-light); border:1px solid var(--line); border-radius:6px; color:var(--chalk); font-family:'Inter';">
+    </div>
+    <div class="field">
+      <label>Flag (paste any emoji)</label>
+      <input type="text" id="customTeamFlag" placeholder="🏳️" style="width:100%; padding:10px; background:var(--turf-light); border:1px solid var(--line); border-radius:6px; color:var(--chalk); font-family:'Inter';">
+    </div>
+    <div class="field">
+      <label>Strength rating: <span id="customTeamRatingLabel">70</span></label>
+      <input type="range" id="customTeamRating" min="30" max="99" value="70" style="width:100%;">
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="customTeamsCloseBtn">Close</button>
+      <button class="primary" id="addCustomTeamBtn">+ Add Team</button>
+    </div>
+  </div>
+</div>
+
 <!-- Champion overlay -->
 <div class="overlay hidden" id="championOverlay">
   <div class="modal champion-card">
+    <canvas id="confettiCanvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></canvas>
     <div class="trophy">🏆</div>
     <div class="flag-big" id="champFlag">🏳️</div>
     <h2 id="champName">—</h2>
@@ -742,11 +830,20 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
         <button class="ghost" data-rating-adj="5">+5</button>
       </div>
     </div>
+    <div class="th-rating-row" id="thEffectiveRow" style="display:none;">
+      <span class="th-rating-label">Effective strength <span style="font-style:italic; color:var(--muted);">(w/ star player)</span></span>
+      <span id="thEffectiveValue" class="th-rating-value" style="color:#ffcf3f;">—</span>
+    </div>
     <div class="th-rating-row">
       <span class="th-rating-label">Recent form</span>
       <span id="thFormGuide"></span>
     </div>
-    <ul class="pulse-list" id="thList" style="max-height:320px;"></ul>
+    <div class="th-squad-head">
+      <span class="th-rating-label">Squad</span>
+      <span class="th-squad-hint">Sorted by rating · GK rating cuts goals conceded</span>
+    </div>
+    <div id="thSquadList" class="th-squad-list"></div>
+    <ul class="pulse-list" id="thList" style="max-height:280px;"></ul>
     <div class="modal-actions">
       <button class="ghost" id="thCloseBtn">Close</button>
     </div>
@@ -858,6 +955,40 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
       <div class="watch-side">
         <div class="wflag" id="watchFlagB">🏳️</div>
         <div class="wname" id="watchNameB">—</div>
+      </div>
+    </div>
+    <div class="momentum-wrap">
+      <div class="momentum-labels">
+        <span id="momentumLabelA">Team A</span>
+        <span class="momentum-center-label">MOMENTUM</span>
+        <span id="momentumLabelB">Team B</span>
+      </div>
+      <div class="momentum-track">
+        <div class="momentum-fill-a" id="momentumFillA"></div>
+        <div class="momentum-fill-b" id="momentumFillB"></div>
+      </div>
+      <div class="momentum-labels" style="margin-top:9px;">
+        <span id="possessionLabelA">50%</span>
+        <span class="momentum-center-label">POSSESSION</span>
+        <span id="possessionLabelB">50%</span>
+      </div>
+      <div class="momentum-track">
+        <div class="momentum-fill-a" id="possessionFillA"></div>
+        <div class="momentum-fill-b" id="possessionFillB"></div>
+      </div>
+      <div class="live-stats-row">
+        <span id="shotsA">0 (0)</span>
+        <span class="live-stats-label">SHOTS (ON TARGET)</span>
+        <span id="shotsB">0 (0)</span>
+      </div>
+      <div class="momentum-labels" style="margin-top:9px;">
+        <span id="winProbLabelA">50%</span>
+        <span class="momentum-center-label">WIN PROBABILITY</span>
+        <span id="winProbLabelB">50%</span>
+      </div>
+      <div class="momentum-track">
+        <div class="momentum-fill-a" id="winProbFillA"></div>
+        <div class="momentum-fill-b" id="winProbFillB"></div>
       </div>
     </div>
     <div class="godmode-panel" id="godmodePanel">
@@ -974,6 +1105,99 @@ const GUEST_FLAGS = ["🏳️","🚩","🎌","🏴","🏁"];
 const FIRST_NAMES = ["Kael","Marco","Diego","Nnamdi","Jonas","Rui","Milo","Enzo","Tade","Bruno","Vik","Rafa","Tomo","Aro","Sami","Luca","Denis","Yusuf","Omar","Theo","Erik","Ivo","Dario","Petar","Nico"];
 const LAST_NAMES = ["Reyes","Kovač","Adeyemi","Halvorsen","Ferreira","Okonkwo","Bramante","Ilić","Castillo","Vranić","Sato","Mensah","Delgado","Furuya","Havránek","Onwuka","Yalcin","Berisha","Tanaka","Sørensen"];
 
+/* ---- Region-based squad name pools -----------------------------------------------
+   Every squad is fictional — these are nationality-flavored name pools, not real
+   professional footballers, so a random draw never puts a real person's name on a
+   simulated scoresheet. GLOBAL is the fallback for any code without a specific pool
+   (guest nations we didn't map, and fully fictional 256+ field-filler teams). ---- */
+const REGION_NAMES = {
+  GLOBAL:   {first:FIRST_NAMES, last:LAST_NAMES},
+  LATAM:    {first:["Diego","Mateo","Santiago","Nicolás","Franco","Emiliano","Agustín","Bruno","Thiago","Facundo","Lucas","Joaquín"], last:["González","Rodríguez","Fernández","López","Martínez","Pérez","Sánchez","Romero","Díaz","Torres","Silva","Herrera"]},
+  BRAZIL:   {first:["Gabriel","Matheus","Lucas","Pedro","João","Rafael","Vinícius","Bruno","Caio","Everton","Wesley","Kaique"], last:["Silva","Santos","Oliveira","Souza","Costa","Pereira","Almeida","Ferreira","Ribeiro","Carvalho","Gomes","Barbosa"]},
+  IBERIAN:  {first:["Álvaro","Pablo","Sergio","Iker","Rodrigo","Diogo","João","Rui","Bruno","Nuno","Hugo","Tomás"], last:["García","Fernández","Martín","Gómez","Ruiz","Silva","Costa","Pereira","Ferreira","Santos","Carvalho","Lima"]},
+  FRANCOPHONE:{first:["Kylian","Antoine","Hugo","Théo","Moussa","Ibrahim","Ngolo","Ousmane","Aurélien","Randal","Bakary","Younes"], last:["Bernard","Dubois","Moreau","Traoré","Diallo","Koné","Camara","Bamba","Sow","Diouf","Ndiaye","Keita"]},
+  BRITISH_IRISH:{first:["Jack","Harry","George","Callum","Ryan","Connor","James","Liam","Declan","Aaron","Ben","Tom"], last:["Smith","Jones","Taylor","Walker","Wright","Evans","Murphy","Kelly","O'Brien","Clarke","Hughes","Wilson"]},
+  GERMANIC: {first:["Leon","Julian","Maximilian","Niklas","Jonas","Lukas","Florian","Felix","Tobias","Sebastian","Moritz","David"], last:["Müller","Schmidt","Schneider","Fischer","Weber","Wagner","Becker","Hoffmann","Schäfer","Koch","Richter","Klein"]},
+  DUTCH:    {first:["Daan","Sem","Luuk","Bram","Milan","Noah","Thijs","Jesse","Ruben","Sven","Wout","Kees"], last:["de Jong","Jansen","Visser","Bakker","de Boer","de Vries","van Dijk","Mulder","Dekker","Smit","Hendriks","Peters"]},
+  ITALIAN:  {first:["Matteo","Lorenzo","Alessandro","Federico","Andrea","Davide","Francesco","Nicolò","Gianluca","Riccardo","Marco","Simone"], last:["Rossi","Russo","Ferrari","Esposito","Bianchi","Romano","Colombo","Ricci","Marino","Greco","Bruno","Gallo"]},
+  SCANDI:   {first:["Erik","Anders","Magnus","Oscar","Emil","Viktor","Elias","Filip","Gustav","Sander","Kasper","Mathias"], last:["Andersen","Hansen","Johansen","Nilsson","Karlsson","Larsen","Pedersen","Berg","Lindqvist","Olsen","Eriksson","Halvorsen"]},
+  SLAVIC_BALKAN:{first:["Luka","Ivan","Marko","Filip","Nikola","Petar","Vuk","Stefan","Dario","Josip","Ante","Bojan"], last:["Kovačević","Petrović","Ilić","Jovanović","Novak","Horvat","Krstić","Vranić","Marić","Babić","Simić","Radić"]},
+  POLISH_CZECH:{first:["Kacper","Jakub","Bartosz","Wojciech","Tomasz","Michał","Adam","Filip","Piotr","Krystian","Dominik","Mateusz"], last:["Kowalski","Nowak","Wiśniewski","Wójcik","Kamiński","Lewandowski","Zieliński","Novák","Svoboda","Dvořák","Procházka","Král"]},
+  CAUCASUS_ASIA:{first:["Giorgi","Levan","Aram","Davit","Bekzod","Ravshan","Nurlan","Erlan","Sardor","Timur","Alisher","Otabek"], last:["Beridze","Sargsyan","Petrosyan","Mamedov","Nazarov","Yusupov","Karimov","Rashidov","Abdullayev","Islamov","Rustamov","Nurmatov"]},
+  TURKISH:  {first:["Emre","Kaan","Burak","Cem","Onur","Barış","Serkan","Umut","Alperen","Yusuf","Mert","Berkay"], last:["Yılmaz","Kaya","Demir","Şahin","Çelik","Yıldız","Aydın","Öztürk","Arslan","Doğan","Koç","Aksoy"]},
+  ARABIC:   {first:["Mohamed","Ahmed","Youssef","Omar","Khalid","Karim","Hassan","Amine","Tarek","Rayan","Yassine","Anas"], last:["El Amrani","Benali","Cherif","Hamdi","Saidi","Mansour","Khalil","Nasser","Farouk","Rachid","Belhadj","Zaidi"]},
+  PERSIAN:  {first:["Reza","Amir","Hamed","Mehdi","Saeed","Arash","Kian","Farhad","Navid","Behnam","Kaveh","Shahin"], last:["Hosseini","Karimi","Rostami","Ahmadi","Moradi","Ebrahimi","Ghasemi","Rahimi","Sadeghi","Nouri","Jafari","Yousefi"]},
+  SUBSAHARAN_A:{first:["Emmanuel","Samuel","Daniel","Kwame","Kofi","Chidi","Chukwu","Tunde","Femi","Bongani","Sipho","Thabo"], last:["Okafor","Adeyemi","Mensah","Owusu","Nwosu","Chukwu","Dlamini","Ndlovu","Mokoena","Banda","Phiri","Chirwa"]},
+  SUBSAHARAN_L:{first:["João","Miguel","Rui","Nelson","Edson","Zeca","Beto","Cesário","Domingos","Adilson","Wilson","Hélder"], last:["dos Santos","da Silva","Costa","Neto","Fonseca","Cardoso","Gonçalves","Pinto","Vieira","Baptista","Correia","Tavares"]},
+  JAPANESE: {first:["Haruto","Sota","Yuto","Ren","Riku","Kaito","Sho","Kenta","Taiga","Daiki","Yuki","Hiroto"], last:["Sato","Suzuki","Takahashi","Tanaka","Watanabe","Ito","Yamamoto","Nakamura","Kobayashi","Saito","Kato","Yoshida"]},
+  KOREAN:   {first:["Min-jun","Seo-jun","Do-yun","Ji-ho","Joon-ho","Hyun-woo","Tae-yang","Sung-min","Jun-seo","Yoon-ho","Dong-hyun","Sang-woo"], last:["Kim","Lee","Park","Choi","Jung","Kang","Cho","Yoon","Jang","Lim","Han","Oh"]},
+  CHINESE:  {first:["Wei","Jun","Hao","Lei","Chao","Yang","Ming","Peng","Feng","Jian","Tao","Bo"], last:["Wang","Li","Zhang","Liu","Chen","Yang","Huang","Zhao","Wu","Zhou","Xu","Sun"]},
+  SEA:      {first:["Anh","Minh","Duc","Hoang","Dat","Bao","Khang","Arif","Aiman","Farhan","Danial","Rizal"], last:["Nguyen","Tran","Le","Pham","Truong","Vo","Hakim","Rahman","Ismail","Aziz","Yusof","Halim"]},
+  SOUTH_ASIAN:{first:["Arjun","Rohan","Vikram","Aarav","Karan","Rahul","Suresh","Aakash","Nabil","Farhan","Imran","Rizwan"], last:["Sharma","Kumar","Patel","Singh","Rao","Reddy","Khan","Ahmed","Hossain","Islam","Chowdhury","Malik"]},
+  OCEANIA:  {first:["Jack","Tyler","Cody","Nathan","Liam","Josh","Blake","Riley","Hemi","Manu","Sione","Api"], last:["Smith","Taylor","Williams","Brown","Tuilagi","Fifita","Havili","Naiqama","Tuivasa","Waqa","Rokoduru","Nabola"]},
+  CARIBBEAN:{first:["Andre","Marcus","Jerome","Kemar","Shane","Dwayne","Kareem","Nicholas","Devon","Jaheim","Tyrique","Rashawn"], last:["Campbell","Brown","Williams","Grant","Bailey","Clarke","Edwards","Francis","Henry","James","Lewis","Roberts"]},
+  NORTH_AM: {first:["Ethan","Tyler","Jordan","Mason","Dylan","Logan","Cole","Brandon","Austin","Jake","Owen","Carter"], last:["Johnson","Miller","Davis","Anderson","Wilson","Moore","Thompson","White","Harris","Clark","Lewis","Walker"]},
+  GREEK:    {first:["Nikos","Yannis","Kostas","Dimitris","Petros","Alexis","Stavros","Christos","Vasilis","Andreas","Michalis","Panos"], last:["Papadopoulos","Georgiou","Nikolaou","Ioannou","Antoniou","Christodoulou","Pappas","Angelou","Vasiliou","Konstantinou","Dimitriou","Stavrou"]},
+  HUN_ROM:  {first:["Bence","Levente","Zsolt","Attila","Gábor","Márk","Alin","Andrei","Cristian","Florin","Mihai","Ștefan"], last:["Nagy","Kovács","Tóth","Szabó","Horváth","Varga","Popescu","Ionescu","Popa","Stan","Dumitru","Constantin"]},
+  HEBREW:   {first:["Noam","Itai","Omer","Yonatan","Eitan","Tomer","Roi","Daniel","Guy","Amit","Idan","Nadav"], last:["Cohen","Levi","Mizrahi","Peretz","Biton","Azulay","Dahan","Avraham","Katz","Friedman","Shapiro","Ben-David"]}
+};
+
+const CODE_TO_REGION = {
+  AR:'LATAM',UY:'LATAM',CO:'LATAM',MX:'LATAM',CL:'LATAM',PE:'LATAM',PY:'LATAM',EC:'LATAM',VE:'LATAM',BO:'LATAM',CR:'LATAM',PA:'LATAM',GT:'LATAM',SV:'LATAM',NI:'LATAM',HN:'LATAM',CU:'LATAM',DO:'LATAM',BZ:'LATAM',
+  BR:'BRAZIL',
+  ES:'IBERIAN',PT:'IBERIAN',
+  FR:'FRANCOPHONE',CI:'FRANCOPHONE',SN:'FRANCOPHONE',ML:'FRANCOPHONE',CM:'FRANCOPHONE',GA:'FRANCOPHONE',CG:'FRANCOPHONE',GN:'FRANCOPHONE',BF:'FRANCOPHONE',NE:'FRANCOPHONE',TD:'FRANCOPHONE',CF:'FRANCOPHONE',TG:'FRANCOPHONE',BJ:'FRANCOPHONE',KM:'FRANCOPHONE',MG:'FRANCOPHONE',GW:'FRANCOPHONE',
+  DE:'GERMANIC',AT:'GERMANIC',CH:'GERMANIC',LU:'GERMANIC',LI:'GERMANIC',
+  NL:'DUTCH',
+  IT:'ITALIAN',SM:'ITALIAN',
+  SE:'SCANDI',NO:'SCANDI',DK:'SCANDI',IS:'SCANDI',FI:'SCANDI',FO:'SCANDI',
+  HR:'SLAVIC_BALKAN',RS:'SLAVIC_BALKAN',BA:'SLAVIC_BALKAN',ME:'SLAVIC_BALKAN',MK:'SLAVIC_BALKAN',BG:'SLAVIC_BALKAN',UA:'SLAVIC_BALKAN',BY:'SLAVIC_BALKAN',XK:'SLAVIC_BALKAN',SI:'SLAVIC_BALKAN',
+  PL:'POLISH_CZECH',CZ:'POLISH_CZECH',SK:'POLISH_CZECH',EE:'POLISH_CZECH',LV:'POLISH_CZECH',LT:'POLISH_CZECH',MD:'POLISH_CZECH',
+  GE:'CAUCASUS_ASIA',AM:'CAUCASUS_ASIA',AZ:'CAUCASUS_ASIA',KZ:'CAUCASUS_ASIA',UZ:'CAUCASUS_ASIA',KG:'CAUCASUS_ASIA',TJ:'CAUCASUS_ASIA',TM:'CAUCASUS_ASIA',MN:'CAUCASUS_ASIA',
+  TR:'TURKISH',
+  MA:'ARABIC',DZ:'ARABIC',TN:'ARABIC',EG:'ARABIC',SA:'ARABIC',QA:'ARABIC',AE:'ARABIC',IQ:'ARABIC',JO:'ARABIC',LB:'ARABIC',SY:'ARABIC',KW:'ARABIC',BH:'ARABIC',OM:'ARABIC',YE:'ARABIC',LY:'ARABIC',SD:'ARABIC',PS:'ARABIC',MR:'ARABIC',
+  IR:'PERSIAN',AF:'PERSIAN',
+  NG:'SUBSAHARAN_A',GH:'SUBSAHARAN_A',ZA:'SUBSAHARAN_A',ZM:'SUBSAHARAN_A',ZW:'SUBSAHARAN_A',KE:'SUBSAHARAN_A',UG:'SUBSAHARAN_A',TZ:'SUBSAHARAN_A',MW:'SUBSAHARAN_A',NA:'SUBSAHARAN_A',BW:'SUBSAHARAN_A',SL:'SUBSAHARAN_A',LR:'SUBSAHARAN_A',GM:'SUBSAHARAN_A',SZ:'SUBSAHARAN_A',LS:'SUBSAHARAN_A',RW:'SUBSAHARAN_A',BI:'SUBSAHARAN_A',ET:'SUBSAHARAN_A',SS:'SUBSAHARAN_A',SO:'SUBSAHARAN_A',ER:'SUBSAHARAN_A',DJ:'SUBSAHARAN_A',GQ:'SUBSAHARAN_A',
+  AO:'SUBSAHARAN_L',MZ:'SUBSAHARAN_L',CV:'SUBSAHARAN_L',ST:'SUBSAHARAN_L',
+  JP:'JAPANESE',
+  KR:'KOREAN',KP:'KOREAN',
+  CN:'CHINESE',HK:'CHINESE',
+  VN:'SEA',ID:'SEA',PH:'SEA',TH:'SEA',MY:'SEA',SG:'SEA',MM:'SEA',KH:'SEA',LA:'SEA',BN:'SEA',TL:'SEA',
+  IN:'SOUTH_ASIAN',PK:'SOUTH_ASIAN',BD:'SOUTH_ASIAN',LK:'SOUTH_ASIAN',NP:'SOUTH_ASIAN',BT:'SOUTH_ASIAN',MV:'SOUTH_ASIAN',
+  AU:'OCEANIA',NZ:'OCEANIA',FJ:'OCEANIA',PG:'OCEANIA',SB:'OCEANIA',VU:'OCEANIA',WS:'OCEANIA',TO:'OCEANIA',GU:'OCEANIA',KI:'OCEANIA',TV:'OCEANIA',
+  JM:'CARIBBEAN',TT:'CARIBBEAN',BS:'CARIBBEAN',BB:'CARIBBEAN',GY:'CARIBBEAN',HT:'CARIBBEAN',SR:'CARIBBEAN',
+  US:'NORTH_AM',CA:'NORTH_AM',
+  GR:'GREEK',CY:'GREEK',MT:'GREEK',
+  HU:'HUN_ROM',RO:'HUN_ROM',
+  IL:'HEBREW',
+  IE:'BRITISH_IRISH'
+};
+
+/* England/Wales/Scotland/N.Ireland carry flagOverride with code:null (custom flag
+   emoji), so they're matched by name instead of code. */
+function nameRegionForTeam(team){
+  if(team.name==='England'||team.name==='Wales'||team.name==='Scotland'||team.name==='North. Ireland') return REGION_NAMES.BRITISH_IRISH;
+  if(team.name==='Vatican City') return REGION_NAMES.ITALIAN;
+  if(!team.code) return REGION_NAMES.GLOBAL;
+  return REGION_NAMES[CODE_TO_REGION[team.code.toUpperCase()]] || REGION_NAMES.GLOBAL;
+}
+
+/* Goals aren't spread evenly across a squad — forwards and midfielders get weighted
+   far more heavily than defenders, and goalkeepers only score the rare stoppage-time
+   set-piece flourish. Weight also scales with the player's own rating, so a team's
+   best players are its most likely scorers, same as real Golden Boot races. */
+const POS_WEIGHT = {ST:4.2, FW:2.8, MF:1.6, DF:0.55, GK:0.08};
+function weightedPickPlayer(pool){
+  const weights = pool.map(p=> (POS_WEIGHT[p.position]||1) * Math.max(20,p.rating));
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for(let i=0;i<pool.length;i++){
+    r -= weights[i];
+    if(r<=0) return pool[i];
+  }
+  return pool[pool.length-1];
+}
+
 const TACTICS = {
   parkbus:  {mult:0.55, drawBoost:1.55},
   defensive:{mult:0.78, drawBoost:1.2},
@@ -1033,6 +1257,9 @@ function halftimeCommentary(aName, bName, sa, sb){
 
 /* ===================== STATE ===================== */
 let state = null;
+/* User-added custom teams. Lives outside `state` on purpose — added teams should
+   survive "New Tournament" and "Run It Back", not reset with the rest of the field. */
+let customTeams = [];
 let matchUidCounter = 0;
 function makeMatch(a,b){
   return {a, b, played:false, revealed:false, uid:matchUidCounter++};
@@ -1090,10 +1317,13 @@ function isPow2(n){ return n>0 && (n & (n-1))===0; }
 function nextPow2(n){ let p=1; while(p<n) p*=2; return p; }
 
 function buildField(size, seeded){
+  const customPool = customTeams.map(ct=>({name:ct.name, code:null, rating:ct.rating, flagOverride:ct.flagOverride||'🏳️', isGuest:false, isCustom:true}));
   const seededPool = shuffle(buildPool());
   const guestPool = shuffle(buildGuestPool());
   const teams = [];
-  const seededCount = Math.min(size, seededPool.length);
+  const customCount = Math.min(size, customPool.length);
+  for(let i=0;i<customCount;i++) teams.push(customPool[i]);
+  const seededCount = Math.min(size-teams.length, seededPool.length);
   for(let i=0;i<seededCount;i++) teams.push(seededPool[i]);
   let gi=0;
   while(teams.length<size && gi<guestPool.length){ teams.push(guestPool[gi++]); }
@@ -1178,15 +1408,33 @@ function computeGroupStandings(group){
   return rows;
 }
 
+/* Starting XI shapes: [GK, DF, MF, FW, ST], always summing to 11. FW covers wide
+   forwards/wingers; ST is the out-and-out striker — the position most likely to score
+   (see POS_WEIGHT above). Picking one shape per team adds a little formation flavor. */
+const FORMATIONS = [[1,4,3,1,2],[1,4,4,0,2],[1,3,5,0,2],[1,4,5,0,1],[1,3,4,1,2],[1,5,3,0,2]];
 function ensurePlayers(team){
   if(team.players.length) return;
-  const n = 4 + Math.floor(Math.random()*3);
-  for(let i=0;i<n;i++){
-    team.players.push({
-      name: FIRST_NAMES[Math.floor(Math.random()*FIRST_NAMES.length)]+" "+LAST_NAMES[Math.floor(Math.random()*LAST_NAMES.length)],
-      number: i+1
-    });
-  }
+  const pool = nameRegionForTeam(team);
+  const [nGK,nDF,nMF,nFW,nST] = FORMATIONS[Math.floor(Math.random()*FORMATIONS.length)];
+  const positions = [
+    ...Array(nGK).fill('GK'),
+    ...Array(nDF).fill('DF'),
+    ...Array(nMF).fill('MF'),
+    ...Array(nFW).fill('FW'),
+    ...Array(nST).fill('ST')
+  ];
+  const used = new Set();
+  positions.forEach((position, i)=>{
+    let name, attempts=0;
+    do{
+      name = pool.first[Math.floor(Math.random()*pool.first.length)]+" "+pool.last[Math.floor(Math.random()*pool.last.length)];
+      attempts++;
+    } while(used.has(name) && attempts<10);
+    used.add(name);
+    const posAdj = position==='ST'?6 : position==='FW'?3 : position==='GK'?-4 : position==='DF'?-2 : 0;
+    const rating = Math.max(30, Math.min(99, Math.round(team.rating+posAdj+(Math.random()*16-8))));
+    team.players.push({name, number:i+1, position, rating});
+  });
 }
 
 /* ---- Injuries & suspensions: a player ruled out can miss exactly their team's next
@@ -1217,6 +1465,32 @@ function roundNameFor(nTeamsInRound){
   return "Round of "+nTeamsInRound;
 }
 
+/* A boosted "god player" needs to actually move the needle, not just hoover up goal
+   credit. Every place that decides win probability, expected goals, or possession uses
+   this instead of team.rating directly — the team's raw rating stays what's shown on
+   cards/leaderboards, but a standout player quietly makes the whole side more dangerous.
+   No bonus at all below 99 (normal rosters never trigger this), then scales up fast. */
+function effectiveTeamRating(team){
+  if(!team.players || !team.players.length) return team.rating;
+  let best = team.rating;
+  for(const p of team.players){ if(p.rating>best) best = p.rating; }
+  const bonus = Math.max(0, best-99) * 0.12;
+  return team.rating + bonus;
+}
+
+/* A team's goalkeeper rating scales how many goals get put past them — 65 is treated
+   as a "neutral" GK (roughly what an average rated team generates via ensurePlayers'
+   position adjustment), so ordinary rosters shift only mildly around 1.0. A god-tier
+   keeper (900+) can shut a game down almost entirely; a weak one leaks more than usual.
+   Returned value multiplies the OPPONENT's goal tally, not the keeper's own team. */
+function keeperFactor(team){
+  ensurePlayers(team);
+  const gk = team.players.find(p=>p.position==='GK');
+  const gkRating = gk ? gk.rating : team.rating;
+  const diff = gkRating - 65;
+  return Math.max(0.15, Math.min(1.6, 1 - diff*0.006));
+}
+
 function styleScale(style){
   return style==="realistic" ? 9 : style==="standard" ? 16 : 45;
 }
@@ -1241,9 +1515,10 @@ function simulateMatchCore(a,b,forceDecisive){
   ensurePlayers(a); ensurePlayers(b);
   const scale = styleScale(state.style);
   const ranges = goalRanges(state.goal, state.tactic);
-  const diff = a.rating-b.rating;
+  const effA = effectiveTeamRating(a), effB = effectiveTeamRating(b);
+  const diff = effA-effB;
   const pA = 1/(1+Math.pow(10, -diff/scale));
-  const isDraw = Math.random()<ranges.draw;
+  const isDraw = Math.random()<ranges.draw*(1-Math.min(0.9,Math.abs(diff)/120));
 
   let scoreA, scoreB, winner=null, penalties=false, penA=0, penB=0, eventsA=[], eventsB=[];
 
@@ -1252,7 +1527,8 @@ function simulateMatchCore(a,b,forceDecisive){
     scoreA = scoreB = drawGoals;
     if(forceDecisive){
       let etGoalsA=0, etGoalsB=0, settledInET = false;
-      if(state.extraTime && Math.random()<0.45){
+      const etChance = state.goldenGoal ? 0.72 : 0.45;
+      if(state.extraTime && Math.random()<etChance){
         settledInET = true;
         if(Math.random()<pA){ scoreA++; etGoalsA=1; winner=a; } else { scoreB++; etGoalsB=1; winner=b; }
       }
@@ -1278,9 +1554,24 @@ function simulateMatchCore(a,b,forceDecisive){
   } else {
     const aWins = Math.random()<pA;
     winner = aWins ? a : b;
-    const wGoals = 1+Math.floor(Math.random()*ranges.winnerMax);
+    let wGoals = 1+Math.floor(Math.random()*ranges.winnerMax);
     let lGoals = ranges.loserMax>0 ? Math.floor(Math.random()*Math.min(ranges.loserMax+1, wGoals+1)) : 0;
     if(lGoals>=wGoals) lGoals = Math.max(0,wGoals-1);
+    /* Blowout scaling: stock team ratings never gap more than ~70 points, so this only
+       ever fires when a god-tier player has pushed effective strength way past normal —
+       exactly when the scoreline should stop looking like an ordinary result. */
+    const gap = Math.abs(diff);
+    if(gap>85){
+      const bonusGoals = Math.min(10, Math.floor((gap-85)/18));
+      wGoals += bonusGoals;
+      if(bonusGoals>=3) lGoals = 0;
+    }
+    /* Keeper quality: each side's goalkeeper cuts into the goals scored against them. */
+    const concederOfWinner = aWins ? b : a; // faces the winner's shots
+    const concederOfLoser = aWins ? a : b;  // faces the loser's shots
+    wGoals = Math.max(0, Math.round(wGoals*keeperFactor(concederOfWinner)));
+    lGoals = Math.max(0, Math.round(lGoals*keeperFactor(concederOfLoser)));
+    if(wGoals<=lGoals) wGoals = lGoals+1;
     if(aWins){ scoreA=wGoals; scoreB=lGoals; } else { scoreB=wGoals; scoreA=lGoals; }
     eventsA = distributeGoals(a, scoreA, 1, 90);
     eventsB = distributeGoals(b, scoreB, 1, 90);
@@ -1296,7 +1587,7 @@ function distributeGoals(team, goals, minMinute, maxMinute){
   const events = [];
   const pool = availablePlayers(team);
   for(let i=0;i<goals;i++){
-    const p = pool[Math.floor(Math.random()*pool.length)];
+    const p = weightedPickPlayer(pool);
     const label = state.useRealNames ? p.name : ("Player #"+p.number);
     const key = label+" ("+team.name+")";
     state.boot[key] = (state.boot[key]||0)+1;
@@ -1326,13 +1617,14 @@ function computeMotm(m){
 }
 
 /* ===================== TOURNAMENT FLOW ===================== */
-function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format){
+function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format, goldenGoal, chaosSensitivity){
   const teams = buildField(size, seeded);
   const isGroups = format==='groups';
   const groupCount = isGroups ? size/4 : 0;
   const knockoutSize = isGroups ? computeKnockoutSize(groupCount) : size;
   state = {
     size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format,
+    goldenGoal: !!goldenGoal, chaosSensitivity: chaosSensitivity || 'normal',
     allTeams: teams,
     phase: isGroups ? 'groups' : 'knockout',
     groups: isGroups ? assignGroups(teams, seeded) : [],
@@ -1355,7 +1647,7 @@ function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, see
     searchQuery:'',
     editDrawMode:false,
     swapSelection:null,
-    lastUndo:null
+    perMatchUndo: new Map()
   };
   if(!isGroups){
     const matches = [];
@@ -1367,55 +1659,76 @@ function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, see
   render();
 }
 
-/* ---- Undo: a single-level safety net for the last INSTANT-simulated match (Play /
-   Simulate Round / Simulate Entire Cup). Watched matches aren't covered — you sat through
-   those on purpose. Cleared whenever a round transition "locks in" results that later
-   matches may already depend on (advancing a round, crowning a champion), since undoing
-   past that point would leave the bracket referencing a team that's technically unplayed
-   again. ---- */
-function captureMatchUndo(m){
-  return {
-    m,
-    prevPlayed:m.played, prevRevealed:m.revealed, prevScoreA:m.scoreA, prevScoreB:m.scoreB,
-    prevWinner:m.winner, prevPenalties:m.penalties, prevPenA:m.penA, prevPenB:m.penB, prevEvents:m.events,
-    matchesPlayed:state.matchesPlayed, totalMatchesPlayed:state.totalMatchesPlayed, upsets:state.upsets,
-    pulses:state.pulses.slice(),
-    followIds:new Set(state.followIds),
-    suspA:state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined,
-    suspB:state.suspensions[m.b.id] ? new Set(state.suspensions[m.b.id]) : undefined,
-    matchHistoryLen:state.matchHistory.length
-  };
+/* ---- Undo: any match still "in scope" can be reverted, not just the last one played.
+   In scope means: a group-stage match before the group stage has advanced to knockout
+   (group standings always recompute from scratch, so order doesn't matter), or a
+   knockout match still in the CURRENT round (state.round.includes(m) — once a round
+   advances, its matches are only reachable via matchHistory, so canUndoMatch naturally
+   returns false without any extra bookkeeping). Snapshots are captured the instant a
+   match is played (instant-sim OR watched) and stored per-uid in state.perMatchUndo, so
+   any of them can be reverted independently and out of order.
+   Suspensions are restored to their pre-match snapshot on undo — a reasonable best
+   effort for a cosmetic feature; if a team already played again since (possible in the
+   group stage, where a team plays 3 matches), a stale suspension flag might briefly
+   linger, but nothing about scores, standings, or the bracket is affected. */
+function registerUndoSnapshot(m, snap){
+  state.perMatchUndo.set(m.uid, snap);
 }
-function applyUndo(){
-  const u = state.lastUndo;
-  if(!u) return;
-  const m = u.m;
-  if(m.events){
-    m.events.forEach(e=>{
-      const key = `${e.scorer} (${e.teamRef.name})`;
-      if(state.boot[key]){
-        state.boot[key]--;
-        if(state.boot[key]<=0) delete state.boot[key];
-      }
-    });
+function canUndoMatch(m){
+  if(!m.played || !state.perMatchUndo.has(m.uid)) return false;
+  if(state.phase==='groups') return true;
+  return state.round.includes(m);
+}
+function findMatchByUid(uid){
+  if(state.phase==='groups'){
+    for(const g of state.groups){
+      const found = g.matches.find(x=>x.uid===uid);
+      if(found) return found;
+    }
+    return null;
   }
-  m.played=u.prevPlayed; m.revealed=u.prevRevealed; m.scoreA=u.prevScoreA; m.scoreB=u.prevScoreB;
-  m.winner=u.prevWinner; m.penalties=u.prevPenalties; m.penA=u.prevPenA; m.penB=u.prevPenB; m.events=u.prevEvents;
-  state.matchesPlayed = u.matchesPlayed;
-  state.totalMatchesPlayed = u.totalMatchesPlayed;
-  state.upsets = u.upsets;
-  state.pulses = u.pulses;
-  state.followIds = u.followIds;
-  if(u.suspA) state.suspensions[m.a.id]=u.suspA; else delete state.suspensions[m.a.id];
-  if(u.suspB) state.suspensions[m.b.id]=u.suspB; else delete state.suspensions[m.b.id];
-  state.matchHistory.length = u.matchHistoryLen;
-  state.lastUndo = null;
+  return state.round.find(x=>x.uid===uid) || null;
+}
+function undoMatch(m){
+  const snap = state.perMatchUndo.get(m.uid);
+  if(!snap || !m.played) return;
+
+  (m.events||[]).forEach(e=>{
+    const key = `${e.scorer} (${e.teamRef.name})`;
+    if(state.boot[key]){
+      state.boot[key]--;
+      if(state.boot[key]<=0) delete state.boot[key];
+    }
+  });
+
+  m.played=false; m.revealed=false;
+  delete m.scoreA; delete m.scoreB; delete m.winner; delete m.penalties; delete m.penA; delete m.penB; delete m.events;
+
+  state.matchesPlayed--;
+  state.totalMatchesPlayed--;
+  if(snap.upset) state.upsets--;
+
+  const hIdx = state.matchHistory.indexOf(snap.historyEntry);
+  if(hIdx!==-1) state.matchHistory.splice(hIdx,1);
+
+  snap.pulsesAdded.forEach(p=>{
+    const idx = state.pulses.indexOf(p);
+    if(idx!==-1) state.pulses.splice(idx,1);
+  });
+
+  if(snap.followRemoved) state.followIds.add(snap.loserId);
+
+  if(snap.suspSnapA) state.suspensions[m.a.id]=new Set(snap.suspSnapA); else delete state.suspensions[m.a.id];
+  if(snap.suspSnapB) state.suspensions[m.b.id]=new Set(snap.suspSnapB); else delete state.suspensions[m.b.id];
+
+  state.perMatchUndo.delete(m.uid);
   render();
 }
 
 function playMatch(m){
   if(m.played) return;
-  const undoSnapshot = captureMatchUndo(m);
+  const suspSnapA = state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined;
+  const suspSnapB = state.suspensions[m.b.id] ? new Set(state.suspensions[m.b.id]) : undefined;
   const res = simulateMatch(m.a, m.b);
   m.played = true;
   m.revealed = !state.spoilerSafe;
@@ -1429,24 +1742,31 @@ function playMatch(m){
   const upset = isUpset(res.winner, loser);
   if(upset) state.upsets++;
 
-  state.matchHistory.push({roundLabel: roundNameFor(state.round.length*2), m});
+  const historyEntry = {roundLabel: roundNameFor(state.round.length*2), m};
+  state.matchHistory.push(historyEntry);
   clearSuspensions(m.a); clearSuspensions(m.b);
   maybeSuspendPlayer(m.a); maybeSuspendPlayer(m.b);
 
+  let followRemoved = false;
+  const pulsesAdded = [];
   if(state.followIds.has(loser.id)){
-    state.pulses.unshift({text:`💔 Your followed side, ${loser.name}, are OUT.`, hot:true});
+    const followMsg = {text:`💔 Your followed side, ${loser.name}, are OUT.`, hot:true};
+    state.pulses.unshift(followMsg);
+    pulsesAdded.push(followMsg);
     state.followIds.delete(loser.id);
+    followRemoved = true;
   }
 
   if(!state.spoilerSafe){
-    logPulse(res, m, upset, loser);
+    pulsesAdded.push(logPulse(res, m, upset, loser));
   }
-  state.lastUndo = undoSnapshot;
+  registerUndoSnapshot(m, {upset, historyEntry, followRemoved, loserId:loser.id, suspSnapA, suspSnapB, pulsesAdded});
 }
 
 function playGroupMatch(m, groupName){
   if(m.played) return;
-  const undoSnapshot = captureMatchUndo(m);
+  const suspSnapA = state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined;
+  const suspSnapB = state.suspensions[m.b.id] ? new Set(state.suspensions[m.b.id]) : undefined;
   const res = simulateGroupMatch(m.a, m.b);
   m.played = true;
   m.revealed = !state.spoilerSafe;
@@ -1458,17 +1778,22 @@ function playGroupMatch(m, groupName){
 
   clearSuspensions(m.a); clearSuspensions(m.b);
   maybeSuspendPlayer(m.a); maybeSuspendPlayer(m.b);
-  state.matchHistory.push({roundLabel: groupName, m});
+  const historyEntry = {roundLabel: groupName, m};
+  state.matchHistory.push(historyEntry);
 
+  let upset = false;
+  const pulsesAdded = [];
   if(res.winner){
     const loser = res.winner===m.a?m.b:m.a;
-    const upset = isUpset(res.winner, loser);
+    upset = isUpset(res.winner, loser);
     if(upset) state.upsets++;
-    if(!state.spoilerSafe) logPulse(res, m, upset, loser);
+    if(!state.spoilerSafe) pulsesAdded.push(logPulse(res, m, upset, loser));
   } else if(!state.spoilerSafe){
-    state.pulses.unshift({text:`${m.a.name} and ${m.b.name} draw ${res.scoreA}-${res.scoreB} in ${groupName}`, hot:false});
+    const drawMsg = {text:`${m.a.name} and ${m.b.name} draw ${res.scoreA}-${res.scoreB} in ${groupName}`, hot:false};
+    state.pulses.unshift(drawMsg);
+    pulsesAdded.push(drawMsg);
   }
-  state.lastUndo = undoSnapshot;
+  registerUndoSnapshot(m, {upset, historyEntry, followRemoved:false, loserId:null, suspSnapA, suspSnapB, pulsesAdded});
 }
 
 function logPulse(res, m, upset, loser){
@@ -1485,6 +1810,7 @@ function logPulse(res, m, upset, loser){
   }
   state.pulses.unshift(msg);
   if(state.pulses.length>40) state.pulses.pop();
+  return msg;
 }
 
 function revealMatch(m){
@@ -1496,10 +1822,16 @@ function revealMatch(m){
   logPulse({scoreA:m.scoreA, scoreB:m.scoreB, winner:m.winner, penA:m.penA, penB:m.penB}, m, upset, loser);
 }
 /* Shared upset definition — requires a real skill gap, not just any lower-rated team
-   winning. ~11+ rating points is roughly Germany-vs-Paraguay territory. */
-const UPSET_GAP = 11;
-const SHOCKER_GAP = 24;
-function isUpset(winner, loser){ return (loser.rating - winner.rating) >= UPSET_GAP; }
+   winning. Base gaps are for "Normal" chaos sensitivity; Strict/Loose scale them so the
+   Chaos Meter and match ribbons can be tuned without touching the sim math. */
+const UPSET_GAP_BASE = 11;
+const SHOCKER_GAP_BASE = 24;
+const CHAOS_SCALE = {strict:1.5, normal:1, loose:0.6};
+function chaosGaps(){
+  const scale = CHAOS_SCALE[state && state.chaosSensitivity] || 1;
+  return {upset: UPSET_GAP_BASE*scale, shocker: SHOCKER_GAP_BASE*scale};
+}
+function isUpset(winner, loser){ return (loser.rating - winner.rating) >= chaosGaps().upset; }
 
 const TAG_LABELS = {upset:"UPSET", shocker:"SHOCKER", crush:"CRUSHING", shootout:"SHOOTOUT", thriller:"THRILLER", close:"CLOSE"};
 function matchTag(m){
@@ -1508,8 +1840,9 @@ function matchTag(m){
   const gap = loser.rating - winner.rating; // positive only when the winner was rated lower
   const margin = Math.abs(m.scoreA-m.scoreB);
   const totalGoals = m.scoreA+m.scoreB;
-  if(gap>=SHOCKER_GAP) return 'shocker';
-  if(gap>=UPSET_GAP) return 'upset';
+  const gaps = chaosGaps();
+  if(gap>=gaps.shocker) return 'shocker';
+  if(gap>=gaps.upset) return 'upset';
   if(!m.penalties && margin>=4) return 'crush';
   if(m.penalties) return 'shootout';
   if(!m.penalties && margin<=1 && totalGoals>=3) return 'thriller';
@@ -1564,7 +1897,6 @@ function advanceRound(){
   state.round = matches;
   state.roundIndex++;
   state.matchesPlayed = 0;
-  state.lastUndo = null;
   render();
 }
 
@@ -1609,7 +1941,6 @@ function advanceToKnockout(){
   state.roundIndex = 0;
   state.totalRounds = Math.log2(qualifiers.length);
   state.matchesPlayed = 0;
-  state.lastUndo = null;
   state.pulses.unshift({text:`⚽ Group stage complete — the knockout stage begins!`, hot:true});
   render();
 }
@@ -1637,7 +1968,6 @@ function simulateEntireCup(){
 
 function crownChampion(team){
   state.champion = team;
-  state.lastUndo = null;
   render();
   showChampion(team);
 }
@@ -1668,7 +1998,6 @@ const jumpNextBtn = document.getElementById('jumpNextBtn');
 const simUnfollowedBtn = document.getElementById('simUnfollowedBtn');
 const thirdPlaceBtn = document.getElementById('thirdPlaceBtn');
 const editDrawBtn = document.getElementById('editDrawBtn');
-const undoBtn = document.getElementById('undoBtn');
 const editDrawBanner = document.getElementById('editDrawBanner');
 const editDrawSelectionNote = document.getElementById('editDrawSelectionNote');
 const pillStyle = document.getElementById('pillStyle');
@@ -1815,7 +2144,7 @@ function render(){
   pillGoal.textContent = (state.goal==="tight"?"Tight":state.goal==="goalfest"?"Goal Fest":"Normal")+" scoring";
   pillTactic.textContent = TACTIC_LABEL[state.tactic]+" tactics";
   pillSeeding.textContent = state.seeded ? "Seeded draw" : "Random draw";
-  pillExtraTime.textContent = state.extraTime ? "Extra time on" : "No extra time";
+  pillExtraTime.textContent = state.extraTime ? (state.goldenGoal ? "Golden Goal ET" : "Extra time on") : "No extra time";
   pillDrama.textContent = state.dramaEnabled ? "Drama on" : "Drama off";
   pillSpoiler.textContent = state.spoilerSafe ? "Spoiler-safe" : "Instant reveal";
   pillNames.textContent = state.useRealNames ? "Real names" : "Squad numbers";
@@ -1849,11 +2178,6 @@ function render(){
   editDrawBtn.textContent = state.editDrawMode ? '✓ Editing Draw' : '🔀 Edit Draw';
   editDrawBanner.classList.toggle('hidden', !state.editDrawMode);
   editDrawSelectionNote.textContent = state.swapSelection ? `Selected: ${state.swapSelection.name} — pick another team to swap with.` : 'Pick a first team.';
-
-  undoBtn.classList.toggle('hidden', !state.lastUndo);
-  if(state.lastUndo){
-    undoBtn.title = `Undo ${state.lastUndo.m.a.name} vs ${state.lastUndo.m.b.name}`;
-  }
 
   const pct2 = state.totalMatchesPlayed ? Math.round(100*state.upsets/state.totalMatchesPlayed) : 0;
   upsetPct.textContent = pct2+"%";
@@ -1932,7 +2256,7 @@ function renderKnockoutFixtures(){
     if(m.played && !m.revealed){
       midHtml = `<div class="hidden-score">? – ?</div><button class="revealbtn" data-reveal="${idx}">👁 Reveal</button>`;
     } else if(m.revealed){
-      midHtml = `<div class="score just-in">${m.scoreA}<span class="dash">–</span>${m.scoreB}</div>${m.penalties?`<div class="pens">pens ${m.penA}-${m.penB}</div>`:''}<div class="mid-hint">tap for details</div>`;
+      midHtml = `<div class="score just-in">${m.scoreA}<span class="dash">–</span>${m.scoreB}</div>${m.penalties?`<div class="pens">pens ${m.penA}-${m.penB}</div>`:''}<div class="mid-hint">tap for details</div>${canUndoMatch(m)?`<button class="ghost undobtn" data-undo-uid="${m.uid}" title="Undo this match">↩ Undo</button>`:''}`;
     } else {
       midHtml = `<div class="vs-label">VS</div>
         <button class="playbtn" data-idx="${idx}">▶ Play</button>
@@ -1974,6 +2298,13 @@ function renderKnockoutFixtures(){
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
       watchMatch(state.round[+btn.dataset.watch]);
+    });
+  });
+  fixturesList.querySelectorAll('.undobtn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const m = findMatchByUid(+btn.dataset.undoUid);
+      if(m) undoMatch(m);
     });
   });
   fixturesList.querySelectorAll('.side').forEach(sideEl=>{
@@ -2065,7 +2396,7 @@ function renderGroupsView(){
       if(m.played && !m.revealed){
         midHtml = `<div class="hidden-score">? – ?</div><button class="revealbtn" data-g="${gi}" data-m="${mi}">👁</button>`;
       } else if(m.revealed){
-        midHtml = `<div class="score">${m.scoreA}<span class="dash">–</span>${m.scoreB}</div>`;
+        midHtml = `<div class="score">${m.scoreA}<span class="dash">–</span>${m.scoreB}</div>${canUndoMatch(m)?`<button class="ghost undobtn" data-undo-uid="${m.uid}" title="Undo this match">↩</button>`:''}`;
       } else {
         midHtml = `<div class="vs-label">VS</div>
           <button class="playbtn" data-g="${gi}" data-m="${mi}">▶</button>
@@ -2135,6 +2466,13 @@ function renderGroupsView(){
       e.stopPropagation();
       const g = state.groups[+btn.dataset.g];
       watchMatch(g.matches[+btn.dataset.m], false, g.name);
+    });
+  });
+  groupsContainer.querySelectorAll('.undobtn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const m = findMatchByUid(+btn.dataset.undoUid);
+      if(m) undoMatch(m);
     });
   });
   groupsContainer.querySelectorAll('.side').forEach(sideEl=>{
@@ -2228,6 +2566,55 @@ function showChampion(team){
     predEl.innerHTML = "";
   }
   championOverlay.classList.remove('hidden');
+  launchConfetti();
+}
+
+/* ---- Confetti burst on the champion screen. Lightweight canvas particle system —
+   fires once when the champion overlay opens, runs for a few seconds, then stops. ---- */
+function launchConfetti(){
+  const canvas = document.getElementById('confettiCanvas');
+  if(!canvas) return;
+  const modalEl = canvas.closest('.modal');
+  const rect = modalEl.getBoundingClientRect();
+  canvas.width = rect.width; canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#4d8dfd','#ef3d54','#4fc3ff','#2be08a','#ff8a00','#f2f5fb'];
+  const pieces = [];
+  const count = 90;
+  for(let i=0;i<count;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height*0.5,
+      w: 5+Math.random()*5,
+      h: 8+Math.random()*6,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      vy: 2+Math.random()*3,
+      vx: -1.5+Math.random()*3,
+      rot: Math.random()*Math.PI*2,
+      vrot: -0.2+Math.random()*0.4
+    });
+  }
+  const start = performance.now();
+  const duration = 3200;
+  function frame(now){
+    const elapsed = now-start;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(elapsed<duration && !championOverlay.classList.contains('hidden')){
+      requestAnimationFrame(frame);
+    } else {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+  }
+  requestAnimationFrame(frame);
 }
 
 /* ===================== MATCH DETAIL & TEAM HISTORY ===================== */
@@ -2258,11 +2645,97 @@ function openMatchDetail(m, roundLabel){
 }
 document.getElementById('mdCloseBtn').addEventListener('click', ()=>matchDetailOverlay.classList.add('hidden'));
 
+/* Generates a squad on first look (teams that haven't played yet have no players until
+   ensurePlayers is called) and lists them strongest-first with position and rating —
+   the same numbers that quietly drive who scores in distributeGoals/weightedPickPlayer.
+   Position and rating are editable in place: both controls mutate the actual player
+   object (same reference used by the sim), so a change here changes who's likely to
+   score from that point on — no separate sync step needed. */
+/* Generates a squad on first look (teams that haven't played yet have no players until
+   ensurePlayers is called) and lists them strongest-first with position, name, and
+   rating all editable in place. Every control mutates the actual player object (same
+   reference used by the sim), so a change here changes who's likely to score from that
+   point on — no separate sync step needed. Ratings aren't capped at 99: push one high
+   enough and weightedPickPlayer will make them the story of the tournament. */
+const PLAYER_RATING_MIN = 20;
+const PLAYER_RATING_MAX = 999;
+/* Shown next to the base rating whenever a squad's best player is pushing the team's
+   real strength (win odds, expected goals, possession) above what the card displays. */
+function renderEffectiveStrength(team){
+  const row = document.getElementById('thEffectiveRow');
+  const eff = effectiveTeamRating(team);
+  if(eff>team.rating+0.5){
+    row.style.display = '';
+    document.getElementById('thEffectiveValue').textContent = Math.round(eff);
+  } else {
+    row.style.display = 'none';
+  }
+}
+
+function renderSquadList(team){
+  ensurePlayers(team);
+  const susp = state.suspensions[team.id];
+  const sorted = team.players.slice().sort((a,b)=> b.rating-a.rating);
+  const squadEl = document.getElementById('thSquadList');
+  squadEl.innerHTML = sorted.map(p=>{
+    const isSusp = susp && susp.has(p.number);
+    const isGod = p.rating>99;
+    return `<div class="th-player-row${isSusp?' suspended':''}">
+      <select class="th-player-pos-select pos-${p.position.toLowerCase()}" data-player-number="${p.number}">
+        ${['GK','DF','MF','FW','ST'].map(pos=>`<option value="${pos}" ${pos===p.position?'selected':''}>${pos}</option>`).join('')}
+      </select>
+      <input type="text" class="th-player-name-input" data-player-number="${p.number}" value="${p.name.replace(/"/g,'&quot;')}" maxlength="40">
+      <span class="th-player-number">#${p.number}</span>
+      ${isSusp?'<span class="th-player-susp" title="Suspended for the next match">🚑</span>':''}
+      ${isGod?'<span title="God-tier rating">🌟</span>':''}
+      <div class="th-player-rating-controls">
+        <button class="ghost th-player-rating-btn" data-player-number="${p.number}" data-adj="-10">−10</button>
+        <button class="ghost th-player-rating-btn" data-player-number="${p.number}" data-adj="-1">−</button>
+        <span class="th-player-rating${isGod?' god':''}">${p.rating}</span>
+        <button class="ghost th-player-rating-btn" data-player-number="${p.number}" data-adj="1">+</button>
+        <button class="ghost th-player-rating-btn" data-player-number="${p.number}" data-adj="10">+10</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  squadEl.querySelectorAll('.th-player-pos-select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const p = team.players.find(x=>x.number===+sel.dataset.playerNumber);
+      if(p){ p.position = sel.value; renderSquadList(team); }
+    });
+  });
+  squadEl.querySelectorAll('.th-player-rating-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const p = team.players.find(x=>x.number===+btn.dataset.playerNumber);
+      if(p){
+        p.rating = Math.max(PLAYER_RATING_MIN, Math.min(PLAYER_RATING_MAX, p.rating+(+btn.dataset.adj)));
+        renderSquadList(team);
+        renderEffectiveStrength(team);
+      }
+    });
+  });
+  /* 'change' (not 'input') so the row doesn't lose focus/re-render on every keystroke —
+     the name commits when the field blurs or Enter is pressed. */
+  squadEl.querySelectorAll('.th-player-name-input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const p = team.players.find(x=>x.number===+inp.dataset.playerNumber);
+      if(p){
+        const trimmed = inp.value.trim();
+        p.name = trimmed || p.name;
+        inp.value = p.name;
+      }
+    });
+    inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') inp.blur(); });
+  });
+}
+
 function openTeamHistory(team){
   thCurrentTeam = team;
   document.getElementById('thTitle').textContent = `${flagFor(team)} ${team.name}`;
   document.getElementById('thRatingValue').textContent = team.rating;
   document.getElementById('thFormGuide').innerHTML = formGuide(team) || '<span style="color:var(--muted); font-size:12px;">No results yet</span>';
+  renderSquadList(team);
+  renderEffectiveStrength(team);
   const followBtn = document.getElementById('thFollowBtn');
   const syncFollowBtn = ()=>{
     followBtn.textContent = state.followIds.has(team.id) ? '★ Following' : '☆ Follow this team';
@@ -2562,28 +3035,47 @@ document.getElementById('bracketCloseBtn').addEventListener('click', ()=>bracket
 const statsOverlay = document.getElementById('statsOverlay');
 const statsGrid = document.getElementById('statsGrid');
 
+/* Best defensive record uses a Bayesian shrinkage estimator instead of a raw per-match
+   average. A team knocked out after one 0-0 has an average of 0 forever — that shouldn't
+   beat a side that's gone six rounds conceding sparingly, purely because it played less
+   football. Shrinking every team's average toward the field-wide mean (weighted by how
+   few matches they've played) fixes that without an arbitrary "must have played N games"
+   cutoff that excludes early tournaments entirely. */
+function computeShrunkDefense(goalsAgainstMap, playedMap, teamIds){
+  const totalGA = teamIds.reduce((s,id)=>s+(goalsAgainstMap[id]||0), 0);
+  const totalP = teamIds.reduce((s,id)=>s+(playedMap[id]||0), 0);
+  const fieldAvg = totalP>0 ? totalGA/totalP : 1.2;
+  const K = 2.5; // shrinkage weight, in "matches" of prior belief
+  return teamIds.map(id=>{
+    const p = playedMap[id]||0;
+    const ga = goalsAgainstMap[id]||0;
+    const rawAvg = p>0 ? ga/p : fieldAvg;
+    const adjAvg = (ga + fieldAvg*K) / (p + K);
+    return {id, played:p, conceded:ga, rawAvg, adjAvg};
+  }).filter(e=>e.played>0);
+}
+
 function computeTournamentStats(){
   const history = state.matchHistory.filter(h=>h.m.played);
   if(!history.length) return null;
 
-  let biggestWin=null, highestScoring=null, biggestUpset=null;
-  const goalsFor={}, goalsAgainst={}, cleanSheets={}, played={}, resultsSeq={};
+  const wins=[], scorelines=[], upsets=[];
+  const goalsFor={}, goalsAgainst={}, cleanSheets={}, played={}, resultsSeq={}, shootoutWins={};
 
   history.forEach(h=>{
     const m = h.m;
     const margin = Math.abs(m.scoreA-m.scoreB);
     const total = m.scoreA+m.scoreB;
-    if(m.winner && (!biggestWin || margin>biggestWin.margin)){
-      biggestWin = {margin, m, roundLabel:h.roundLabel};
+    if(m.winner){
+      wins.push({margin, m, roundLabel:h.roundLabel});
     }
-    if(!highestScoring || total>highestScoring.total){
-      highestScoring = {total, m, roundLabel:h.roundLabel};
-    }
+    scorelines.push({total, m, roundLabel:h.roundLabel});
     if(m.winner){
       const loser = m.winner===m.a?m.b:m.a;
       const gap = loser.rating - m.winner.rating;
-      if(gap>0 && (!biggestUpset || gap>biggestUpset.gap)){
-        biggestUpset = {gap, m, roundLabel:h.roundLabel, winner:m.winner, loser};
+      if(gap>0) upsets.push({gap, m, roundLabel:h.roundLabel, winner:m.winner, loser});
+      if(m.penalties){
+        shootoutWins[m.winner.id] = (shootoutWins[m.winner.id]||0)+1;
       }
     }
     [[m.a,m.scoreA,m.scoreB],[m.b,m.scoreB,m.scoreA]].forEach(([team,gf,ga])=>{
@@ -2598,37 +3090,47 @@ function computeTournamentStats(){
   });
 
   const teamById = id => state.allTeams.find(t=>t.id===+id);
+  const top3 = (arr, cmp) => arr.slice().sort(cmp).slice(0,3);
 
-  const topScorerEntry = Object.entries(goalsFor).sort((a,b)=>b[1]-a[1])[0];
+  wins.sort((a,b)=>b.margin-a.margin);
+  scorelines.sort((a,b)=>b.total-a.total);
+  upsets.sort((a,b)=>b.gap-a.gap);
 
-  /* Best defense uses goals-conceded PER MATCH, not the raw total — otherwise a team
-     knocked out after 2 matches with 1 goal against looks "better" than a side that
-     went 6 matches deep conceding just 4, purely because they played less football.
-     Require a minimum sample size, falling back only if the field is too small/early
-     to have any team clear that bar yet. */
-  const defenseList = Object.entries(goalsAgainst).map(([id,ga])=>({id, ga, p:played[id], avg:ga/played[id]}));
-  let minPlayed = 3;
-  let defensePool = defenseList.filter(e=>e.p>=minPlayed);
-  if(!defensePool.length){ minPlayed=2; defensePool = defenseList.filter(e=>e.p>=minPlayed); }
-  if(!defensePool.length){ minPlayed=1; defensePool = defenseList.filter(e=>e.p>=minPlayed); }
-  defensePool.sort((a,b)=> a.avg-b.avg || b.p-a.p);
-  const bestDefenseEntry = defensePool[0];
+  const scorerRows = Object.entries(goalsFor).map(([id,g])=>({team:teamById(id), goals:g}))
+    .sort((a,b)=>b.goals-a.goals);
 
-  const cleanSheetEntry = Object.entries(cleanSheets).sort((a,b)=>b[1]-a[1])[0];
+  const teamIds = Object.keys(played);
+  const defenseRows = computeShrunkDefense(goalsAgainst, played, teamIds)
+    .sort((a,b)=> a.adjAvg-b.adjAvg || b.played-a.played)
+    .map(e=>({team:teamById(e.id), played:e.played, conceded:e.conceded, avg:e.rawAvg}));
 
-  let longestStreak = {teamId:null, length:0};
-  Object.entries(resultsSeq).forEach(([id,seq])=>{
+  const cleanSheetRows = Object.entries(cleanSheets).map(([id,c])=>({team:teamById(id), count:c}))
+    .sort((a,b)=>b.count-a.count);
+
+  const shootoutRows = Object.entries(shootoutWins).map(([id,c])=>({team:teamById(id), count:c}))
+    .sort((a,b)=>b.count-a.count);
+
+  const streaks = Object.entries(resultsSeq).map(([id,seq])=>{
     let cur=0, best=0;
     seq.forEach(r=>{ if(r==='W'){ cur++; best=Math.max(best,cur); } else cur=0; });
-    if(best>longestStreak.length) longestStreak = {teamId:id, length:best};
-  });
+    return {team:teamById(id), length:best};
+  }).filter(s=>s.length>1).sort((a,b)=>b.length-a.length);
 
   return {
-    biggestWin, highestScoring, biggestUpset,
-    topScorer: topScorerEntry ? {team:teamById(topScorerEntry[0]), goals:topScorerEntry[1]} : null,
-    bestDefense: bestDefenseEntry ? {team:teamById(bestDefenseEntry.id), conceded:bestDefenseEntry.ga, played:bestDefenseEntry.p, avg:bestDefenseEntry.avg} : null,
-    cleanSheets: cleanSheetEntry ? {team:teamById(cleanSheetEntry[0]), count:cleanSheetEntry[1]} : null,
-    longestStreak: longestStreak.teamId!=null ? {team:teamById(longestStreak.teamId), length:longestStreak.length} : null
+    biggestWins: wins.slice(0,3),
+    highestScoring: scorelines.slice(0,3),
+    biggestUpsets: upsets.slice(0,3),
+    topScorers: scorerRows.slice(0,3),
+    bestDefense: defenseRows.slice(0,3),
+    cleanSheets: cleanSheetRows.slice(0,3),
+    longestStreaks: streaks.slice(0,3),
+    shootoutWins: shootoutRows.slice(0,3),
+    // kept for the recap sentence generator, which only needs the #1 of each
+    biggestWin: wins[0]||null,
+    highestScoringMatch: scorelines[0]||null,
+    biggestUpset: upsets[0]||null,
+    topScorer: scorerRows[0]||null,
+    longestStreak: streaks[0]||null
   };
 }
 
@@ -2676,6 +3178,24 @@ function generateHighlightsRecap(){
   return lines;
 }
 
+/* Renders one stat card. `entries` is an array (top 3) of {label,value} pairs already
+   formatted for display — the first entry is shown as the headline value/sub, any
+   further entries render as a compact ranked list underneath. */
+function renderStatCard(title, entries){
+  if(!entries || !entries.length) return '';
+  const [first, ...rest] = entries;
+  const restHtml = rest.length
+    ? `<div class="stat-sub" style="margin-top:8px;">${rest.map((e,i)=>`${i+2}. ${e.sub}`).join('<br>')}</div>`
+    : '';
+  return `
+    <div class="stat-card">
+      <div class="stat-label">${title}</div>
+      <div class="stat-value">${first.value}</div>
+      <div class="stat-sub">${first.sub}</div>
+      ${restHtml}
+    </div>`;
+}
+
 function renderStats(){
   const recap = generateHighlightsRecap();
   const recapEl = document.getElementById('highlightsRecap');
@@ -2687,42 +3207,50 @@ function renderStats(){
     return;
   }
   const cards = [];
-  if(stats.biggestWin){
-    const m = stats.biggestWin.m;
-    cards.push({label:'Biggest Win Margin', value:`${stats.biggestWin.margin} goals`,
-      sub:`${m.winner.name} ${m.scoreA}-${m.scoreB} ${m.winner===m.a?m.b.name:m.a.name} (${stats.biggestWin.roundLabel})`});
+
+  if(stats.biggestWins.length){
+    cards.push(renderStatCard('Biggest Win Margins', stats.biggestWins.map(w=>{
+      const m = w.m;
+      return {value:`${w.margin} goals`, sub:`${m.winner.name} ${m.scoreA}-${m.scoreB} ${m.winner===m.a?m.b.name:m.a.name} (${w.roundLabel})`};
+    })));
   }
-  if(stats.highestScoring){
-    const m = stats.highestScoring.m;
-    cards.push({label:'Highest-Scoring Match', value:`${stats.highestScoring.total} goals`,
-      sub:`${m.a.name} ${m.scoreA}-${m.scoreB} ${m.b.name} (${stats.highestScoring.roundLabel})`});
+  if(stats.highestScoring.length){
+    cards.push(renderStatCard('Highest-Scoring Matches', stats.highestScoring.map(s=>{
+      const m = s.m;
+      return {value:`${s.total} goals`, sub:`${m.a.name} ${m.scoreA}-${m.scoreB} ${m.b.name} (${s.roundLabel})`};
+    })));
   }
-  if(stats.biggestUpset){
-    cards.push({label:'Biggest Upset', value:`${stats.biggestUpset.gap}pt gap`,
-      sub:`${stats.biggestUpset.winner.name} beat ${stats.biggestUpset.loser.name} (${stats.biggestUpset.roundLabel})`});
+  if(stats.biggestUpsets.length){
+    cards.push(renderStatCard('Biggest Upsets', stats.biggestUpsets.map(u=>({
+      value:`${u.gap}pt gap`, sub:`${u.winner.name} beat ${u.loser.name} (${u.roundLabel})`
+    }))));
   }
-  if(stats.topScorer){
-    cards.push({label:'Most Team Goals', value:`${stats.topScorer.goals} goals`,
-      sub:`${flagFor(stats.topScorer.team)} ${stats.topScorer.team.name}`});
+  if(stats.topScorers.length){
+    cards.push(renderStatCard('Most Team Goals', stats.topScorers.map(s=>({
+      value:`${s.goals} goals`, sub:`${flagFor(s.team)} ${s.team.name}`
+    }))));
   }
-  if(stats.bestDefense){
-    cards.push({label:'Best Defensive Record', value:`${stats.bestDefense.avg.toFixed(2)}/match`,
-      sub:`${flagFor(stats.bestDefense.team)} ${stats.bestDefense.team.name} — ${stats.bestDefense.conceded} conceded in ${stats.bestDefense.played} matches`});
+  if(stats.bestDefense.length){
+    cards.push(renderStatCard('Best Defensive Record', stats.bestDefense.map(d=>({
+      value:`${d.avg.toFixed(2)}/match`, sub:`${flagFor(d.team)} ${d.team.name} — ${d.conceded} conceded in ${d.played} matches`
+    }))));
   }
-  if(stats.cleanSheets){
-    cards.push({label:'Most Clean Sheets', value:`${stats.cleanSheets.count}`,
-      sub:`${flagFor(stats.cleanSheets.team)} ${stats.cleanSheets.team.name}`});
+  if(stats.cleanSheets.length){
+    cards.push(renderStatCard('Most Clean Sheets', stats.cleanSheets.map(c=>({
+      value:`${c.count}`, sub:`${flagFor(c.team)} ${c.team.name}`
+    }))));
   }
-  if(stats.longestStreak && stats.longestStreak.length>1){
-    cards.push({label:'Longest Win Streak', value:`${stats.longestStreak.length} in a row`,
-      sub:`${flagFor(stats.longestStreak.team)} ${stats.longestStreak.team.name}`});
+  if(stats.longestStreaks.length){
+    cards.push(renderStatCard('Longest Win Streaks', stats.longestStreaks.map(s=>({
+      value:`${s.length} in a row`, sub:`${flagFor(s.team)} ${s.team.name}`
+    }))));
   }
-  statsGrid.innerHTML = cards.map(c=>`
-    <div class="stat-card">
-      <div class="stat-label">${c.label}</div>
-      <div class="stat-value">${c.value}</div>
-      <div class="stat-sub">${c.sub}</div>
-    </div>`).join('');
+  if(stats.shootoutWins.length){
+    cards.push(renderStatCard('Penalty Shootout Specialists', stats.shootoutWins.map(s=>({
+      value:`${s.count} won`, sub:`${flagFor(s.team)} ${s.team.name}`
+    }))));
+  }
+  statsGrid.innerHTML = cards.join('');
 }
 
 document.getElementById('statsBtn').addEventListener('click', ()=>{
@@ -2743,8 +3271,6 @@ document.getElementById('editDrawDoneBtn').addEventListener('click', ()=>{
   render();
 });
 
-undoBtn.addEventListener('click', applyUndo);
-
 /* ===================== LIVE WATCH ENGINE ===================== */
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
@@ -2758,11 +3284,12 @@ function poissonSample(lambda){
 
 function halfLambda(team, opp, tacticMultOverride){
   const base = state.goal==="tight" ? 0.42 : state.goal==="goalfest" ? 0.95 : 0.62;
-  const diff = (team.rating-opp.rating)/40;
+  const diff = (effectiveTeamRating(team)-effectiveTeamRating(opp))/40;
   const styleAdj = state.style==="chaos" ? 1.25 : state.style==="standard" ? 1.1 : 1.0;
   const baseTacticMult = (TACTICS[state.tactic]||TACTICS.balanced).mult;
   const overrideMult = tacticMultOverride!=null ? tacticMultOverride : 1;
-  return Math.max(0.05, (base+diff)*styleAdj*baseTacticMult*overrideMult);
+  const lambda = Math.max(0.05, (base+diff)*styleAdj*baseTacticMult*overrideMult);
+  return lambda * keeperFactor(opp);
 }
 
 function simulateHalfGoals(team, opp, minMinute, maxMinute, tacticMultOverride){
@@ -2826,12 +3353,26 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const godTacticB = document.getElementById('godTacticB');
   const tacticLabelA = document.getElementById('tacticLabelA');
   const tacticLabelB = document.getElementById('tacticLabelB');
+  const momentumFillA = document.getElementById('momentumFillA');
+  const momentumFillB = document.getElementById('momentumFillB');
+  const possessionFillA = document.getElementById('possessionFillA');
+  const possessionFillB = document.getElementById('possessionFillB');
+  const possessionLabelA = document.getElementById('possessionLabelA');
+  const possessionLabelB = document.getElementById('possessionLabelB');
+  const shotsAEl = document.getElementById('shotsA');
+  const shotsBEl = document.getElementById('shotsB');
+  const winProbFillA = document.getElementById('winProbFillA');
+  const winProbFillB = document.getElementById('winProbFillB');
+  const winProbLabelA = document.getElementById('winProbLabelA');
+  const winProbLabelB = document.getElementById('winProbLabelB');
 
   document.getElementById('watchTitle').textContent = `${m.a.name} vs ${m.b.name}`;
   document.getElementById('watchFlagA').textContent = flagFor(m.a);
   document.getElementById('watchFlagB').textContent = flagFor(m.b);
   document.getElementById('watchNameA').textContent = m.a.name;
   document.getElementById('watchNameB').textContent = m.b.name;
+  document.getElementById('momentumLabelA').textContent = m.a.name;
+  document.getElementById('momentumLabelB').textContent = m.b.name;
   scoreAEl.textContent='0'; scoreBEl.textContent='0';
   feedEl.innerHTML='';
   shootoutRow.classList.add('hidden'); shootoutRow.innerHTML='';
@@ -2853,7 +3394,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   godTacticA.disabled = false;
   godTacticB.disabled = false;
 
-  let liveScoreA=0, liveScoreB=0, skipRequested=false;
+  let liveScoreA=0, liveScoreB=0, skipRequested=false, goldenGoalEnded=false;
   let matchEvents=[];
   let paused=false, speedIndex=0, halfEndBonus=0;
   let tacticMultA=1, tacticMultB=1;
@@ -2861,6 +3402,94 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const SPEEDS=[90,45,20];
   const SPEED_LABELS=['1x','2x','4x'];
   skipBtn.onclick = ()=>{ skipRequested=true; };
+
+  /* ---- Momentum: 0 = fully Team A's momentum, 100 = fully Team B's. Drifts slowly
+     toward whichever side is playing the more attacking tactic, wanders a little each
+     minute, and swings hard on a goal — then settles back toward the centre. Purely a
+     visual read on how the match "feels"; it doesn't feed back into the sim. ---- */
+  let momentum = 50;
+  function renderMomentum(){
+    momentumFillA.style.width = (100-momentum)+'%';
+    momentumFillB.style.width = momentum+'%';
+  }
+  function nudgeMomentum(delta){
+    momentum = Math.max(5, Math.min(95, momentum+delta));
+    renderMomentum();
+  }
+  renderMomentum();
+
+  /* ---- Possession: a slower-moving sibling of momentum. Drifts toward an equilibrium
+     set by rating gap and tactic aggression rather than reacting to goals directly. ---- */
+  let possessionA = 50;
+  function renderPossession(){
+    possessionLabelA.textContent = Math.round(possessionA)+'%';
+    possessionLabelB.textContent = Math.round(100-possessionA)+'%';
+    possessionFillA.style.width = possessionA+'%';
+    possessionFillB.style.width = (100-possessionA)+'%';
+  }
+  renderPossession();
+
+  /* ---- Shots / shots on target: incremented by real goals, god-mode goals, and the
+     non-goal "chances" generated each minute (maybeChance below). ---- */
+  const shotStats = {a:{shots:0,sot:0}, b:{shots:0,sot:0}};
+  function renderShotStats(){
+    shotsAEl.textContent = `${shotStats.a.shots} (${shotStats.a.sot})`;
+    shotsBEl.textContent = `${shotStats.b.shots} (${shotStats.b.sot})`;
+  }
+  function recordShot(team, onTarget){
+    const s = team===m.a ? shotStats.a : shotStats.b;
+    s.shots++;
+    if(onTarget) s.sot++;
+    renderShotStats();
+  }
+  renderShotStats();
+
+  /* ---- Win probability: blends the pre-match rating gap with the current scoreline,
+     weighting the scoreline more heavily as the clock runs down. Purely a live readout —
+     it watches the match, it doesn't influence it. ---- */
+  function renderWinProbability(){
+    const scale = styleScale(state.style);
+    const ratingP = 1/(1+Math.pow(10, -(effectiveTeamRating(m.a)-effectiveTeamRating(m.b))/scale));
+    const scoreDiff = liveScoreA-liveScoreB;
+    const timeFactor = Math.min(1, (currentMin||0)/90);
+    const scoreWeight = 0.5 + timeFactor*0.4;
+    const scoreP = 1/(1+Math.exp(-scoreDiff*0.9));
+    let pA = (1-scoreWeight)*ratingP + scoreWeight*scoreP;
+    pA = Math.max(0.03, Math.min(0.97, pA));
+    winProbLabelA.textContent = Math.round(pA*100)+'%';
+    winProbLabelB.textContent = Math.round((1-pA)*100)+'%';
+    winProbFillA.style.width = (pA*100)+'%';
+    winProbFillB.style.width = ((1-pA)*100)+'%';
+  }
+  renderWinProbability();
+
+  /* ---- Non-goal chances: saves, off-target efforts, and woodwork strikes. Feed flavor
+     plus a small momentum nudge, and they're what actually builds the shot counts —
+     goals also count as a shot on target via recordShot() in applyGoal/forceGoal. ---- */
+  function maybeChance(){
+    if(Math.random()>=0.14) return;
+    const wA = tacticMultA * (100-momentum) + 5;
+    const wB = tacticMultB * momentum + 5;
+    const attackingTeam = Math.random() < wA/(wA+wB) ? m.a : m.b;
+    const defendingTeam = attackingTeam===m.a ? m.b : m.a;
+    const attacker = weightedPickPlayer(availablePlayers(attackingTeam));
+    const attackerLabel = state.useRealNames ? attacker.name : ('Player #'+attacker.number);
+    const roll = Math.random();
+    if(roll<0.45){
+      const keeper = defendingTeam.players.find(p=>p.position==='GK') || defendingTeam.players[0];
+      const keeperLabel = state.useRealNames ? keeper.name : ('Player #'+keeper.number);
+      addFeed(`🧤 Big save! ${keeperLabel} denies ${attackerLabel} (${attackingTeam.name})`, false);
+      recordShot(attackingTeam, true);
+      nudgeMomentum(attackingTeam===m.a ? -4 : 4);
+    } else if(roll<0.85){
+      addFeed(`🎯 ${attackerLabel} fires wide for ${attackingTeam.name}`, false);
+      recordShot(attackingTeam, false);
+    } else {
+      addFeed(`💥 Off the woodwork! ${attackerLabel} (${attackingTeam.name}) rattles the frame`, false);
+      recordShot(attackingTeam, false);
+      nudgeMomentum(attackingTeam===m.a ? -6 : 6);
+    }
+  }
 
   function addFeed(text, isGoal){
     const li = document.createElement('li');
@@ -2870,7 +3499,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   }
   function pickScorer(team){
     const pool = availablePlayers(team);
-    const p = pool[Math.floor(Math.random()*pool.length)];
+    const p = weightedPickPlayer(pool);
     return state.useRealNames ? p.name : ("Player #"+p.number);
   }
   function forceGoal(team, tag){
@@ -2880,6 +3509,12 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
     matchEvents.push({minute, teamRef:team, scorer: `${scorer} (${tag||'God Mode'})`});
     addFeed(`⚡ ${tag||'GOD MODE'}: ${team.name} — ${scorer}!`, true);
+    nudgeMomentum(team===m.a ? -22 : 22);
+    recordShot(team, true);
+    renderWinProbability();
+    if(matchLive && currentMin>90 && decisive && state.extraTime && state.goldenGoal){
+      goldenGoalEnded = true;
+    }
   }
   godGoalABtn.onclick = ()=>forceGoal(m.a);
   godGoalBBtn.onclick = ()=>forceGoal(m.b);
@@ -2887,6 +3522,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     const trailing = liveScoreA===liveScoreB ? null : (liveScoreA<liveScoreB ? m.a : m.b);
     if(!trailing){ addFeed('🔥 GOD MODE: Comeback spark called, but the sides are level!', false); return; }
     addFeed(`🔥 GOD MODE: ${trailing.name} given a jolt of momentum!`, false);
+    nudgeMomentum(trailing===m.a ? -14 : 14);
     if(Math.random()<0.55) forceGoal(trailing, 'MOMENTUM SWING');
   };
   godInjuryBtn.onclick = ()=>{
@@ -2928,6 +3564,9 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
     matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer});
     addFeed(goalCommentary(ev.teamRef.name, scorer, ev.minute), true);
+    nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
+    recordShot(ev.teamRef, true);
+    renderWinProbability();
   }
   function maybeDrama(){
     if(Math.random()>=0.025) return;
@@ -2943,30 +3582,56 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     ];
     addFeed(lines[Math.floor(Math.random()*lines.length)], false);
   }
-  async function playHalf(events, startMin, endMin){
+  /* isExtraTime lets the clock loop bail out the instant either side scores when Golden
+     Goal is active — sudden death, exactly like the real (retired) rule used to work. */
+  async function playHalf(events, startMin, endMin, isExtraTime){
     events.sort((e,f)=>e.minute-f.minute);
     currentHalfEvents = events;
     currentHalfEi = 0;
     currentMin = startMin;
     currentHalfEndMin = endMin+halfEndBonus;
     matchLive = true;
+    const goldenActive = isExtraTime && decisive && state.extraTime && state.goldenGoal;
     while(currentMin <= currentHalfEndMin){
       if(skipRequested){
-        while(currentHalfEi<currentHalfEvents.length){ applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
+        while(currentHalfEi<currentHalfEvents.length){
+          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+          if(goldenActive){ matchLive=false; return; }
+        }
         clockEl.textContent = currentHalfEndMin+"'";
         matchLive = false;
         return;
       }
       while(paused && !skipRequested){ await wait(120); }
       if(skipRequested){
-        while(currentHalfEi<currentHalfEvents.length){ applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
+        while(currentHalfEi<currentHalfEvents.length){
+          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+          if(goldenActive){ matchLive=false; return; }
+        }
         clockEl.textContent = currentHalfEndMin+"'";
         matchLive = false;
         return;
       }
       clockEl.textContent = currentMin+"'";
-      while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){ applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
+      while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){
+        applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+        if(goldenActive){
+          addFeed(`🏆 GOLDEN GOAL! ${m.winner===m.a?m.a.name:''}${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true);
+          matchLive = false;
+          return;
+        }
+      }
+      if(goldenGoalEnded){ matchLive=false; return; }
       if(state.dramaEnabled) maybeDrama();
+      maybeChance();
+      momentum += (50-momentum)*0.05 + (tacticMultB-tacticMultA)*1.1 + (Math.random()-0.5)*3;
+      momentum = Math.max(5, Math.min(95, momentum));
+      renderMomentum();
+      const possessionTarget = 50 + (effectiveTeamRating(m.a)-effectiveTeamRating(m.b))*0.4 + (tacticMultA-tacticMultB)*8;
+      possessionA += (possessionTarget-possessionA)*0.04 + (Math.random()-0.5)*1.4;
+      possessionA = Math.max(26, Math.min(74, possessionA));
+      renderPossession();
+      renderWinProbability();
       await wait(SPEEDS[speedIndex]);
       currentMin++;
       currentHalfEndMin = endMin+halfEndBonus;
@@ -2979,7 +3644,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const stoppage1 = 1+Math.floor(Math.random()*3);
   const h1EventsA = simulateHalfGoals(m.a, m.b, 1, 45+stoppage1, tacticMultA);
   const h1EventsB = simulateHalfGoals(m.b, m.a, 1, 45+stoppage1, tacticMultB);
-  await playHalf([...h1EventsA,...h1EventsB], 1, 45+stoppage1);
+  await playHalf([...h1EventsA,...h1EventsB], 1, 45+stoppage1, false);
 
   phaseEl.textContent = "Half-time";
   addFeed(halftimeCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false);
@@ -2990,24 +3655,24 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const stoppage2 = 2+Math.floor(Math.random()*4);
   const h2EventsA = simulateHalfGoals(m.a, m.b, 46, 90+stoppage2, tacticMultA);
   const h2EventsB = simulateHalfGoals(m.b, m.a, 46, 90+stoppage2, tacticMultB);
-  await playHalf([...h2EventsA,...h2EventsB], 46, 90+stoppage2);
+  await playHalf([...h2EventsA,...h2EventsB], 46, 90+stoppage2, false);
 
   if(decisive && state.extraTime && !skipRequested && liveScoreA===liveScoreB){
     addFeed(`⏱ Full-time: level at ${liveScoreA}-${liveScoreB}. Extra time!`, false);
-    phaseEl.textContent = "Extra Time — 1st period";
+    phaseEl.textContent = state.goldenGoal ? "Extra Time — Golden Goal" : "Extra Time — 1st period";
     halfEndBonus = 0;
     const et1A = simulateHalfGoals(m.a, m.b, 91, 105, tacticMultA*0.65);
     const et1B = simulateHalfGoals(m.b, m.a, 91, 105, tacticMultB*0.65);
-    await playHalf([...et1A,...et1B], 91, 105);
+    await playHalf([...et1A,...et1B], 91, 105, true);
 
-    if(!skipRequested){
-      phaseEl.textContent = "Extra Time — 2nd period";
+    if(liveScoreA===liveScoreB && !skipRequested){
+      phaseEl.textContent = state.goldenGoal ? "Extra Time — Golden Goal continues" : "Extra Time — 2nd period";
       await wait(300);
+      halfEndBonus = 0;
+      const et2A = simulateHalfGoals(m.a, m.b, 106, 120, tacticMultA*0.65);
+      const et2B = simulateHalfGoals(m.b, m.a, 106, 120, tacticMultB*0.65);
+      await playHalf([...et2A,...et2B], 106, 120, true);
     }
-    halfEndBonus = 0;
-    const et2A = simulateHalfGoals(m.a, m.b, 106, 120, tacticMultA*0.65);
-    const et2B = simulateHalfGoals(m.b, m.a, 106, 120, tacticMultB*0.65);
-    await playHalf([...et2A,...et2B], 106, 120);
   }
 
   phaseEl.textContent = "Full-time";
@@ -3020,7 +3685,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     phaseEl.textContent = "Penalty shootout";
     shootoutRow.classList.remove('hidden');
     const scale = styleScale(state.style);
-    const diff = m.a.rating-m.b.rating;
+    const diff = effectiveTeamRating(m.a)-effectiveTeamRating(m.b);
     const pA = 1/(1+Math.pow(10,-diff/scale));
     const result = await runShootoutAnimation(shootoutRow, pA);
     penA=result.penA; penB=result.penB; winner = result.aWon?m.a:m.b; penalties=true;
@@ -3032,6 +3697,8 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   }
 
   // ---- write the result back into the tournament ----
+  const suspSnapA = state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined;
+  const suspSnapB = state.suspensions[m.b.id] ? new Set(state.suspensions[m.b.id]) : undefined;
   m.played=true; m.revealed=true;
   m.scoreA=liveScoreA; m.scoreB=liveScoreB; m.winner=winner; m.penalties=penalties; m.penA=penA; m.penB=penB;
   m.events = matchEvents.slice().sort((x,y)=>x.minute-y.minute);
@@ -3039,19 +3706,29 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   clearSuspensions(m.a); clearSuspensions(m.b);
   maybeSuspendPlayer(m.a); maybeSuspendPlayer(m.b);
   const roundLabel = roundLabelOverride || roundNameFor(state.round.length*2);
-  state.matchHistory.push({roundLabel, m});
+  const historyEntry = {roundLabel, m};
+  state.matchHistory.push(historyEntry);
+  let upset=false, followRemoved=false, loserId=null;
+  const pulsesAdded = [];
   if(winner){
     const loser = winner===m.a?m.b:m.a;
-    const upset = isUpset(winner, loser);
+    upset = isUpset(winner, loser);
     if(upset) state.upsets++;
+    loserId = loser.id;
     if(decisive && state.followIds.has(loser.id)){
-      state.pulses.unshift({text:`💔 Your followed side, ${loser.name}, are OUT.`, hot:true});
+      const followMsg = {text:`💔 Your followed side, ${loser.name}, are OUT.`, hot:true};
+      state.pulses.unshift(followMsg);
+      pulsesAdded.push(followMsg);
       state.followIds.delete(loser.id);
+      followRemoved = true;
     }
-    logPulse({scoreA:liveScoreA, scoreB:liveScoreB, winner, penA, penB}, m, upset, loser);
+    pulsesAdded.push(logPulse({scoreA:liveScoreA, scoreB:liveScoreB, winner, penA, penB}, m, upset, loser));
   } else {
-    state.pulses.unshift({text:`${m.a.name} and ${m.b.name} draw ${liveScoreA}-${liveScoreB} in ${roundLabel}`, hot:false});
+    const drawMsg = {text:`${m.a.name} and ${m.b.name} draw ${liveScoreA}-${liveScoreB} in ${roundLabel}`, hot:false};
+    state.pulses.unshift(drawMsg);
+    pulsesAdded.push(drawMsg);
   }
+  registerUndoSnapshot(m, {upset, historyEntry, followRemoved, loserId, suspSnapA, suspSnapB, pulsesAdded});
 
   closeBtn.classList.remove('hidden');
   closeBtn.onclick = ()=>{ overlay.classList.add('hidden'); render(); };
@@ -3061,7 +3738,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
 /* ===================== SETUP MODAL ===================== */
 const setupOverlay = document.getElementById('setupOverlay');
 let pendingSize=64, pendingStyle="realistic", pendingGoal="normal", pendingTactic="balanced", pendingSpoiler="off", pendingNames="real";
-let pendingSeeding="random", pendingExtraTime="off", pendingDrama="off", pendingFormat="knockout";
+let pendingSeeding="random", pendingExtraTime="off", pendingDrama="off", pendingFormat="knockout", pendingGoldenGoal="off", pendingChaos="normal";
 
 function wireOptRow(rowId, dataAttr, onPick){
   document.getElementById(rowId).querySelectorAll('.opt').forEach(opt=>{
@@ -3078,10 +3755,16 @@ wireOptRow('seedingRow','seeding', v=>pendingSeeding=v);
 wireOptRow('styleRow','style', v=>pendingStyle=v);
 wireOptRow('goalRow','goal', v=>pendingGoal=v);
 wireOptRow('tacticRow','tactic', v=>pendingTactic=v);
-wireOptRow('extraTimeRow','extratime', v=>pendingExtraTime=v);
+wireOptRow('extraTimeRow','extratime', v=>{ pendingExtraTime=v; updateGoldenGoalVisibility(); });
+wireOptRow('goldenGoalRow','goldengoal', v=>pendingGoldenGoal=v);
 wireOptRow('dramaRow','drama', v=>pendingDrama=v);
+wireOptRow('chaosRow','chaos', v=>pendingChaos=v);
 wireOptRow('spoilerRow','spoiler', v=>pendingSpoiler=v);
 wireOptRow('namesRow','names', v=>pendingNames=v);
+
+function updateGoldenGoalVisibility(){
+  document.getElementById('goldenGoalField').style.display = pendingExtraTime==='on' ? '' : 'none';
+}
 
 /* 24 and 48 team fields only make sense for Groups + Knockout (they need best-third-place
    qualifiers to reach a clean bracket size) — hide them, and back out of them, for Straight
@@ -3103,6 +3786,7 @@ document.getElementById('newTournamentBtn').addEventListener('click', ()=>{
   document.getElementById('formatField').style.display = "";
   document.getElementById('seedingField').style.display = "";
   updateSizeOptionsForFormat();
+  updateGoldenGoalVisibility();
   setupOverlay.classList.remove('hidden');
 });
 document.getElementById('settingsBtn').addEventListener('click', ()=>{
@@ -3110,6 +3794,7 @@ document.getElementById('settingsBtn').addEventListener('click', ()=>{
   document.getElementById('sizeField').style.display = "none";
   document.getElementById('formatField').style.display = "none";
   document.getElementById('seedingField').style.display = "none";
+  updateGoldenGoalVisibility();
   setupOverlay.classList.remove('hidden');
 });
 document.getElementById('cancelSetupBtn').addEventListener('click', ()=>{
@@ -3120,7 +3805,7 @@ document.getElementById('startBtn').addEventListener('click', ()=>{
   setupOverlay.classList.add('hidden');
   championOverlay.classList.add('hidden');
   if(isNewTournament){
-    newTournament(pendingSize, pendingStyle, pendingGoal, pendingTactic, pendingSpoiler==="on", pendingNames==="real", pendingSeeding==="seeded", pendingExtraTime==="on", pendingDrama==="on", pendingFormat);
+    newTournament(pendingSize, pendingStyle, pendingGoal, pendingTactic, pendingSpoiler==="on", pendingNames==="real", pendingSeeding==="seeded", pendingExtraTime==="on", pendingDrama==="on", pendingFormat, pendingGoldenGoal==="on", pendingChaos);
   } else if(state){
     state.style = pendingStyle;
     state.goal = pendingGoal;
@@ -3129,6 +3814,8 @@ document.getElementById('startBtn').addEventListener('click', ()=>{
     state.useRealNames = pendingNames==="real";
     state.extraTime = pendingExtraTime==="on";
     state.dramaEnabled = pendingDrama==="on";
+    state.goldenGoal = pendingGoldenGoal==="on";
+    state.chaosSensitivity = pendingChaos;
     render();
   }
 });
@@ -3143,7 +3830,7 @@ document.getElementById('nextRoundBtn').addEventListener('click', ()=>{
 });
 document.getElementById('runItBackBtn').addEventListener('click', ()=>{
   championOverlay.classList.add('hidden');
-  newTournament(state.size, state.style, state.goal, state.tactic, state.spoilerSafe, state.useRealNames, state.seeded, state.extraTime, state.dramaEnabled, state.format);
+  newTournament(state.size, state.style, state.goal, state.tactic, state.spoilerSafe, state.useRealNames, state.seeded, state.extraTime, state.dramaEnabled, state.format, state.goldenGoal, state.chaosSensitivity);
 });
 
 /* follow a team — selecting one adds it to the Following list */
@@ -3246,8 +3933,45 @@ document.getElementById('lockPredictBtn').addEventListener('click', ()=>{
   render();
 });
 
+/* ===================== CUSTOM TEAM BUILDER ===================== */
+const customTeamsOverlay = document.getElementById('customTeamsOverlay');
+const customTeamsList = document.getElementById('customTeamsList');
+const customTeamRatingInput = document.getElementById('customTeamRating');
+const customTeamRatingLabel = document.getElementById('customTeamRatingLabel');
+
+function renderCustomTeamsList(){
+  customTeamsList.innerHTML = customTeams.length
+    ? customTeams.map((ct,i)=>`<div class="follow-chip"><span class="fc-name">${ct.flagOverride||'🏳️'} ${ct.name} <span style="color:var(--muted); font-family:'Space Mono'; margin-left:6px;">${ct.rating}</span></span><button data-remove-custom="${i}" title="Remove">✕</button></div>`).join('')
+    : `<div style="color:var(--muted); font-size:12.5px;">No custom teams yet — add one below.</div>`;
+  customTeamsList.querySelectorAll('[data-remove-custom]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      customTeams.splice(+btn.dataset.removeCustom,1);
+      renderCustomTeamsList();
+    });
+  });
+}
+document.getElementById('customTeamsBtn').addEventListener('click', ()=>{
+  renderCustomTeamsList();
+  customTeamsOverlay.classList.remove('hidden');
+});
+document.getElementById('customTeamsCloseBtn').addEventListener('click', ()=>customTeamsOverlay.classList.add('hidden'));
+customTeamRatingInput.addEventListener('input', ()=>{
+  customTeamRatingLabel.textContent = customTeamRatingInput.value;
+});
+document.getElementById('addCustomTeamBtn').addEventListener('click', ()=>{
+  const nameInput = document.getElementById('customTeamName');
+  const flagInput = document.getElementById('customTeamFlag');
+  const name = nameInput.value.trim();
+  if(!name) return;
+  const flagOverride = flagInput.value.trim() || '🏳️';
+  const rating = +customTeamRatingInput.value;
+  customTeams.push({name, flagOverride, rating});
+  nameInput.value=''; flagInput.value='';
+  renderCustomTeamsList();
+});
+
 /* ===================== BOOT ===================== */
-newTournament(64, "realistic", "normal", "balanced", false, true, false, false, false, "knockout");
+newTournament(64, "realistic", "normal", "balanced", false, true, false, false, false, "knockout", false, "normal");
 </script>
 </body>
 </html>
