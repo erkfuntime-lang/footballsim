@@ -3507,11 +3507,13 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     const minute = currentMin || 1;
     if(team===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
-    matchEvents.push({minute, teamRef:team, scorer: `${scorer} (${tag||'God Mode'})`});
+    matchEvents.push({minute, teamRef:team, scorer});
     addFeed(`⚡ ${tag||'GOD MODE'}: ${team.name} — ${scorer}!`, true);
     nudgeMomentum(team===m.a ? -22 : 22);
     recordShot(team, true);
     renderWinProbability();
+    const bootKey = `${scorer} (${team.name})`;
+    state.boot[bootKey] = (state.boot[bootKey]||0)+1;
     if(matchLive && currentMin>90 && decisive && state.extraTime && state.goldenGoal){
       goldenGoalEnded = true;
     }
@@ -3567,6 +3569,8 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
     recordShot(ev.teamRef, true);
     renderWinProbability();
+    const bootKey = `${scorer} (${ev.teamRef.name})`;
+    state.boot[bootKey] = (state.boot[bootKey]||0)+1;
   }
   function maybeDrama(){
     if(Math.random()>=0.025) return;
