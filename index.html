@@ -4155,7 +4155,7 @@ async function loadNationRosters(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
     const map = {};
-    data.forEach(entry=>{ map[entry.country] = entry.players; });
+    (data.countries || []).forEach(entry=>{ map[entry.country] = entry.players; });
     NATION_ROSTERS = map;
     console.log(`Loaded curated rosters for ${Object.keys(map).length} nations.`);
   }catch(err){
