@@ -168,6 +168,11 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .vs-label{font-family:'Space Mono'; color:var(--muted); font-size:12px;}
 .hidden-score{font-family:'Space Mono'; color:var(--muted); font-size:18px; letter-spacing:.3em;}
 
+.live-pitch-wrap{
+  background:linear-gradient(180deg,#123a1e,#0d2c17); border:1px solid #1e5c33; border-radius:12px;
+  margin-bottom:14px; flex-shrink:0; overflow:hidden;
+}
+.live-pitch-wrap canvas{display:block; width:100%; height:180px;}
 .momentum-wrap{margin-bottom:14px; flex-shrink:0;}
 .momentum-labels{display:flex; justify-content:space-between; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--chalk-dim); margin-bottom:5px;}
 .momentum-center-label{color:var(--muted);}
@@ -176,6 +181,14 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .momentum-fill-b{background:linear-gradient(90deg,var(--win),#6ba2ff); height:100%; transition:width .6s ease;}
 .live-stats-row{display:flex; justify-content:space-between; align-items:center; font-family:'Space Mono'; font-size:12.5px; color:var(--chalk-dim); margin-top:6px;}
 .live-stats-label{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-family:'Inter';}
+.winprob-graph{width:100%; height:40px; margin-top:8px; display:block;}
+.shotmap-wrap{
+  background:linear-gradient(180deg,#123a1e,#0d2c17); border:1px solid #1e5c33; border-radius:10px;
+  padding:8px 10px 10px; margin-bottom:14px; flex-shrink:0;
+}
+.shotmap-label{font-size:9.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--chalk-dim); margin-bottom:4px;}
+.shotmap-svg{width:100%; height:110px; display:block;}
+.shot-marker{transition:opacity .3s ease;}
 
 .godmode-panel{
   background:var(--turf-light); border:1px solid #b23bff; border-radius:10px; padding:12px 14px; margin-bottom:14px;
@@ -500,6 +513,29 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .th-player-rating-btn{padding:2px 6px !important; font-size:10.5px !important; min-width:0;}
 .th-player-rating{font-family:'Space Mono'; font-weight:700; color:var(--amber); flex-shrink:0; min-width:20px; text-align:center;}
 .th-player-row.suspended{opacity:.55;}
+
+.squad-pitch-wrap{
+  position:relative; width:100%; aspect-ratio:5/3;
+  background:linear-gradient(180deg,#123a1e,#0d2c17); border:1px solid #1e5c33; border-radius:10px;
+  margin-bottom:16px; overflow:hidden;
+}
+.squad-pitch-wrap::before{
+  content:""; position:absolute; inset:8%; border:2px solid rgba(255,255,255,.1); border-radius:6px; pointer-events:none;
+}
+.squad-pitch-wrap::after{
+  content:""; position:absolute; left:50%; top:8%; bottom:8%; width:0; border-left:2px solid rgba(255,255,255,.1); pointer-events:none;
+}
+.squad-pitch-dot{
+  position:absolute; width:28px; height:28px; border-radius:50%; transform:translate(-50%,-50%);
+  display:flex; align-items:center; justify-content:center; font:700 10px 'Space Mono'; color:#06101f;
+  box-shadow:0 2px 6px rgba(0,0,0,.4); cursor:default;
+}
+.squad-pitch-dot.pos-gk{background:#b23bff; color:#f6ecff;}
+.squad-pitch-dot.pos-df{background:var(--win);}
+.squad-pitch-dot.pos-mf{background:var(--amber);}
+.squad-pitch-dot.pos-fw{background:var(--flare); color:#170609;}
+.squad-pitch-dot.pos-st{background:#ffcf3f;}
+.squad-pitch-dot.god{box-shadow:0 0 10px 2px rgba(255,207,63,.8);}
 .th-player-row .th-player-susp{font-size:10.5px; flex-shrink:0;}
 
 footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; letter-spacing:.03em;}
@@ -877,6 +913,7 @@ PLAYER: 2 | DF | Triton | 88
       <span class="th-rating-label">Recent form</span>
       <span id="thFormGuide"></span>
     </div>
+    <div id="squadPitchWrap" class="squad-pitch-wrap"></div>
     <div class="th-squad-head">
       <span class="th-rating-label">Squad</span>
       <span class="th-squad-hint">Sorted by rating · GK rating cuts goals conceded</span>
@@ -996,6 +1033,9 @@ PLAYER: 2 | DF | Triton | 88
         <div class="wname" id="watchNameB">—</div>
       </div>
     </div>
+    <div class="live-pitch-wrap">
+      <canvas id="pitchAnimCanvas" width="640" height="220"></canvas>
+    </div>
     <div class="momentum-wrap">
       <div class="momentum-labels">
         <span id="momentumLabelA">Team A</span>
@@ -1029,6 +1069,20 @@ PLAYER: 2 | DF | Triton | 88
         <div class="momentum-fill-a" id="winProbFillA"></div>
         <div class="momentum-fill-b" id="winProbFillB"></div>
       </div>
+      <svg id="winProbGraph" class="winprob-graph" viewBox="0 0 300 44" preserveAspectRatio="none">
+        <line x1="0" y1="22" x2="300" y2="22" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+        <polyline id="winProbLine" points="" fill="none" stroke="#ffcf3f" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="shotmap-wrap">
+      <div class="shotmap-label">SHOT MAP</div>
+      <svg id="shotMapSvg" class="shotmap-svg" viewBox="0 0 300 130" preserveAspectRatio="none">
+        <rect x="1" y="1" width="298" height="128" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+        <line x1="150" y1="1" x2="150" y2="129" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+        <circle cx="150" cy="65" r="18" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+        <rect x="1" y="30" width="30" height="70" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+        <rect x="269" y="30" width="30" height="70" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+      </svg>
     </div>
     <div class="godmode-panel" id="godmodePanel">
       <div class="godmode-title">🕹 God Mode — bend the match to your will</div>
@@ -2755,6 +2809,28 @@ function renderEffectiveStrength(team){
   }
 }
 
+/* Lays the squad out on a pitch by position band (GK deepest, ST/FW furthest forward),
+   spread evenly within each band. Purely visual — reads the same player objects the
+   list below edits, so moving a player's position in the dropdown reshuffles them here
+   on the next render too. */
+function renderSquadPitch(team){
+  const wrap = document.getElementById('squadPitchWrap');
+  const bands = {GK:[], DF:[], MF:[], FW:[], ST:[]};
+  team.players.forEach(p=>{ (bands[p.position]||bands.MF).push(p); });
+  const bandY = {GK:90, DF:70, MF:48, FW:26, ST:10};
+  let html = '';
+  Object.entries(bands).forEach(([pos, players])=>{
+    if(!players.length) return;
+    const y = bandY[pos];
+    players.forEach((p,i)=>{
+      const x = ((i+1)/(players.length+1))*100;
+      const isGod = p.rating>99;
+      html += `<div class="squad-pitch-dot pos-${pos.toLowerCase()}${isGod?' god':''}" style="left:${x}%; top:${y}%;" title="${p.name} (${pos}) — ${p.rating}">${p.number}</div>`;
+    });
+  });
+  wrap.innerHTML = html;
+}
+
 function renderSquadList(team){
   ensurePlayers(team);
   const susp = state.suspensions[team.id];
@@ -2784,7 +2860,7 @@ function renderSquadList(team){
   squadEl.querySelectorAll('.th-player-pos-select').forEach(sel=>{
     sel.addEventListener('change', ()=>{
       const p = team.players.find(x=>x.number===+sel.dataset.playerNumber);
-      if(p){ p.position = sel.value; renderSquadList(team); }
+      if(p){ p.position = sel.value; renderSquadList(team); renderSquadPitch(team); }
     });
   });
   squadEl.querySelectorAll('.th-player-rating-btn').forEach(btn=>{
@@ -2793,6 +2869,7 @@ function renderSquadList(team){
       if(p){
         p.rating = Math.max(PLAYER_RATING_MIN, Math.min(PLAYER_RATING_MAX, p.rating+(+btn.dataset.adj)));
         renderSquadList(team);
+        renderSquadPitch(team);
         renderEffectiveStrength(team);
       }
     });
@@ -2818,6 +2895,7 @@ function openTeamHistory(team){
   document.getElementById('thRatingValue').textContent = team.rating;
   document.getElementById('thFormGuide').innerHTML = formGuide(team) || '<span style="color:var(--muted); font-size:12px;">No results yet</span>';
   renderSquadList(team);
+  renderSquadPitch(team);
   renderEffectiveStrength(team);
   const followBtn = document.getElementById('thFollowBtn');
   const syncFollowBtn = ()=>{
@@ -3355,6 +3433,85 @@ document.getElementById('editDrawDoneBtn').addEventListener('click', ()=>{
 });
 
 /* ===================== LIVE WATCH ENGINE ===================== */
+/* Tracked outside watchMatch so a new match session can cancel a stray animation loop
+   left over from a previous one (e.g. if the modal was force-closed mid-match). */
+let pitchAnimFrameId = null;
+
+/* Abstract 7-dot formation per side (GK + 3DF + 2MF + 1FW) in normalized 0..1 canvas
+   coordinates. Flavor, not a real positional simulation — the game doesn't track
+   individual player locations — but each dot actually roams (velocity-based random
+   walk, spring-tethered to its formation slot) rather than just wobbling in place, and
+   updatePitchTeam() below keeps teammates separated so attacking drift never collapses
+   them into a single clump. */
+function generateFormationDots(side){
+  const mirror = side==='b';
+  const raw = [
+    {bx:0.06, by:0.5, num:1},
+    {bx:0.22, by:0.2, num:2}, {bx:0.22, by:0.5, num:4}, {bx:0.22, by:0.8, num:3},
+    {bx:0.42, by:0.35, num:6}, {bx:0.42, by:0.65, num:8},
+    {bx:0.62, by:0.5, num:9}
+  ];
+  return raw.map(d=>{
+    const bx = mirror ? 1-d.bx : d.bx;
+    return {bx, by:d.by, num:d.num, x:bx, y:d.by, vx:0, vy:0};
+  });
+}
+
+/* Football-like ball response instead of everyone chasing (or nobody reacting):
+   - the 1-2 outfield players whose HOME slot is closest to the ball press toward it
+     (picked by home position, not live position, so the "who's chasing" identity
+     doesn't flicker frame to frame as dots move)
+   - the goalkeeper mostly holds the line, shifting a little with the ball's height
+   - everyone else holds shape but drifts mildly toward the ball's side, like a team
+     shifting as a block rather than swarming it
+   `spread` widens/narrows the outfield line around its own centre — Park the Bus
+   compresses everyone tight and deep, Ultra Attacking spreads them wide, echoing how
+   the tactic actually changes the effective goal-scoring math elsewhere in the sim.
+   Random wander + a spring toward that target, damped each frame; a separation pass
+   afterward keeps any two teammates from ending up on top of each other. */
+function updatePitchTeam(dots, drift, spread, ballX, ballY){
+  const outfield = dots.slice(1);
+  const byHomeDist = outfield.map(d=>({d, dist:Math.hypot((d.bx+drift)-ballX, d.by-ballY)}))
+    .sort((a,b)=>a.dist-b.dist);
+  const chasers = new Set(byHomeDist.slice(0,2).map(o=>o.d));
+
+  dots.forEach((d,i)=>{
+    const homeX = d.bx+drift;
+    const homeY = i===0 ? d.by : 0.5 + (d.by-0.5)*spread;
+    let targetX, targetY;
+    if(i===0){
+      targetX = homeX;
+      targetY = homeY + (ballY-0.5)*0.12;
+    } else if(chasers.has(d)){
+      targetX = homeX*0.35 + ballX*0.65;
+      targetY = homeY*0.35 + ballY*0.65;
+    } else {
+      targetX = homeX + (ballX-0.5)*0.14;
+      targetY = homeY + (ballY-0.5)*0.10;
+    }
+    let ax = (targetX-d.x)*0.03 + (Math.random()-0.5)*0.01;
+    let ay = (targetY-d.y)*0.03 + (Math.random()-0.5)*0.01;
+    d.vx = (d.vx+ax)*0.88;
+    d.vy = (d.vy+ay)*0.88;
+    d.x += d.vx;
+    d.y += d.vy;
+  });
+  const minDist = 0.075;
+  for(let i=0;i<dots.length;i++){
+    for(let j=i+1;j<dots.length;j++){
+      const dx=dots[j].x-dots[i].x, dy=dots[j].y-dots[i].y;
+      const distSq = dx*dx+dy*dy;
+      if(distSq<minDist*minDist && distSq>0.000001){
+        const dist = Math.sqrt(distSq);
+        const push = (minDist-dist)*0.5;
+        const nx=dx/dist, ny=dy/dist;
+        dots[i].x -= nx*push; dots[i].y -= ny*push;
+        dots[j].x += nx*push; dots[j].y += ny*push;
+      }
+    }
+  }
+}
+
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 function poissonSample(lambda){
@@ -3448,6 +3605,8 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const winProbFillB = document.getElementById('winProbFillB');
   const winProbLabelA = document.getElementById('winProbLabelA');
   const winProbLabelB = document.getElementById('winProbLabelB');
+  const winProbLine = document.getElementById('winProbLine');
+  const shotMapSvg = document.getElementById('shotMapSvg');
 
   document.getElementById('watchTitle').textContent = `${m.a.name} vs ${m.b.name}`;
   document.getElementById('watchFlagA').textContent = flagFor(m.a);
@@ -3482,7 +3641,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   let paused=false, speedIndex=0, halfEndBonus=0;
   let tacticMultA=1, tacticMultB=1;
   let currentHalfEvents=[], currentHalfEi=0, currentMin=0, currentHalfEndMin=0, matchLive=false;
-  const SPEEDS=[90,45,20];
+  const SPEEDS=[650,320,140];
   const SPEED_LABELS=['1x','2x','4x'];
   skipBtn.onclick = ()=>{ skipRequested=true; };
 
@@ -3501,6 +3660,137 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   }
   renderMomentum();
 
+  /* ---- Live pitch: an abstract animated top-down view, not a real positional
+     simulation (the game has no per-player location data). Dots jitter around a base
+     formation slot, drift forward when their side is attacking (driven by tactic
+     multipliers and momentum), and the ball glides toward whichever box a shot/goal
+     just happened in before resuming an idle wander biased toward the side in control. */
+  if(pitchAnimFrameId) cancelAnimationFrame(pitchAnimFrameId);
+  let pitchActive = true;
+  const pitchCanvas = document.getElementById('pitchAnimCanvas');
+  const pitchCtx = pitchCanvas.getContext('2d');
+  const dotsA = generateFormationDots('a');
+  const dotsB = generateFormationDots('b');
+  const ball = {x:0.5, y:0.5, tx:0.5, ty:0.5, vx:0, vy:0};
+  let ballWanderNext = 0;
+  /* A struck ball, not a point gliding to a target: kickBallToward gives it an initial
+     velocity impulse, then every frame in drawPitchFrame it's steered by a homing force
+     that weakens as it nears the target (so it settles instead of orbiting) and slowed
+     by friction (damping) — a fast, decelerating roll rather than a constant-speed glide. */
+  function kickBallToward(tx, ty, power){
+    ball.tx = tx; ball.ty = ty;
+    const dx = tx-ball.x, dy = ty-ball.y;
+    const dist = Math.hypot(dx,dy) || 0.0001;
+    ball.vx += (dx/dist)*power;
+    ball.vy += (dy/dist)*power;
+  }
+  /* Passes aim at an actual teammate's current position (not a random open point), so
+     the ball reads as being played to someone rather than just wandering the pitch.
+     Which team gets the ball is weighted by momentum; longer diagonals get a bit more
+     kick power than short ones so travel time scales with distance. */
+  function pickWanderTarget(){
+    const favorB = momentum/100;
+    const teamDots = (Math.random()<favorB ? dotsB : dotsA).slice(1);
+    const receiver = teamDots[Math.floor(Math.random()*teamDots.length)];
+    const tx = Math.max(0.06, Math.min(0.94, receiver.x + (Math.random()-0.5)*0.04));
+    const ty = Math.max(0.1, Math.min(0.9, receiver.y + (Math.random()-0.5)*0.04));
+    const dist = Math.hypot(tx-ball.x, ty-ball.y);
+    kickBallToward(tx, ty, 0.005 + dist*0.018);
+  }
+  function sendBallToward(team, holdMs){
+    const tx = team===m.a ? (0.8+Math.random()*0.13) : (0.07+Math.random()*0.13);
+    const ty = 0.22+Math.random()*0.56;
+    kickBallToward(tx, ty, 0.013);
+    ballWanderNext = performance.now()+holdMs;
+  }
+  const ballTrail = [];
+  function drawPitchFrame(now){
+    if(!pitchActive) return;
+    const w = pitchCanvas.width, h = pitchCanvas.height;
+    pitchCtx.clearRect(0,0,w,h);
+    pitchCtx.strokeStyle = 'rgba(255,255,255,.12)'; pitchCtx.lineWidth = 1;
+    pitchCtx.strokeRect(4,4,w-8,h-8);
+    pitchCtx.beginPath(); pitchCtx.moveTo(w/2,4); pitchCtx.lineTo(w/2,h-4); pitchCtx.stroke();
+    pitchCtx.beginPath(); pitchCtx.arc(w/2,h/2,28,0,Math.PI*2); pitchCtx.stroke();
+    pitchCtx.strokeRect(4,h*0.28,55,h*0.44);
+    pitchCtx.strokeRect(w-59,h*0.28,55,h*0.44);
+
+    if(now > ballWanderNext){
+      pickWanderTarget();
+      ballWanderNext = now + 1200 + Math.random()*1400;
+    }
+    {
+      const dx = ball.tx-ball.x, dy = ball.ty-ball.y;
+      const dist = Math.hypot(dx,dy) || 0.0001;
+      const homing = 0.0009*Math.min(1, dist/0.05);
+      ball.vx += (dx/dist)*homing;
+      ball.vy += (dy/dist)*homing;
+      ball.vx *= 0.95; ball.vy *= 0.95;
+      ball.x += ball.vx; ball.y += ball.vy;
+      ball.x = Math.max(0.015, Math.min(0.985, ball.x));
+      ball.y = Math.max(0.03, Math.min(0.97, ball.y));
+    }
+    ballTrail.push({x:ball.x, y:ball.y});
+    if(ballTrail.length>14) ballTrail.shift();
+
+    /* Tactics visibly reshape the team, not just nudge win odds: Park the Bus sits deep
+       and narrow, Ultra Attacking pushes the line high and wide. */
+    const driftA = ((tacticMultA-1)*0.09) + ((50-momentum)/100)*0.06;
+    const driftB = ((tacticMultB-1)*0.09) + ((momentum-50)/100)*0.06;
+    const spreadA = 0.75 + Math.min(2, tacticMultA)*0.28;
+    const spreadB = 0.75 + Math.min(2, tacticMultB)*0.28;
+    updatePitchTeam(dotsA, driftA, spreadA, ball.x, ball.y);
+    updatePitchTeam(dotsB, driftB, spreadB, ball.x, ball.y);
+
+    /* Possession: whichever side's nearest outfield player (by home slot, so it's
+       stable rather than flickering) is closest to the ball right now. Drawn as a
+       ring around the ball in that team's color. */
+    function nearestHomeDist(dots, drift){
+      let best = Infinity;
+      dots.slice(1).forEach(d=>{ best = Math.min(best, Math.hypot((d.bx+drift)-ball.x, d.by-ball.y)); });
+      return best;
+    }
+    const possessionIsA = nearestHomeDist(dotsA, driftA) <= nearestHomeDist(dotsB, driftB);
+
+    function drawTeam(dots, color){
+      dots.forEach(d=>{
+        const cx = d.x*w, cy = d.y*h;
+        const speed = Math.hypot(d.vx, d.vy);
+        if(speed>0.0025){
+          const len = Math.min(14, speed*260);
+          const ang = Math.atan2(d.vy, d.vx);
+          pitchCtx.beginPath();
+          pitchCtx.moveTo(cx, cy);
+          pitchCtx.lineTo(cx+Math.cos(ang)*(7+len), cy+Math.sin(ang)*(7+len));
+          pitchCtx.strokeStyle = color; pitchCtx.lineWidth = 2; pitchCtx.globalAlpha = 0.55;
+          pitchCtx.stroke(); pitchCtx.globalAlpha = 1;
+        }
+        pitchCtx.beginPath(); pitchCtx.arc(cx, cy, 7, 0, Math.PI*2);
+        pitchCtx.fillStyle = color; pitchCtx.fill();
+        pitchCtx.fillStyle = '#06101f'; pitchCtx.font = "8px 'Space Mono'";
+        pitchCtx.textAlign = 'center'; pitchCtx.textBaseline = 'middle';
+        pitchCtx.fillText(d.num, cx, cy+0.5);
+      });
+    }
+    drawTeam(dotsA, '#ef3d54');
+    drawTeam(dotsB, '#4fc3ff');
+
+    ballTrail.forEach((p,i)=>{
+      pitchCtx.beginPath(); pitchCtx.arc(p.x*w, p.y*h, 2.2, 0, Math.PI*2);
+      pitchCtx.fillStyle = '#f2f5fb'; pitchCtx.globalAlpha = (i/ballTrail.length)*0.35;
+      pitchCtx.fill(); pitchCtx.globalAlpha = 1;
+    });
+    pitchCtx.beginPath(); pitchCtx.arc(ball.x*w, ball.y*h, 8, 0, Math.PI*2);
+    pitchCtx.strokeStyle = possessionIsA ? '#ef3d54' : '#4fc3ff';
+    pitchCtx.lineWidth = 1.5; pitchCtx.globalAlpha = 0.7; pitchCtx.stroke(); pitchCtx.globalAlpha = 1;
+    pitchCtx.beginPath(); pitchCtx.arc(ball.x*w, ball.y*h, 4, 0, Math.PI*2);
+    pitchCtx.fillStyle = '#f2f5fb'; pitchCtx.fill();
+    pitchCtx.strokeStyle = '#06101f'; pitchCtx.lineWidth = 1; pitchCtx.stroke();
+
+    pitchAnimFrameId = requestAnimationFrame(drawPitchFrame);
+  }
+  pitchAnimFrameId = requestAnimationFrame(drawPitchFrame);
+
   /* ---- Possession: a slower-moving sibling of momentum. Drifts toward an equilibrium
      set by rating gap and tactic aggression rather than reacting to goals directly. ---- */
   let possessionA = 50;
@@ -3513,23 +3803,64 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   renderPossession();
 
   /* ---- Shots / shots on target: incremented by real goals, god-mode goals, and the
-     non-goal "chances" generated each minute (maybeChance below). ---- */
+     non-goal "chances" generated each minute (maybeChance below). Each shot also plots
+     a marker on the shot map — team A always attacks the right goal, team B the left,
+     matching how the scoreboard lays them out. ---- */
   const shotStats = {a:{shots:0,sot:0}, b:{shots:0,sot:0}};
   function renderShotStats(){
     shotsAEl.textContent = `${shotStats.a.shots} (${shotStats.a.sot})`;
     shotsBEl.textContent = `${shotStats.b.shots} (${shotStats.b.sot})`;
   }
-  function recordShot(team, onTarget){
+  const SHOT_MARKER_STYLE = {
+    goal: {shape:'circle', r:5, fillOpacity:1},
+    save: {shape:'circle', r:4, fillOpacity:0.15, stroke:true},
+    miss: {shape:'x', r:4, fillOpacity:1},
+    post: {shape:'diamond', r:4, fillOpacity:1}
+  };
+  function plotShot(team, kind){
+    const style = SHOT_MARKER_STYLE[kind] || SHOT_MARKER_STYLE.miss;
+    const color = team===m.a ? '#ef3d54' : '#4fc3ff';
+    const towardRight = team===m.a; // team A attacks right, team B attacks left
+    const boxX = towardRight ? (240+Math.random()*45) : (15+Math.random()*45);
+    const y = 20+Math.random()*90;
+    const ns = 'http://www.w3.org/2000/svg';
+    let el;
+    if(style.shape==='x'){
+      el = document.createElementNS(ns,'path');
+      const s=style.r;
+      el.setAttribute('d', `M${boxX-s},${y-s} L${boxX+s},${y+s} M${boxX-s},${y+s} L${boxX+s},${y-s}`);
+      el.setAttribute('stroke', color);
+      el.setAttribute('stroke-width', '2');
+    } else if(style.shape==='diamond'){
+      el = document.createElementNS(ns,'path');
+      const s=style.r;
+      el.setAttribute('d', `M${boxX},${y-s} L${boxX+s},${y} L${boxX},${y+s} L${boxX-s},${y} Z`);
+      el.setAttribute('fill', color);
+    } else {
+      el = document.createElementNS(ns,'circle');
+      el.setAttribute('cx', boxX); el.setAttribute('cy', y); el.setAttribute('r', style.r);
+      el.setAttribute('fill', style.stroke ? 'none' : color);
+      el.setAttribute('fill-opacity', style.fillOpacity);
+      if(style.stroke){ el.setAttribute('stroke', color); el.setAttribute('stroke-width', '2'); }
+    }
+    el.setAttribute('class', 'shot-marker');
+    shotMapSvg.appendChild(el);
+  }
+  function recordShot(team, onTarget, kind){
     const s = team===m.a ? shotStats.a : shotStats.b;
     s.shots++;
     if(onTarget) s.sot++;
     renderShotStats();
+    plotShot(team, kind || (onTarget ? 'save' : 'miss'));
   }
   renderShotStats();
+  shotMapSvg.querySelectorAll('.shot-marker').forEach(el=>el.remove());
 
   /* ---- Win probability: blends the pre-match rating gap with the current scoreline,
      weighting the scoreline more heavily as the clock runs down. Purely a live readout —
-     it watches the match, it doesn't influence it. ---- */
+     it watches the match, it doesn't influence it. The line graph plots pA over the
+     course of the match so its trajectory (not just the current number) is visible. ---- */
+  const winProbHistory = [];
   function renderWinProbability(){
     const scale = styleScale(state.style);
     const ratingP = 1/(1+Math.pow(10, -(effectiveTeamRating(m.a)-effectiveTeamRating(m.b))/scale));
@@ -3543,6 +3874,14 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     winProbLabelB.textContent = Math.round((1-pA)*100)+'%';
     winProbFillA.style.width = (pA*100)+'%';
     winProbFillB.style.width = ((1-pA)*100)+'%';
+    winProbHistory.push(pA);
+    if(winProbHistory.length>1){
+      const n = winProbHistory.length;
+      const points = winProbHistory.map((p,i)=> `${(i/(n-1))*300},${44-p*44}`).join(' ');
+      winProbLine.setAttribute('points', points);
+    } else {
+      winProbLine.setAttribute('points', `0,${44-pA*44} 300,${44-pA*44}`);
+    }
   }
   renderWinProbability();
 
@@ -3557,19 +3896,20 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     const defendingTeam = attackingTeam===m.a ? m.b : m.a;
     const attacker = weightedPickPlayer(availablePlayers(attackingTeam));
     const attackerLabel = state.useRealNames ? attacker.name : ('Player #'+attacker.number);
+    sendBallToward(attackingTeam, 900);
     const roll = Math.random();
     if(roll<0.45){
       const keeper = defendingTeam.players.find(p=>p.position==='GK') || defendingTeam.players[0];
       const keeperLabel = state.useRealNames ? keeper.name : ('Player #'+keeper.number);
       addFeed(`🧤 Big save! ${keeperLabel} denies ${attackerLabel} (${attackingTeam.name})`, false);
-      recordShot(attackingTeam, true);
+      recordShot(attackingTeam, true, 'save');
       nudgeMomentum(attackingTeam===m.a ? -4 : 4);
     } else if(roll<0.85){
       addFeed(`🎯 ${attackerLabel} fires wide for ${attackingTeam.name}`, false);
-      recordShot(attackingTeam, false);
+      recordShot(attackingTeam, false, 'miss');
     } else {
       addFeed(`💥 Off the woodwork! ${attackerLabel} (${attackingTeam.name}) rattles the frame`, false);
-      recordShot(attackingTeam, false);
+      recordShot(attackingTeam, false, 'post');
       nudgeMomentum(attackingTeam===m.a ? -6 : 6);
     }
   }
@@ -3593,7 +3933,8 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     matchEvents.push({minute, teamRef:team, scorer: `${scorer} (${tag||'God Mode'})`});
     addFeed(`⚡ ${tag||'GOD MODE'}: ${team.name} — ${scorer}!`, true);
     nudgeMomentum(team===m.a ? -22 : 22);
-    recordShot(team, true);
+    recordShot(team, true, 'goal');
+    sendBallToward(team, 1400);
     renderWinProbability();
     if(matchLive && currentMin>90 && decisive && state.extraTime && state.goldenGoal){
       goldenGoalEnded = true;
@@ -3648,7 +3989,8 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer});
     addFeed(goalCommentary(ev.teamRef.name, scorer, ev.minute), true);
     nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
-    recordShot(ev.teamRef, true);
+    recordShot(ev.teamRef, true, 'goal');
+    sendBallToward(ev.teamRef, 1400);
     renderWinProbability();
   }
   function maybeDrama(){
@@ -3814,7 +4156,12 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   registerUndoSnapshot(m, {upset, historyEntry, followRemoved, loserId, suspSnapA, suspSnapB, pulsesAdded});
 
   closeBtn.classList.remove('hidden');
-  closeBtn.onclick = ()=>{ overlay.classList.add('hidden'); render(); };
+  closeBtn.onclick = ()=>{
+    pitchActive = false;
+    if(pitchAnimFrameId) cancelAnimationFrame(pitchAnimFrameId);
+    overlay.classList.add('hidden');
+    render();
+  };
   render();
 }
 
@@ -4155,7 +4502,7 @@ async function loadNationRosters(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
     const map = {};
-    (data.countries || []).forEach(entry=>{ map[entry.country] = entry.players; });
+    data.forEach(entry=>{ map[entry.country] = entry.players; });
     NATION_ROSTERS = map;
     console.log(`Loaded curated rosters for ${Object.keys(map).length} nations.`);
   }catch(err){
