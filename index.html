@@ -3704,18 +3704,6 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     kickBallToward(tx, ty, 0.013);
     ballWanderNext = performance.now()+holdMs;
   }
-  /* After a goal: let the ball finish its run into the net (sendBallToward), then snap
-     it back to the center circle and hold it there — a little kickoff-style pause —
-     before normal wandering resumes. Guarded by pitchActive so a stray timeout can't
-     touch the ball after the match view has closed. */
-  function celebrateGoalAndReset(team, netTravelMs=1200, pauseMs=2200){
-    sendBallToward(team, netTravelMs);
-    setTimeout(()=>{
-      if(!pitchActive) return;
-      ball.x = 0.5; ball.y = 0.5; ball.tx = 0.5; ball.ty = 0.5; ball.vx = 0; ball.vy = 0;
-      ballWanderNext = performance.now() + pauseMs;
-    }, netTravelMs);
-  }
   const ballTrail = [];
   function drawPitchFrame(now){
     if(!pitchActive) return;
@@ -3900,7 +3888,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
 
   /* ---- Non-goal chances: saves, off-target efforts, and woodwork strikes. Feed flavor
      plus a small momentum nudge, and they're what actually builds the shot counts —
-     goals also count as a shot on target via recordShot() in applyGoal/forceGoal. ---- */
+     goals also count as a shot on target via recordShot() in registerGoalScore/forceGoal. ---- */
   function maybeChance(){
     if(Math.random()>=0.14) return;
     const wA = tacticMultA * (100-momentum) + 5;
@@ -3938,17 +3926,23 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     const p = weightedPickPlayer(pool);
     return state.useRealNames ? p.name : ("Player #"+p.number);
   }
-  function forceGoal(team, tag){
+  async function forceGoal(team, tag){
     const scorer = pickScorer(team);
     const minute = currentMin || 1;
+    sendBallToward(team, 1200);
+    await wait(1200);
     if(team===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
     matchEvents.push({minute, teamRef:team, scorer: `${scorer} (${tag||'God Mode'})`});
     addFeed(`⚡ ${tag||'GOD MODE'}: ${team.name} — ${scorer}!`, true);
     nudgeMomentum(team===m.a ? -22 : 22);
     recordShot(team, true, 'goal');
-    celebrateGoalAndReset(team);
     renderWinProbability();
+    setTimeout(()=>{
+      if(!pitchActive) return;
+      ball.x = 0.5; ball.y = 0.5; ball.tx = 0.5; ball.ty = 0.5; ball.vx = 0; ball.vy = 0;
+      ballWanderNext = performance.now() + 2200;
+    }, 2200);
     if(matchLive && currentMin>90 && decisive && state.extraTime && state.goldenGoal){
       goldenGoalEnded = true;
     }
@@ -3995,7 +3989,13 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   godTacticA.onchange = ()=>applyLiveTactic(m.a, godTacticA.value);
   godTacticB.onchange = ()=>applyLiveTactic(m.b, godTacticB.value);
 
-  function applyGoal(ev){
+  /* Goal registration is split from the ball animation so the scoreboard only ticks up
+     once the ball has actually reached the net on screen — no more goals appearing while
+     the ball is still mid-pitch. applyGoalAnimated is the normal path (used by the live
+     per-minute clock loop): it kicks the ball, waits for it to arrive, THEN registers the
+     goal. applyGoalInstant skips the wait — used only when the user hits Skip, where no
+     animation is being watched anyway, so there's nothing to synchronize with. */
+  function registerGoalScore(ev){
     const scorer = pickScorer(ev.teamRef);
     if(ev.teamRef===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
@@ -4003,8 +4003,20 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     addFeed(goalCommentary(ev.teamRef.name, scorer, ev.minute), true);
     nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
     recordShot(ev.teamRef, true, 'goal');
-    celebrateGoalAndReset(ev.teamRef);
     renderWinProbability();
+  }
+  async function applyGoalAnimated(ev, netTravelMs=1200, pauseMs=2200){
+    sendBallToward(ev.teamRef, netTravelMs);
+    await wait(netTravelMs);
+    registerGoalScore(ev);
+    setTimeout(()=>{
+      if(!pitchActive) return;
+      ball.x = 0.5; ball.y = 0.5; ball.tx = 0.5; ball.ty = 0.5; ball.vx = 0; ball.vy = 0;
+      ballWanderNext = performance.now() + pauseMs;
+    }, pauseMs);
+  }
+  function applyGoalInstant(ev){
+    registerGoalScore(ev);
   }
   function maybeDrama(){
     if(Math.random()>=0.025) return;
@@ -4033,7 +4045,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     while(currentMin <= currentHalfEndMin){
       if(skipRequested){
         while(currentHalfEi<currentHalfEvents.length){
-          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+          applyGoalInstant(currentHalfEvents[currentHalfEi]); currentHalfEi++;
           if(goldenActive){ matchLive=false; return; }
         }
         clockEl.textContent = currentHalfEndMin+"'";
@@ -4043,7 +4055,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
       while(paused && !skipRequested){ await wait(120); }
       if(skipRequested){
         while(currentHalfEi<currentHalfEvents.length){
-          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+          applyGoalInstant(currentHalfEvents[currentHalfEi]); currentHalfEi++;
           if(goldenActive){ matchLive=false; return; }
         }
         clockEl.textContent = currentHalfEndMin+"'";
@@ -4052,7 +4064,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
       }
       clockEl.textContent = currentMin+"'";
       while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){
-        applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
+        await applyGoalAnimated(currentHalfEvents[currentHalfEi]); currentHalfEi++;
         if(goldenActive){
           addFeed(`🏆 GOLDEN GOAL! ${m.winner===m.a?m.a.name:''}${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true);
           matchLive = false;
@@ -4074,7 +4086,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
       currentMin++;
       currentHalfEndMin = endMin+halfEndBonus;
     }
-    while(currentHalfEi<currentHalfEvents.length){ applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
+    while(currentHalfEi<currentHalfEvents.length){ applyGoalInstant(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
     matchLive = false;
   }
 
