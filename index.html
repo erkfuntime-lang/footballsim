@@ -575,6 +575,7 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <button class="ghost" id="achievementsBtn">🎖 Achievements</button>
     <button class="ghost" id="predictBtn">🔮 Predict Champion</button>
     <button class="ghost" id="customTeamsBtn">👤 Custom Teams</button>
+    <button class="ghost" id="realSquadsBtn">🌍 Real Squads</button>
     <button class="ghost" id="saveBtn">💾 Save</button>
     <button class="ghost" id="loadBtn">📂 Load</button>
     <input type="file" id="loadFileInput" accept="application/json,.json" class="hidden">
@@ -855,6 +856,40 @@ PLAYER: 2 | DF | Triton | 88
     <div class="modal-actions">
       <button class="ghost" id="customTeamsCloseBtn">Close</button>
       <button class="primary" id="addCustomTeamBtn">+ Add Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- Real Squads overlay -->
+<div class="overlay hidden" id="realSquadsOverlay">
+  <div class="modal">
+    <h2>Real Squads</h2>
+    <p class="sub">Import real (or better-than-generated) player names per nation. When a country's squad is generated for a match, an imported roster is used instead of the usual random names — everything else (ratings, positions, editing) works exactly the same.</p>
+    <div id="realSquadsList" style="margin-bottom:18px;"></div>
+    <div class="field">
+      <label>Load automatically from a URL</label>
+      <div class="file-upload">
+        <input type="text" id="realSquadsUrlInput" placeholder="https://raw.githubusercontent.com/USER/REPO/main/players.json" style="flex:1; min-width:220px; padding:9px 10px; background:var(--turf-light); border:1px solid var(--line); border-radius:6px; color:var(--chalk); font-family:'Space Mono'; font-size:11px;">
+        <button class="ghost" id="loadRealSquadsUrlBtn" type="button">🔄 Load</button>
+      </div>
+      <div class="hint">Set this once and it re-loads automatically every time the page opens. Use a GitHub "Raw" link (not the regular github.com page link) or a jsDelivr link (<span class="mono">cdn.jsdelivr.net/gh/USER/REPO@main/players.json</span>) — both send the CORS headers a browser fetch needs.</div>
+    </div>
+    <div class="field">
+      <label>Import from a JSON file</label>
+      <div class="file-upload">
+        <input type="file" id="realSquadsFile" accept=".json,application/json">
+        <button class="ghost" id="loadRealSquadsFileBtn" type="button">📥 Import .json</button>
+      </div>
+      <div class="hint">Expects <span class="mono">{"countries":[{"country":"Algeria","players":[{"name":"...","position":"RW"}, ...]}, ...]}</span>. Positions can be detailed real-football shorthand (GK/RB/CB/LB/CDM/CM/RW/ST/LW, etc.) — they're mapped down to this game's GK/DF/MF/FW/ST automatically. Rosters with fewer than 11 players are padded out with generated names.</div>
+    </div>
+    <div class="field">
+      <label>Or paste JSON</label>
+      <textarea id="realSquadsText" rows="7" placeholder='{"countries":[{"country":"Brazil","players":[{"name":"Real Player Name","position":"ST"}]}]}' style="width:100%;padding:10px;background:var(--turf-light);border:1px solid var(--line);border-radius:6px;color:var(--chalk);font-family:'Space Mono';font-size:11px;resize:vertical;"></textarea>
+      <button class="ghost" id="importRealSquadsTextBtn" type="button" style="margin-top:8px;width:100%;">＋ Import Pasted JSON</button>
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="realSquadsClearBtn">Clear All</button>
+      <button class="primary" id="realSquadsCloseBtn">Close</button>
     </div>
   </div>
 </div>
@@ -1643,8 +1678,141 @@ function computeGroupStandings(group){
 }
 
 const FORMATIONS = [[1,4,3,1,2],[1,4,4,0,2],[1,3,5,0,2],[1,4,5,0,1],[1,3,4,1,2],[1,5,3,0,2]];
+
+/* ---- Real squad data ------------------------------------------------------------
+   An optional external data source: a country -> real (or better-than-generated)
+   player list, keyed by exact team name (e.g. "Algeria" matches the REAL_TEAMS/
+   GUEST_NATIONS entry of the same name). Loaded via the "Real Squads" import UI
+   (paste JSON or a .json file) matching the shape:
+     { "countries": [ { "country": "Algeria", "source": "real", "players": [
+         { "name": "Riyad Mahrez", "position": "RW" }, ... ] }, ... ] }
+   Seeded here with the sample the user provided so the feature works out of the box;
+   importing a fuller file merges in (and can override) additional countries.
+   Positions come in as detailed real-football shorthand (GK/RB/CB/LB/CDM/CM/RW/ST/LW
+   etc.) and get mapped down to this game's 5-bucket system (GK/DF/MF/FW/ST) via
+   mapImportedPosition() below — everything downstream (goal weighting, keeper factor,
+   squad editor) keeps working exactly as it already does for generated squads. */
+let realSquadData = {
+  "Algeria": {source:"real", players:[
+    {name:"Anthony Mandrea", position:"GK"},
+    {name:"Ahmed Touba", position:"RB"},
+    {name:"Aissa Mandi", position:"CB"},
+    {name:"Youcef Atal", position:"CB"},
+    {name:"Rami Bensebaini", position:"LB"},
+    {name:"Ismael Bennacer", position:"CDM"},
+    {name:"Houssem Aouar", position:"CM"},
+    {name:"Ramiz Zerrouki", position:"CM"},
+    {name:"Riyad Mahrez", position:"RW"},
+    {name:"Baghdad Bounedjah", position:"ST"},
+    {name:"Amir Sayoud", position:"LW"}
+  ]},
+  "Angola": {source:"generated", players:[
+    {name:"Fode Diallo", position:"GK"},
+    {name:"Patrick Banda", position:"RB"},
+    {name:"Boubacar Diallo", position:"CB"},
+    {name:"Joseph Okafor", position:"CB"},
+    {name:"John Sow", position:"LB"},
+    {name:"Yannick Toure", position:"CDM"},
+    {name:"Daniel Banda", position:"CM"},
+    {name:"Kwame Keita", position:"CM"},
+    {name:"Kwame Sow", position:"RW"},
+    {name:"Joseph Diallo", position:"ST"},
+    {name:"Aliou Banda", position:"LW"}
+  ]},
+  "Benin": {source:"generated", players:[
+    {name:"John Phiri", position:"GK"},
+    {name:"Boubacar Cisse", position:"RB"},
+    {name:"Sekou Keita", position:"CB"},
+    {name:"Ibrahim Dlamini", position:"CB"},
+    {name:"Boubacar Ndiaye", position:"LB"},
+    {name:"Chinedu Ndiaye", position:"CDM"},
+    {name:"Samuel Cisse", position:"CM"},
+    {name:"Abdoulaye Diallo", position:"CM"},
+    {name:"Kwame Banda", position:"RW"},
+    {name:"Peter Mwangi", position:"ST"},
+    {name:"Abdoulaye Cisse", position:"LW"}
+  ]},
+  "Botswana": {source:"generated", players:[
+    {name:"Success Owusu", position:"GK"},
+    {name:"Peter Banda", position:"RB"},
+    {name:"Chinedu Diallo", position:"CB"},
+    {name:"Ibrahim Phiri", position:"CB"},
+    {name:"Kwame Mwangi", position:"LB"},
+    {name:"Chinedu Cisse", position:"CDM"},
+    {name:"Kwame Phiri", position:"CM"},
+    {name:"Sekou Ndiaye", position:"CM"},
+    {name:"Ousmane Bello", position:"RW"},
+    {name:"Ousmane Dlamini", position:"ST"},
+    {name:"Ibrahim Mwangi", position:"LW"}
+  ]}
+};
+
+const IMPORTED_POSITION_BUCKET_MAP = {
+  GK:'GK',
+  RB:'DF', LB:'DF', CB:'DF', SW:'DF', WB:'DF', RWB:'DF', LWB:'DF', DF:'DF',
+  CDM:'MF', DM:'MF', CM:'MF', CAM:'MF', AM:'MF', LM:'MF', RM:'MF', MF:'MF',
+  RW:'FW', LW:'FW', WF:'FW',
+  ST:'ST', CF:'ST', FW:'ST', SS:'ST'
+};
+function mapImportedPosition(pos){
+  const key = String(pos||'').trim().toUpperCase();
+  return IMPORTED_POSITION_BUCKET_MAP[key] || 'MF';
+}
+function playerRatingFor(team, bucket){
+  const posAdj = bucket==='ST'?6 : bucket==='FW'?3 : bucket==='GK'?-4 : bucket==='DF'?-2 : 0;
+  return Math.max(30, Math.min(99, Math.round(team.rating+posAdj+(Math.random()*16-8))));
+}
+/* Case/whitespace-tolerant lookup — "Algeria" matches "algeria " etc. */
+function findRealSquad(team){
+  if(!team || !team.name) return null;
+  if(realSquadData[team.name]) return realSquadData[team.name];
+  const target = team.name.trim().toLowerCase();
+  const key = Object.keys(realSquadData).find(k=>k.trim().toLowerCase()===target);
+  return key ? realSquadData[key] : null;
+}
+/* Builds an 11-player squad from imported real-squad data. Puts a GK first (guarantees
+   one exists), takes up to 11 entries, and — if the imported roster has fewer than 11 —
+   pads out the remainder with the normal procedurally-generated players (same regional
+   name pool and rating formula as a fully-generated squad) so the team is never short a
+   full XI regardless of how complete the imported data is. */
+function buildPlayersFromRealSquad(team, realSquad){
+  const entries = realSquad.players.map(p=>({name:p.name, bucket: mapImportedPosition(p.position)}));
+  entries.sort((a,b)=> (a.bucket==='GK'?-1:0) - (b.bucket==='GK'?-1:0));
+  const chosen = entries.slice(0, 11);
+  if(chosen.length<11){
+    const pool = nameRegionForTeam(team);
+    const bucketCounts = {GK:0,DF:0,MF:0,FW:0,ST:0};
+    chosen.forEach(e=>bucketCounts[e.bucket]=(bucketCounts[e.bucket]||0)+1);
+    const targetShape = {GK:1,DF:4,MF:4,FW:0,ST:2};
+    const needed = [];
+    Object.keys(targetShape).forEach(b=>{
+      const missing = targetShape[b]-(bucketCounts[b]||0);
+      for(let i=0;i<missing;i++) needed.push(b);
+    });
+    while(chosen.length<11){
+      const bucket = needed.length ? needed.shift() : 'MF';
+      const used = new Set(chosen.map(c=>c.name));
+      let name, attempts=0;
+      do{
+        name = pool.first[Math.floor(Math.random()*pool.first.length)]+" "+pool.last[Math.floor(Math.random()*pool.last.length)];
+        attempts++;
+      } while(used.has(name) && attempts<10);
+      chosen.push({name, bucket});
+    }
+  }
+  if(!chosen.some(c=>c.bucket==='GK')) chosen[0] = {...chosen[0], bucket:'GK'};
+  chosen.forEach((entry,i)=>{
+    team.players.push({ name: entry.name, number:i+1, position: entry.bucket, rating: playerRatingFor(team, entry.bucket) });
+  });
+}
+
 function ensurePlayers(team){
   if(team.players.length) return;
+  const realSquad = findRealSquad(team);
+  if(realSquad && realSquad.players && realSquad.players.length){
+    buildPlayersFromRealSquad(team, realSquad);
+    return;
+  }
   const pool = nameRegionForTeam(team);
   const [nGK,nDF,nMF,nFW,nST] = FORMATIONS[Math.floor(Math.random()*FORMATIONS.length)];
   const positions = [
@@ -5063,6 +5231,128 @@ document.getElementById('addCustomTeamBtn').addEventListener('click', ()=>{
   renderCustomTeamsList();
 });
 
+/* ===================== REAL SQUADS ===================== */
+/* Point this at a JSON file matching the Real Squads schema to auto-load it every time
+   the page opens — a relative path works if you host global_cup.html and the JSON
+   together (e.g. GitHub Pages: 'players.json'), or use an absolute URL such as a GitHub
+   "raw" link: 'https://raw.githubusercontent.com/USER/REPO/main/players.json' (the
+   plain github.com "blob" page URL will NOT work — click the Raw button on GitHub to
+   get the right link; raw.githubusercontent.com and jsDelivr's
+   cdn.jsdelivr.net/gh/USER/REPO@main/players.json both serve with the CORS headers a
+   browser fetch() needs). Leave it empty to rely only on the built-in seed data and the
+   manual import button below. Also editable at runtime from the Real Squads modal
+   without touching this file. */
+let REAL_SQUADS_SOURCE_URL = '';
+
+const realSquadsOverlay = document.getElementById('realSquadsOverlay');
+const realSquadsList = document.getElementById('realSquadsList');
+
+function renderRealSquadsList(){
+  const countries = Object.keys(realSquadData).sort((a,b)=>a.localeCompare(b));
+  realSquadsList.innerHTML = countries.length
+    ? `<div style="color:var(--muted); font-size:12px; margin-bottom:8px;">${countries.length} countr${countries.length===1?'y':'ies'} loaded</div>` +
+      countries.map(name=>{
+        const sq = realSquadData[name];
+        return `<div class="follow-chip"><span class="fc-name">${name} <span style="color:var(--muted); font-family:'Space Mono'; margin-left:6px;">${sq.players.length} players · ${sq.source||'unknown'}</span></span><button data-remove-squad="${name}" title="Remove">✕</button></div>`;
+      }).join('')
+    : `<div style="color:var(--muted); font-size:12.5px;">No real squads loaded yet — set a URL above, or import a JSON file / paste JSON below.</div>`;
+  realSquadsList.querySelectorAll('[data-remove-squad]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      delete realSquadData[btn.dataset.removeSquad];
+      renderRealSquadsList();
+    });
+  });
+}
+
+/* Shared core: takes an already-parsed JS value (object or array) and merges any valid
+   country entries into realSquadData. Used by both the paste/file import path (which
+   parses text first) and the URL auto-load path (which parses a fetch response). */
+function applyRealSquadsPayload(parsed){
+  const list = Array.isArray(parsed) ? parsed : Array.isArray(parsed && parsed.countries) ? parsed.countries : null;
+  if(!list) return {imported:0, skipped:0, invalid:true};
+  let imported=0, skipped=0;
+  list.forEach(entry=>{
+    if(!entry || !entry.country || !Array.isArray(entry.players) || !entry.players.length){ skipped++; return; }
+    const players = entry.players
+      .filter(p=>p && p.name)
+      .map(p=>({name:String(p.name).trim(), position:p.position||''}));
+    if(!players.length){ skipped++; return; }
+    realSquadData[String(entry.country).trim()] = { source: entry.source||'unknown', players };
+    imported++;
+  });
+  return {imported, skipped, invalid:false};
+}
+
+/* Accepts {"countries":[{country, players:[{name, position}]}]} or a bare array of the
+   same country entries. Existing countries in realSquadData are overwritten by a
+   re-import (so re-loading an updated file refreshes rosters rather than duplicating). */
+function importRealSquadsJSON(jsonText){
+  let parsed;
+  try{ parsed = JSON.parse(jsonText); }
+  catch(e){ alert('Could not parse that JSON — check it is valid.'); return; }
+  const {imported, skipped, invalid} = applyRealSquadsPayload(parsed);
+  if(invalid){ alert('Expected a JSON object with a "countries" array (or a plain array of country entries).'); return; }
+  renderRealSquadsList();
+  alert(`Imported squads for ${imported} countr${imported===1?'y':'ies'}${skipped?`, skipped ${skipped} invalid entr${skipped===1?'y':'ies'}`:''}.`);
+}
+
+/* Fetches and merges a Real Squads JSON file from a URL. silent=true (used for the
+   automatic page-load attempt) swallows errors and skips the alert/pulse so a missing
+   or unset URL never interrupts anyone who isn't using this feature. */
+async function loadRealSquadsFromUrl(url, silent){
+  if(!url || typeof fetch!=='function') return null;
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const parsed = await res.json();
+    const {imported, skipped, invalid} = applyRealSquadsPayload(parsed);
+    if(invalid){ if(!silent) alert('That URL did not return the expected {"countries":[...]} shape.'); return null; }
+    renderRealSquadsList();
+    if(!silent){
+      alert(`Loaded squads for ${imported} countr${imported===1?'y':'ies'}${skipped?`, skipped ${skipped} invalid entr${skipped===1?'y':'ies'}`:''}.`);
+    } else if(imported && state){
+      state.pulses.unshift({text:`Real squads auto-loaded: ${imported} countries`, hot:false});
+      render();
+    }
+    return {imported, skipped};
+  } catch(err){
+    console.warn('Real squads auto-load failed:', err);
+    if(!silent) alert('Could not load real squads from that URL. Check it is reachable and CORS-enabled (a GitHub "raw" link or jsDelivr works well — the plain github.com page link will not).');
+    return null;
+  }
+}
+
+document.getElementById('realSquadsBtn').addEventListener('click', ()=>{
+  renderRealSquadsList();
+  document.getElementById('realSquadsUrlInput').value = REAL_SQUADS_SOURCE_URL;
+  realSquadsOverlay.classList.remove('hidden');
+});
+document.getElementById('realSquadsCloseBtn').addEventListener('click', ()=>realSquadsOverlay.classList.add('hidden'));
+document.getElementById('realSquadsClearBtn').addEventListener('click', ()=>{
+  if(!Object.keys(realSquadData).length) return;
+  if(confirm('Clear all imported real squads? Teams already generated this tournament keep their current squad; only future squad generation is affected.')){
+    realSquadData = {};
+    renderRealSquadsList();
+  }
+});
+document.getElementById('loadRealSquadsUrlBtn').addEventListener('click', ()=>{
+  const url = document.getElementById('realSquadsUrlInput').value.trim();
+  if(!url){ alert('Enter a URL first.'); return; }
+  REAL_SQUADS_SOURCE_URL = url;
+  loadRealSquadsFromUrl(url, false);
+});
+const realSquadsFileInput = document.getElementById('realSquadsFile');
+document.getElementById('loadRealSquadsFileBtn').addEventListener('click', ()=>{
+  const f = realSquadsFileInput.files[0];
+  if(!f){ alert('Choose a .json file first.'); return; }
+  const reader = new FileReader();
+  reader.onload = ()=>importRealSquadsJSON(String(reader.result));
+  reader.readAsText(f);
+});
+document.getElementById('importRealSquadsTextBtn').addEventListener('click', ()=>{
+  importRealSquadsJSON(document.getElementById('realSquadsText').value);
+});
+
 /* ===================== SAVE / LOAD ===================== */
 function serializeMatch(m){
   return {
@@ -5113,6 +5403,7 @@ function exportTournament(){
     customTeams,
     careerLog,
     achievements,
+    realSquadData,
     formatsCompleted: Array.from(formatsCompleted),
     state: {
       size:state.size, style:state.style, goal:state.goal, tactic:state.tactic,
@@ -5176,6 +5467,7 @@ function importTournament(payload){
     customTeams = payload.customTeams || [];
     careerLog = payload.careerLog || careerLog;
     achievements = payload.achievements || achievements;
+    realSquadData = payload.realSquadData || realSquadData;
     formatsCompleted = new Set(payload.formatsCompleted || Array.from(formatsCompleted));
     matchUidCounter = payload.matchUidCounter || 0;
     tieUidCounter = payload.tieUidCounter || 0;
@@ -5299,6 +5591,7 @@ loadFileInput.addEventListener('change', ()=>{
 
 /* ===================== BOOT ===================== */
 newTournament(64, "realistic", "normal", "balanced", false, true, false, false, false, "knockout", false, "normal");
+if(REAL_SQUADS_SOURCE_URL) loadRealSquadsFromUrl(REAL_SQUADS_SOURCE_URL, true);
 </script>
 </body>
 </html>
