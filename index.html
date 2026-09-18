@@ -872,7 +872,7 @@ PLAYER: 2 | DF | Triton | 88
         <input type="text" id="realSquadsUrlInput" placeholder="https://raw.githubusercontent.com/USER/REPO/main/players.json" style="flex:1; min-width:220px; padding:9px 10px; background:var(--turf-light); border:1px solid var(--line); border-radius:6px; color:var(--chalk); font-family:'Space Mono'; font-size:11px;">
         <button class="ghost" id="loadRealSquadsUrlBtn" type="button">🔄 Load</button>
       </div>
-      <div class="hint">Set this once and it re-loads automatically every time the page opens. Use a GitHub "Raw" link (not the regular github.com page link) or a jsDelivr link (<span class="mono">cdn.jsdelivr.net/gh/USER/REPO@main/players.json</span>) — both send the CORS headers a browser fetch needs.</div>
+      <div class="hint">Defaults to <span class="mono">players.json</span> in the same folder — deploy this page next to a players.json in the same repo (e.g. GitHub Pages) and it loads automatically, no setup needed. If you're opening this as a local file instead, or hosting the JSON elsewhere, paste a URL here — a GitHub "Raw" link (not the regular github.com page link) or a jsDelivr link (<span class="mono">cdn.jsdelivr.net/gh/USER/REPO@main/players.json</span>) both work; this re-loads automatically every time the page opens.</div>
     </div>
     <div class="field">
       <label>Import from a JSON file</label>
@@ -5232,17 +5232,18 @@ document.getElementById('addCustomTeamBtn').addEventListener('click', ()=>{
 });
 
 /* ===================== REAL SQUADS ===================== */
-/* Point this at a JSON file matching the Real Squads schema to auto-load it every time
-   the page opens — a relative path works if you host global_cup.html and the JSON
-   together (e.g. GitHub Pages: 'players.json'), or use an absolute URL such as a GitHub
-   "raw" link: 'https://raw.githubusercontent.com/USER/REPO/main/players.json' (the
-   plain github.com "blob" page URL will NOT work — click the Raw button on GitHub to
-   get the right link; raw.githubusercontent.com and jsDelivr's
-   cdn.jsdelivr.net/gh/USER/REPO@main/players.json both serve with the CORS headers a
-   browser fetch() needs). Leave it empty to rely only on the built-in seed data and the
-   manual import button below. Also editable at runtime from the Real Squads modal
-   without touching this file. */
-let REAL_SQUADS_SOURCE_URL = '';
+/* Defaults to a same-folder relative path — deploy this file (rename it to index.html
+   if you like) alongside a players.json in the same repo/folder (e.g. GitHub Pages),
+   and it's picked up automatically with zero configuration, no editing, no clicking
+   anything. Only matters when served over http(s) — opening the HTML directly as a
+   local file (file://) can't fetch a sibling file this way in most browsers; use the
+   URL field in the Real Squads modal for that case instead, pointed at a GitHub "raw"
+   link (e.g. 'https://raw.githubusercontent.com/USER/REPO/main/players.json' — the
+   plain github.com "blob" page URL will NOT work) or a jsDelivr link
+   (cdn.jsdelivr.net/gh/USER/REPO@main/players.json). If players.json isn't present at
+   all, the fetch just fails silently and the built-in seed data is used instead — no
+   error shown. */
+let REAL_SQUADS_SOURCE_URL = 'players.json';
 
 const realSquadsOverlay = document.getElementById('realSquadsOverlay');
 const realSquadsList = document.getElementById('realSquadsList');
