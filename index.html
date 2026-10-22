@@ -539,6 +539,131 @@ input#teamSearch:focus{outline:none; border-color:var(--amber);}
 .th-player-row .th-player-susp{font-size:10.5px; flex-shrink:0;}
 
 footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; letter-spacing:.03em;}
+
+/* ---------- lineups, formations, substitutions ---------- */
+.lineup-bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px; flex-shrink:0;}
+.lineup-bar button{font-size:12px; padding:8px 14px;}
+.auto-sub-toggle{font-size:11.5px; color:var(--chalk-dim); display:flex; gap:6px; align-items:center; cursor:pointer;}
+.lineup-panel{background:var(--turf-light); border:1px solid var(--amber); border-radius:10px; padding:12px 14px; margin-bottom:14px; flex-shrink:0;}
+.lineup-title{font:600 12px 'Oswald'; text-transform:uppercase; letter-spacing:.1em; color:var(--amber);}
+.lineup-hint{font-size:11px; color:var(--muted); margin:4px 0 10px; line-height:1.4;}
+.lineup-cols{display:grid; grid-template-columns:1fr; gap:18px;}
+.lineup-cols > div{min-width:0;}
+.lineup-kickoff{display:flex; gap:16px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+.lineup-kickoff label{font-size:11.5px; color:var(--chalk-dim); display:flex; gap:6px; align-items:center;}
+.lu-head{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; font-size:13px;}
+.lu-head select{font-size:11.5px; padding:5px 6px;}
+.lu-subs{margin-left:auto; font:11px 'Space Mono'; color:var(--amber);}
+.lu-pitch{position:relative; height:150px; border-radius:8px; margin-bottom:8px; border:1px solid var(--line);
+  background:linear-gradient(180deg,#123062,#0e2550); overflow:hidden;}
+.lu-pitch::after{content:''; position:absolute; left:0; right:0; top:50%; border-top:1px solid rgba(255,255,255,.1);}
+.lu-dot{position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; font:700 10px 'Space Mono';
+  display:flex; align-items:center; justify-content:center; color:#06101f; border:1px solid #0a1128; z-index:1;}
+.lu-dot.a{background:var(--flare);} .lu-dot.b{background:var(--win);}
+.lu-dot.inj{outline:2px solid #ff8a00;} .lu-dot.yc{box-shadow:0 0 0 2px #ffcf3f;}
+.lu-sub-title{font:600 10px 'Oswald'; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:8px 0 4px;}
+.lu-row{display:grid; grid-template-columns:30px 34px 1fr auto 30px 34px 40px; gap:6px; align-items:center; padding:3px 4px;
+  font-size:11.5px; border-radius:5px; border-bottom:1px solid rgba(255,255,255,.04);}
+.lu-row.sel{background:rgba(77,141,253,.22);}
+.lu-row.inj .lu-name{color:#ff8a00;}
+.lu-slot{font:700 9.5px 'Space Mono'; padding:2px 0; text-align:center; border-radius:3px; background:#1d3868;}
+.lu-slot.s-GK{background:#7a5a00;} .lu-slot.s-DF{background:#1c4d8a;} .lu-slot.s-MF{background:#1d6a4f;} .lu-slot.s-AT{background:#8a2b3a;}
+.lu-num{font:10.5px 'Space Mono'; color:var(--muted);}
+.lu-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.lu-badges{font-size:10.5px; white-space:nowrap;}
+.lu-rt{font:700 11.5px 'Space Mono'; text-align:right; color:var(--amber);}
+.lu-stam{height:5px; background:var(--turf); border-radius:3px; overflow:hidden;}
+.lu-stam i{display:block; height:100%; background:linear-gradient(90deg,var(--flare),#ffcf3f,#2be08a);}
+.lu-btn{padding:2px 4px !important; font-size:11px !important; min-width:0;}
+.lu-gone{font-size:10.5px; color:var(--muted); margin-top:6px; line-height:1.4;}
+.watch-feed li.card-yellow{border-left-color:#ffcf3f; color:var(--chalk);}
+.watch-feed li.card-red{border-left-color:var(--flare); color:#ffb3bd;}
+.watch-feed li.sub{border-left-color:#2be08a;}
+
+/* ---------- penalty shootout ---------- */
+.pen-panel{background:var(--turf-light); border:1px solid var(--win); border-radius:10px; padding:14px; margin-bottom:14px; flex-shrink:0;}
+.pen-title{font:600 13px 'Oswald'; text-transform:uppercase; letter-spacing:.08em; color:var(--win); margin-bottom:10px;}
+.pen-mode-row{display:flex; gap:8px; flex-wrap:wrap;}
+.pen-mode-row button{flex:1; min-width:140px; font-size:12px;}
+.pen-note{font-size:11px; color:var(--muted); margin-top:8px; line-height:1.4;}
+.pen-board{text-align:center; font:700 18px 'Space Mono'; margin-bottom:8px;}
+.pen-goal-wrap{max-width:420px; margin:0 auto 34px;}
+.pen-goal{position:relative; height:150px; border:4px solid #e9eef9; border-bottom:none; border-radius:6px 6px 0 0;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 12px),repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 12px),#0d2146;}
+.pen-goal.flash-good{animation:penGood .7s;} .pen-goal.flash-bad{animation:penBad .7s;}
+@keyframes penGood{0%,100%{box-shadow:none;}40%{box-shadow:0 0 28px 6px rgba(43,224,138,.7);}}
+@keyframes penBad{0%,100%{box-shadow:none;}40%{box-shadow:0 0 28px 6px rgba(239,61,84,.7);}}
+.pen-keeper{position:absolute; left:50%; bottom:6px; font-size:38px; transform:translate(-50%,0); transition:left .35s ease, transform .35s ease; z-index:2; pointer-events:none;}
+.pen-ball{position:absolute; left:50%; top:118%; font-size:24px; transform:translate(-50%,-50%); transition:left .5s cubic-bezier(.2,.7,.3,1), top .5s cubic-bezier(.2,.7,.3,1); z-index:3; pointer-events:none;}
+.pen-zones{position:absolute; inset:0; display:grid; z-index:4;}
+.pen-zones.shoot{grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr);}
+.pen-zones.dive{grid-template-columns:repeat(3,1fr);}
+.pen-zone{background:rgba(77,141,253,.10); border:1px dashed rgba(255,255,255,.3); border-radius:0; color:#fff; font-size:20px; padding:0;}
+.pen-zone:hover{background:rgba(77,141,253,.4);}
+.pen-zone.dive{grid-row:1 / span 2; font-size:12px;}
+.pen-prompt{text-align:center; font-size:13px; line-height:1.5; margin-bottom:6px;}
+.pen-token{text-align:center; font-size:11px; color:var(--muted); margin-bottom:6px;}
+.pen-kicker-pick{display:flex; gap:8px; align-items:center; justify-content:center; margin-bottom:8px; font-size:12px;}
+.pen-kicker-pick select{max-width:70%;}
+.pen-result{text-align:center; font:700 14px 'Oswald'; letter-spacing:.05em; min-height:20px;}
+.pen-result.good{color:#2be08a;} .pen-result.bad{color:var(--flare);}
+.pen-auto{display:block; margin:8px auto 0; font-size:11px; padding:6px 12px;}
+
+/* ---------- replay viewer ---------- */
+.replay-modal{max-width:980px; width:94vw;}
+.rp-tabs{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+.rp-tab{font-size:12px; padding:7px 14px;}
+.rp-tab.active{background:var(--amber); color:#06101f; border-color:var(--amber);}
+.rp-scoreboard{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; margin-bottom:10px;}
+.rp-team{display:flex; gap:8px; align-items:center; font:600 16px 'Oswald'; min-width:0;}
+.rp-team.right{justify-content:flex-end;}
+.rp-team span:first-child{font-size:26px;} .rp-team.right span:last-child{font-size:26px;}
+.rp-score{font:700 30px 'Space Mono'; text-align:center;}
+.rp-clock{font:12px 'Space Mono'; color:var(--amber);}
+.rp-moment{background:var(--turf-light); border:1px solid var(--line); border-radius:10px; padding:12px 16px; text-align:center;
+  font:600 14px 'Space Mono'; min-height:44px; margin-bottom:10px; line-height:1.4;}
+.rp-moment.ev-goal,.rp-moment.ev-penend{border-color:var(--win); color:var(--win);}
+.rp-moment.ev-rc{border-color:var(--flare); color:#ffb3bd;}
+.rp-moment.pop{animation:rpPop .35s ease-out;}
+@keyframes rpPop{0%{transform:scale(.96); opacity:.4;}100%{transform:scale(1); opacity:1;}}
+.rp-controls{display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap;}
+.rp-controls button{padding:7px 12px; font-size:12px;}
+.rp-controls input[type=range]{flex:1; min-width:120px;}
+.rp-count{font:11px 'Space Mono'; color:var(--muted);}
+.rp-body{display:grid; grid-template-columns:1.3fr 1fr; gap:12px; margin-bottom:12px;}
+@media (max-width:760px){ .rp-body{grid-template-columns:1fr;} }
+.rp-feed{max-height:260px;}
+.rp-feed li b{font-family:'Space Mono'; color:var(--amber); margin-right:4px;}
+.rp-feed li.ev-rc{border-left-color:var(--flare);} .rp-feed li.ev-yc{border-left-color:#ffcf3f;}
+.rp-feed li.ev-sub{border-left-color:#2be08a;}
+
+/* ---------- replay library, autosave ---------- */
+.replays-toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;}
+.replays-toolbar input{font-family:'Inter'; background:var(--turf-light); color:var(--chalk); border:1px solid var(--line); border-radius:6px; padding:9px 10px; font-size:13px; flex:1; min-width:140px;}
+.rl-row{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:9px 4px; border-bottom:1px solid var(--turf-light); flex-wrap:wrap;}
+.rl-title{font-size:13px;} .rl-sub{font-size:11px; color:var(--muted); margin-top:2px;}
+.rl-btns{display:flex; gap:6px;} .rl-btns button{font-size:11px; padding:6px 10px;}
+.autosave-banner{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:80; background:var(--turf); border:1px solid var(--amber);
+  border-radius:10px; padding:10px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12.5px; box-shadow:0 8px 30px rgba(0,0,0,.5); max-width:94vw;}
+.autosave-banner button{padding:6px 12px; font-size:12px;}
+
+/* ---------- match report pieces ---------- */
+.md-actions{display:flex; gap:8px; margin:10px 0; flex-wrap:wrap;} .md-actions button{flex:1; font-size:12px; padding:8px;}
+.tsb{margin:10px 0;} .tsb-row{display:grid; grid-template-columns:44px 1fr 44px; gap:8px; align-items:center; margin-bottom:6px;}
+.tsb-v{font:700 12px 'Space Mono'; text-align:center;} .tsb-label{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); text-align:center; margin-bottom:2px;}
+.tsb-track{display:flex; height:7px; border-radius:4px; overflow:hidden; background:var(--turf-light);}
+.tsb-track .a{background:var(--flare);} .tsb-track .b{background:var(--win);}
+.md-lineups summary{cursor:pointer; font:600 12px 'Oswald'; text-transform:uppercase; letter-spacing:.08em; color:var(--amber); margin:8px 0;}
+.lt-team{margin-bottom:12px;} .lt-head{font-weight:600; font-size:13px; margin-bottom:4px;} .lt-form{font:11px 'Space Mono'; color:var(--amber); margin-left:6px;}
+.lt-table{width:100%; border-collapse:collapse; font-size:11.5px;}
+.lt-table th{text-align:left; color:var(--muted); font-weight:500; padding:3px 4px; font-size:10px; text-transform:uppercase;}
+.lt-table td{padding:3px 4px; border-bottom:1px solid var(--turf-light); white-space:nowrap;}
+.lt-table tr.sub td{color:var(--chalk-dim);} .lt-in{color:#2be08a; font-size:10px;} .lt-out{color:var(--flare); font-size:10px;}
+.stats-h3{font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--amber); margin:16px 0 8px;}
+.tot-pitch{position:relative; height:300px; border-radius:10px; border:1px solid var(--line); background:linear-gradient(180deg,#123062,#0e2550);}
+.tot-line{position:absolute; left:0; right:0; transform:translateY(-50%); display:flex; justify-content:space-around;}
+.tot-p{text-align:center; font-size:11px; display:flex; flex-direction:column; min-width:60px;}
+.tot-p small{font:10px 'Space Mono'; color:var(--amber);}
 </style>
 </head>
 <body>
@@ -570,6 +695,7 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <button class="ghost hidden" id="thirdPlaceBtn">🥉 Third-Place Table</button>
     <button class="ghost" id="leaderboardBtn">🏅 Leaderboard</button>
     <button class="ghost" id="statsBtn">📊 Stats & Records</button>
+    <button class="ghost" id="replaysBtn">🎞 Replays</button>
     <button class="ghost" id="bracketBtn">🏆 Bracket View</button>
     <button class="ghost" id="careerBtn">🏛 Career Mode</button>
     <button class="ghost" id="achievementsBtn">🎖 Achievements</button>
@@ -915,7 +1041,7 @@ PLAYER: 2 | DF | Triton | 88
 
 <!-- Match detail overlay -->
 <div class="overlay hidden" id="matchDetailOverlay">
-  <div class="modal">
+  <div class="modal" style="max-width:620px;">
     <h2 id="mdTitle">—</h2>
     <p class="sub" id="mdSub">—</p>
     <div class="md-scoreline">
@@ -933,6 +1059,9 @@ PLAYER: 2 | DF | Triton | 88
     <div class="md-result" id="mdResult"></div>
     <div class="md-motm" id="mdMotm"></div>
     <ul class="pulse-list" id="mdTimeline" style="max-height:280px;"></ul>
+    <div class="md-actions" id="mdActions"></div>
+    <div id="mdStats"></div>
+    <details class="md-lineups" id="mdLineupsWrap"><summary>Lineups, minutes &amp; ratings</summary><div id="mdLineups"></div></details>
     <div class="modal-actions">
       <button class="primary" id="mdCloseBtn">Close</button>
     </div>
@@ -1041,11 +1170,22 @@ PLAYER: 2 | DF | Triton | 88
 
 <!-- Stats & records overlay -->
 <div class="overlay hidden" id="statsOverlay">
-  <div class="modal" style="max-width:640px;">
+  <div class="modal" style="max-width:900px; width:94vw;">
     <h2>Tournament Records</h2>
     <p class="sub">Standout performances so far.</p>
+    <div class="rp-tabs" id="statsTabs">
+      <button class="rp-tab active" data-stab="records">📊 Records</button>
+      <button class="rp-tab" data-stab="players">👤 Players</button>
+      <button class="rp-tab" data-stab="awards">🏅 Awards</button>
+      <button class="rp-tab" data-stab="teams">🛡 Teams</button>
+    </div>
+    <div id="statsTabRecords">
     <div id="highlightsRecap" class="highlights-recap"></div>
     <div id="statsGrid" class="stats-grid"></div>
+    </div>
+    <div id="statsTabPlayers" class="hidden"></div>
+    <div id="statsTabAwards" class="hidden"></div>
+    <div id="statsTabTeams" class="hidden"></div>
     <div class="modal-actions">
       <button class="ghost" id="statsCloseBtn">Close</button>
     </div>
@@ -1219,13 +1359,104 @@ PLAYER: 2 | DF | Triton | 88
         </div>
       </div>
     </div>
+    <div class="lineup-bar hidden" id="lineupBar">
+      <button class="ghost" id="lineupToggleBtn">📋 Lineups, Formations &amp; Subs</button>
+      <label class="auto-sub-toggle"><input type="checkbox" id="autoSubsChk" checked> 🤖 AI manager (auto-subs &amp; shape changes)</label>
+    </div>
+    <div class="lineup-panel hidden" id="lineupPanel">
+      <div class="lineup-title" id="lineupTitle">📋 Team sheet</div>
+      <div class="lineup-hint" id="lineupHint"></div>
+      <div class="lineup-cols"><div id="lineupColA"></div><div id="lineupColB"></div></div>
+      <div class="lineup-kickoff hidden" id="lineupKickoff">
+        <button class="primary" id="kickoffBtn">▶ Kick off</button>
+        <label><input type="checkbox" id="skipSheetChk"> Skip the team sheet next time</label>
+      </div>
+    </div>
+    <div class="pen-panel hidden" id="penPanel">
+      <div id="penModes" class="hidden">
+        <div class="pen-title">🎯 Penalty shootout — who takes control?</div>
+        <div class="pen-mode-row">
+          <button id="penModeA">A</button><button id="penModeB">B</button><button id="penModeBoth">Both</button><button id="penModeAuto">Auto</button>
+        </div>
+        <div class="pen-note">Aim your penalties (6 spots) and guess the keeper's dive when defending. Player ratings change the odds — top corners are risky, the middle is safe but easier to save.</div>
+      </div>
+      <div id="penStage" class="hidden">
+        <div class="pen-board" id="penBoard"></div>
+        <div class="pen-prompt" id="penPrompt"></div>
+        <div class="pen-token" id="penTokenNote"></div>
+        <div class="pen-kicker-pick hidden" id="penKickerPick"><label for="penKickerSel">Taker:</label><select id="penKickerSel"></select></div>
+        <div class="pen-goal-wrap"><div class="pen-goal" id="penGoal">
+          <div class="pen-keeper" id="penKeeper">🧤</div><div class="pen-ball" id="penBall">⚽</div><div class="pen-zones" id="penZones"></div>
+        </div></div>
+        <div class="pen-result" id="penResult"></div>
+        <button class="ghost pen-auto" id="penAutoBtn">⏩ Auto-finish shootout</button>
+      </div>
+    </div>
     <div class="shootout-row hidden" id="shootoutRow"></div>
     <ul class="watch-feed" id="watchFeed"></ul>
     <div class="watch-actions">
       <button id="watchSkipBtn" class="ghost">⏭ Skip to Full Time</button>
+      <button id="watchReportBtn" class="ghost hidden">📋 Match report</button>
+      <button id="watchReplayBtn" class="ghost hidden">🎞 Replay</button>
       <button id="watchCloseBtn" class="primary hidden">Continue →</button>
     </div>
   </div>
+</div>
+
+<!-- Replay viewer -->
+<div class="overlay hidden" id="replayOverlay" style="z-index:60;">
+  <div class="modal replay-modal">
+    <div class="watch-head" style="margin-bottom:10px;">
+      <div><h2 id="rpTitle">Replay</h2><p class="sub" id="rpSub" style="margin:2px 0 0;"></p></div>
+      <button class="ghost" id="rpCloseBtn">Close</button>
+    </div>
+    <div class="rp-tabs" id="rpTabs">
+      <button class="rp-tab active" data-mode="full">▶ Full replay</button>
+      <button class="rp-tab" data-mode="highlights">✨ Highlights</button>
+    </div>
+    <div class="rp-scoreboard">
+      <div class="rp-team"><span id="rpFlagA"></span><span id="rpNameA"></span></div>
+      <div class="rp-score"><span id="rpScoreA">0</span> – <span id="rpScoreB">0</span><div class="rp-clock" id="rpClock">0'</div></div>
+      <div class="rp-team right"><span id="rpNameB"></span><span id="rpFlagB"></span></div>
+    </div>
+    <div class="rp-moment" id="rpMoment"></div>
+    <div class="rp-controls">
+      <button class="ghost" id="rpPrevBtn">⏮</button>
+      <button class="primary" id="rpPlayBtn">⏸ Pause</button>
+      <button class="ghost" id="rpNextBtn">⏭</button>
+      <button class="ghost" id="rpSpeedBtn">1x</button>
+      <input type="range" id="rpScrub" min="0" max="0" value="0">
+      <span class="rp-count" id="rpCount">0 / 0</span>
+    </div>
+    <div class="rp-body">
+      <ul class="watch-feed rp-feed" id="rpFeed"></ul>
+      <div class="analytics-card"><div class="analytics-title">Shot Map</div><svg id="rpShotMap" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="analytics-legend"><span><i class="dot" style="background:#4fc3ff;"></i>Goal</span><span><i class="dot" style="background:#ffcf3f;"></i>Saved</span><span><i class="dot" style="background:#b23bff;"></i>Post</span><span><i class="dot" style="background:#7086ad;"></i>Wide</span></div></div>
+    </div>
+    <div id="rpStats"></div>
+    <div class="modal-actions"><button class="ghost" id="rpReportBtn">📋 Match report</button></div>
+  </div>
+</div>
+
+<!-- Replay library -->
+<div class="overlay hidden" id="replaysOverlay">
+  <div class="modal leaderboard-modal">
+    <h2>Replays &amp; Highlights</h2>
+    <p class="sub">Matches you watch live keep a full minute-by-minute replay; instantly simulated matches keep a recap of goals, cards and substitutions. Everything is stored with your tournament.</p>
+    <div class="replays-toolbar">
+      <button class="primary" id="reelAllBtn">✨ Tournament highlights reel</button>
+      <select id="replaysFilter"><option value="all">All matches</option><option value="live">Watched live</option><option value="goals">5+ goals</option><option value="shootouts">Shootouts</option><option value="reds">Red cards</option></select>
+      <input type="text" id="replaysSearch" placeholder="Search…">
+    </div>
+    <div class="leaderboard-scroll"><div id="replaysList"></div></div>
+    <div class="modal-actions"><button class="ghost" id="replaysCloseBtn">Close</button></div>
+  </div>
+</div>
+
+<div class="autosave-banner hidden" id="autosaveBanner">
+  <span id="autosaveText">💾 Autosaved tournament found.</span>
+  <button class="primary" id="autosaveResumeBtn">Resume</button>
+  <button class="ghost" id="autosaveDiscardBtn">Start fresh</button>
 </div>
 
 <script>
@@ -1807,10 +2038,11 @@ function buildPlayersFromRealSquad(team, realSquad){
 }
 
 function ensurePlayers(team){
-  if(team.players.length) return;
+  if(team.players.length){ ensureBench(team); return; }
   const realSquad = findRealSquad(team);
   if(realSquad && realSquad.players && realSquad.players.length){
     buildPlayersFromRealSquad(team, realSquad);
+    ensureBench(team);
     return;
   }
   const pool = nameRegionForTeam(team);
@@ -1834,6 +2066,7 @@ function ensurePlayers(team){
     const rating = Math.max(30, Math.min(99, Math.round(team.rating+posAdj+(Math.random()*16-8))));
     team.players.push({name, number:i+1, position, rating});
   });
+  ensureBench(team);
 }
 
 function availablePlayers(team){
@@ -1934,7 +2167,7 @@ function renderRadarChart(teamA, teamB){
 function keeperFactor(team){
   ensurePlayers(team);
   const gk = team.players.find(p=>p.position==='GK');
-  const gkRating = gk ? gk.rating : team.rating;
+  const gkRating = (LIVE_GK[team.id]!=null) ? LIVE_GK[team.id] : (gk ? gk.rating : team.rating);
   const diff = gkRating - 65;
   return Math.max(0.15, Math.min(1.6, 1 - diff*0.006));
 }
@@ -2044,7 +2277,7 @@ function bootDisplayLabel(key){
   const teamId = +teamIdStr, num = +numStr;
   const team = state.allTeams.find(t=>t.id===teamId);
   if(!team) return key; // legacy/malformed key (e.g. from a save made before this fix)
-  const player = team.players.find(p=>p.number===num);
+  const player = findSquadPlayer(team, num);
   const name = player ? (state.useRealNames ? player.name : ('Player #'+player.number)) : ('Player #'+num);
   return `${name} (${team.name})`;
 }
@@ -2070,6 +2303,8 @@ function distributeGoals(team, goals, minMinute, maxMinute){
 }
 
 function computeMotm(m){
+  const rm = reportMotm(m);
+  if(rm) return rm;
   if(m.events && m.events.length){
     const tally = {};
     m.events.forEach(e=>{
@@ -2443,6 +2678,7 @@ function playTieLeg(m){
   m.scoreA = res.scoreA; m.scoreB = res.scoreB;
   m.winner = res.winner; m.penalties=false; m.penA=0; m.penB=0;
   m.events = res.events;
+  synthesizeMatchRecord(m, res); checkReportAchievements(m);
   state.matchesPlayed++;
   state.totalMatchesPlayed++;
   clearSuspensions(m.a); clearSuspensions(m.b);
@@ -2511,7 +2747,7 @@ function undoMatch(m){
   const wasTieDecider = !!m.tieResult;
 
   m.played=false; m.revealed=false;
-  delete m.scoreA; delete m.scoreB; delete m.winner; delete m.penalties; delete m.penA; delete m.penB; delete m.events;
+  delete m.scoreA; delete m.scoreB; delete m.winner; delete m.penalties; delete m.penA; delete m.penB; delete m.events; delete m.report; delete m.replay;
   delete m.tieResult;
 
   if(wasTieDecider && m.tieId && state.ties[m.tieId]){
@@ -2551,6 +2787,7 @@ function playMatch(m){
   m.scoreA = res.scoreA; m.scoreB = res.scoreB;
   m.winner = res.winner; m.penalties = res.penalties; m.penA=res.penA; m.penB=res.penB;
   m.events = res.events;
+  synthesizeMatchRecord(m, res); checkReportAchievements(m);
   state.matchesPlayed++;
   state.totalMatchesPlayed++;
 
@@ -2608,6 +2845,7 @@ function playGroupMatch(m, groupName){
   m.scoreA = res.scoreA; m.scoreB = res.scoreB;
   m.winner = res.winner; m.penalties = false; m.penA=0; m.penB=0;
   m.events = res.events;
+  synthesizeMatchRecord(m, res); checkReportAchievements(m);
   state.matchesPlayed++;
   state.totalMatchesPlayed++;
 
@@ -3091,6 +3329,7 @@ function render(){
   } else {
     followingCard.style.display = 'none';
   }
+  scheduleAutosave();
 }
 
 function matchesSearch(m){
@@ -3539,13 +3778,24 @@ function openMatchDetail(m, roundLabel){
   }
 
   const motm = computeMotm(m);
-  document.getElementById('mdMotm').textContent = `⭐ Man of the Match: ${motm.name} (${motm.team.name})`;
+  document.getElementById('mdMotm').textContent = `⭐ Man of the Match: ${motm.name} (${motm.team.name})${motm.rt?` — rated ${motm.rt.toFixed(1)}`:''}`;
 
-  const events = (m.events||[]).slice().sort((x,y)=>x.minute-y.minute);
+  const tl = (m.events||[]).map(e=>({n:e.minute, html:`⚽ ${e.minute}' — ${escHtml(e.scorer)} <span style="color:var(--muted)">(${escHtml(e.teamRef.name)}${e.assist?` · assist ${escHtml(e.assist)}`:''})</span>`}));
+  ((m.replay && m.replay.ev) || []).filter(e=>['yc','rc','sub','inj'].includes(e.ty)).forEach(e=>tl.push({n:e.n!=null?e.n:(parseInt(e.c)||0), html:`${e.c} ${escHtml(e.x)}`}));
+  tl.sort((x,y)=>x.n-y.n);
   const timelineEl = document.getElementById('mdTimeline');
-  timelineEl.innerHTML = events.length
-    ? events.map(e=>`<li>⚽ ${e.minute}' — ${e.scorer} <span style="color:var(--muted)">(${e.teamRef.name})</span></li>`).join('')
+  timelineEl.innerHTML = tl.length
+    ? tl.map(x=>`<li>${x.html}</li>`).join('')
     : `<li>No goals from open play${m.penalties?' — settled on penalties.':'.'}</li>`;
+  const actions = document.getElementById('mdActions');
+  actions.innerHTML = m.replay ? '<button class="ghost" id="mdReplayBtn">▶ Replay</button><button class="ghost" id="mdHlBtn">✨ Highlights</button>' : '';
+  if(m.replay){
+    document.getElementById('mdReplayBtn').onclick = ()=>{ matchDetailOverlay.classList.add('hidden'); openReplay(m, roundLabel, 'full'); };
+    document.getElementById('mdHlBtn').onclick = ()=>{ matchDetailOverlay.classList.add('hidden'); openReplay(m, roundLabel, 'highlights'); };
+  }
+  document.getElementById('mdStats').innerHTML = teamStatBarsHtml(m);
+  document.getElementById('mdLineups').innerHTML = lineupTablesHtml(m);
+  document.getElementById('mdLineupsWrap').classList.toggle('hidden', !m.report);
 
   matchDetailOverlay.classList.remove('hidden');
 }
@@ -3569,6 +3819,8 @@ function renderSquadList(team){
   const susp = state.suspensions[team.id];
   const sorted = team.players.slice().sort((a,b)=> b.rating-a.rating);
   const squadEl = document.getElementById('thSquadList');
+  const benchHtml = (team.bench&&team.bench.length) ? `<div class="lu-sub-title" style="margin-top:10px;">Bench (${team.bench.length}) · used for substitutions in Watch mode</div>` +
+    team.bench.slice().sort((a,b)=>b.rating-a.rating).map(p=>`<div class="th-player-row" style="opacity:.8;"><span class="lu-slot s-${naturalGroup(p.position)}" style="width:34px;">${p.position}</span><span style="flex:1;margin-left:8px;">${escHtml(p.name)}</span><span class="th-player-number">#${p.number}${p.age?' · '+p.age+'y':''}</span><span class="th-player-rating">${p.rating}</span></div>`).join('') : '';
   squadEl.innerHTML = sorted.map(p=>{
     const isSusp = susp && susp.has(p.number);
     const isGod = p.rating>99;
@@ -3588,7 +3840,7 @@ function renderSquadList(team){
         <button class="ghost th-player-rating-btn" data-player-number="${p.number}" data-adj="10">+10</button>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + benchHtml;
 
   squadEl.querySelectorAll('.th-player-pos-select').forEach(sel=>{
     sel.addEventListener('change', ()=>{
@@ -4280,6 +4532,683 @@ document.getElementById('editDrawDoneBtn').addEventListener('click', ()=>{
   render();
 });
 
+/* ===================== MATCH ENGINE EXTENSIONS ===================== */
+/* Everything below was added for: bench + substitutions, formations, per-match reports
+   (assists, cards, minutes, ratings) and stored replays. The design rule throughout is
+   "don't change what a match looks like unless the user changes something": every team
+   gets a default formation matching its own squad shape, and all formation / lineup
+   modifiers are measured RELATIVE to that default — so a watched match with no subs,
+   no formation changes and no cards plays out with the same odds as it always did. */
+
+/* ---------- bench, ages ---------- */
+const BENCH_SHAPE = ['GK','DF','DF','MF','MF','MF','FW','ST','ST'];
+
+function hashStr(s){
+  let h = 2166136261; s = String(s);
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h>>>0;
+}
+/* Deterministic (name-derived) so a player's age never changes between sessions,
+   even for squads that get regenerated from the same real-squad data. ~24% are U21. */
+function ageFor(team, p){
+  const r = hashStr(team.name+'|'+p.name+'|'+p.number) % 100;
+  return r<24 ? 18+(r%4) : 22+((r*7)%14);
+}
+function ensureAges(team){
+  (team.players||[]).forEach(p=>{ if(p.age==null) p.age = ageFor(team,p); });
+  (team.bench||[]).forEach(p=>{ if(p.age==null) p.age = ageFor(team,p); });
+}
+function ensureBench(team){
+  if(!team.bench) team.bench = [];
+  if(team.bench.length===0 && team.players.length){
+    const pool = nameRegionForTeam(team);
+    const used = new Set(team.players.map(p=>p.name));
+    const startNum = team.players.reduce((mx,p)=>Math.max(mx,p.number||0),0)+1;
+    BENCH_SHAPE.forEach((position,i)=>{
+      let name, attempts=0;
+      do{
+        name = pool.first[Math.floor(Math.random()*pool.first.length)]+" "+pool.last[Math.floor(Math.random()*pool.last.length)];
+        attempts++;
+      } while(used.has(name) && attempts<12);
+      used.add(name);
+      const posAdj = position==='ST'?4 : position==='FW'?2 : position==='GK'?-6 : position==='DF'?-3 : -1;
+      const rating = Math.max(30, Math.min(99, Math.round(team.rating+posAdj-5+(Math.random()*14-7))));
+      team.bench.push({name, number:startNum+i, position, rating});
+    });
+  }
+  ensureAges(team);
+}
+function allSquad(team){ return [...(team.players||[]), ...(team.bench||[])]; }
+function findSquadPlayer(team, num){ return allSquad(team).find(p=>p.number===num); }
+function playerLabel(p){ return state.useRealNames ? p.name : ('Player #'+p.number); }
+function clampN(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+function randInt(lo, hi){ return lo + Math.floor(Math.random()*(hi-lo+1)); }
+
+/* ---------- formations ---------- */
+/* df/mf/at = outfield slot counts (always 10). att / leak / mid are multipliers on
+   chance creation, chances conceded and midfield control relative to a plain 4-4-2. */
+const FORMATION_DEFS = {
+  '4-4-2':   {df:4, mf:4, at:2, att:1.00, leak:1.00, mid:1.00, tag:'Balanced'},
+  '4-3-3':   {df:4, mf:3, at:3, att:1.08, leak:1.05, mid:1.00, tag:'Attacking'},
+  '4-2-3-1': {df:4, mf:5, at:1, att:1.03, leak:0.97, mid:1.07, tag:'Control'},
+  '3-5-2':   {df:3, mf:5, at:2, att:1.05, leak:1.05, mid:1.10, tag:'Midfield-heavy'},
+  '3-4-3':   {df:3, mf:4, at:3, att:1.16, leak:1.16, mid:0.97, tag:'All-out attack'},
+  '5-3-2':   {df:5, mf:3, at:2, att:0.90, leak:0.86, mid:0.95, tag:'Solid'},
+  '5-4-1':   {df:5, mf:4, at:1, att:0.80, leak:0.76, mid:1.00, tag:'Park the bus'},
+  '4-5-1':   {df:4, mf:5, at:1, att:0.90, leak:0.92, mid:1.10, tag:'Compact'}
+};
+const GROUP_RANK = {GK:0, DF:1, MF:2, AT:3};
+function naturalGroup(pos){ return pos==='GK'?'GK' : pos==='DF'?'DF' : pos==='MF'?'MF' : 'AT'; }
+/* Playing out of position costs rating points: 5 per line stepped, 30 to/from goal. */
+function oopPenalty(pos, slot){
+  const n = naturalGroup(pos);
+  if(n===slot) return 0;
+  if(n==='GK' || slot==='GK') return 30;
+  return Math.abs(GROUP_RANK[n]-GROUP_RANK[slot])*5;
+}
+function defaultFormationFor(team){
+  ensurePlayers(team);
+  let df=0, mf=0, at=0;
+  team.players.forEach(p=>{
+    const g = naturalGroup(p.position);
+    if(g==='DF') df++; else if(g==='MF') mf++; else if(g==='AT') at++;
+  });
+  let best='4-4-2', bestD=1e9;
+  Object.keys(FORMATION_DEFS).forEach(k=>{
+    const f = FORMATION_DEFS[k];
+    const d = Math.abs(f.df-df)+Math.abs(f.mf-mf)+Math.abs(f.at-at);
+    if(d<bestD){ bestD=d; best=k; }
+  });
+  return best;
+}
+
+function makeEntry(p, slot, onMin){
+  return {p, slot, on:onMin||0, off:null, yc:0, red:false, inj:false,
+          g:0, a:0, sh:0, sot:0, sv:0, pk:0, pkm:0, pks:0};
+}
+/* Places a set of players into formation slots. Within each natural line the players
+   nearest the neighbouring line are the ones who get pushed across when the shape needs
+   more/fewer men there (weakest defenders step into midfield, best midfielders step into
+   attack, weakest attackers drop back), so the strongest players stay in their roles. */
+function assignSlots(players, fkey, gkPlayer){
+  const F = FORMATION_DEFS[fkey] || FORMATION_DEFS['4-4-2'];
+  let gk = gkPlayer || players.filter(p=>p.position==='GK').sort((a,b)=>b.rating-a.rating)[0];
+  if(!gk) gk = players[0];
+  const outfield = players.filter(p=>p!==gk);
+  const grp = p => { const g = naturalGroup(p.position); return g==='GK' ? 'MF' : g; };
+  const dfs = outfield.filter(p=>grp(p)==='DF').sort((a,b)=>b.rating-a.rating);
+  const mfs = outfield.filter(p=>grp(p)==='MF').sort((a,b)=>a.rating-b.rating);
+  const ats = outfield.filter(p=>grp(p)==='AT').sort((a,b)=>a.rating-b.rating);
+  const ordered = [...dfs, ...mfs, ...ats];
+  const entries = gk ? [makeEntry(gk,'GK',0)] : [];
+  let i = 0;
+  [['DF',F.df],['MF',F.mf],['AT',F.at]].forEach(([slot,count])=>{
+    for(let k=0;k<count && i<ordered.length;k++) entries.push(makeEntry(ordered[i++], slot, 0));
+  });
+  while(i<ordered.length) entries.push(makeEntry(ordered[i++], 'MF', 0));
+  return entries;
+}
+
+/* Starting XI for a match: the 11 squad players minus anyone suspended (those get
+   like-for-like cover from the bench), plus whoever is left on the bench. */
+function buildStartingXI(team){
+  ensurePlayers(team);
+  const susp = state.suspensions[team.id];
+  const bench = team.bench.slice();
+  const xi = team.players.filter(p=>!(susp && susp.has(p.number)));
+  const missingGroups = team.players.filter(p=>susp && susp.has(p.number)).map(p=>naturalGroup(p.position));
+  missingGroups.forEach(g=>{
+    const cands = bench.filter(p=>naturalGroup(p.position)===g).sort((a,b)=>b.rating-a.rating);
+    const rep = cands[0] || bench.slice().sort((a,b)=>b.rating-a.rating)[0];
+    if(rep){ bench.splice(bench.indexOf(rep),1); xi.push(rep); }
+  });
+  while(xi.length<11 && bench.length){
+    const rep = bench.slice().sort((a,b)=>b.rating-a.rating)[0];
+    bench.splice(bench.indexOf(rep),1); xi.push(rep);
+  }
+  return {xi, bench};
+}
+
+/* ---------- live strength model ---------- */
+function staminaPct(e, minute){
+  const mins = Math.max(0, minute - e.on);
+  return clampN(100 - Math.max(0, mins-15)*0.75, 10, 100);
+}
+function effRating(e, minute){
+  let r = e.p.rating - oopPenalty(e.p.position, e.slot);
+  r -= (100 - staminaPct(e, minute))*0.11;
+  if(e.inj) r -= 18;
+  return Math.max(15, r);
+}
+function isActive(e){ return e.off==null && !e.red; }
+function groupAverages(entries, minute){
+  const buckets = {GK:[], DF:[], MF:[], AT:[]};
+  entries.forEach(e=>{ if(isActive(e)) buckets[e.slot].push(effRating(e, minute)); });
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  return {GK:avg(buckets.GK), DF:avg(buckets.DF), MF:avg(buckets.MF), AT:avg(buckets.AT)};
+}
+/* Turns a side's current lineup into three multipliers (+ the keeper's live rating).
+   Everything is relative to the team's default shape and starting XI, and the quality
+   deltas are clamped so a god-tier player leaving can't flip a multiplier negative. */
+function computeMods(side, minute){
+  const F = FORMATION_DEFS[side.formation] || FORMATION_DEFS['4-4-2'];
+  const F0 = FORMATION_DEFS[side.baseFormation] || FORMATION_DEFS['4-4-2'];
+  const g = groupAverages(side.entries, minute);
+  const d = (now, base) => (now==null || base==null) ? 0 : clampN(now-base, -15, 15);
+  const dAT = d(g.AT, side.baseQ.AT), dMF = d(g.MF, side.baseQ.MF), dDF = d(g.DF, side.baseQ.DF);
+  const reds = side.entries.filter(e=>e.red).length;
+  const gkE = side.entries.find(e=>isActive(e) && e.slot==='GK');
+  return {
+    att:  clampN((F.att/F0.att) * (1 + dAT*0.010 + dMF*0.004) * Math.pow(0.86, reds), 0.35, 1.9),
+    leak: clampN((F.leak/F0.leak) * (1 - dDF*0.008 - dMF*0.002) * Math.pow(1.12, reds), 0.5, 2.0),
+    mid:  clampN((F.mid/F0.mid) * (1 + dMF*0.010), 0.6, 1.5),
+    gk:   gkE ? effRating(gkE, minute) : 30
+  };
+}
+/* Live keeper override: keeperFactor() consults this so a mid-match keeper change (or an
+   outfielder in goal after a red card) really changes the odds. Cleared after each watch. */
+let LIVE_GK = {};
+
+/* ---------- the live match container ---------- */
+function makeAiPlan(){
+  const plan = [];
+  [[55,63],[64,72],[73,80],[81,88]].forEach(([a,b])=>{
+    if(Math.random()<0.85) plan.push({min:randInt(a,b), n:Math.random()<0.55?1:2, done:false});
+  });
+  return plan;
+}
+const CARD_W = {GK:0.12, DF:1.4, MF:1.25, AT:0.7};
+const SCORER_W = {ST:4.2, FW:2.8, MF:1.6, DF:0.55, GK:0.08};
+const ASSIST_W = {AT:2.0, MF:2.6, DF:0.8, GK:0.04};
+function slotPos(e){
+  return e.slot==='GK' ? 'GK' : e.slot==='DF' ? 'DF' : e.slot==='MF' ? 'MF' : (e.p.position==='ST'?'ST':'FW');
+}
+function weightedEntry(list, wfn){
+  if(!list.length) return null;
+  const ws = list.map(wfn);
+  let r = Math.random()*ws.reduce((a,b)=>a+b,0);
+  for(let i=0;i<list.length;i++){ r -= ws[i]; if(r<=0) return list[i]; }
+  return list[list.length-1];
+}
+
+class LiveMatch{
+  /* hooks: {minute(), score(team), log(text, meta), changed()} — the watch screen wires
+     these to its feed/clock; the instant-sim report generator passes simple stand-ins. */
+  constructor(m, hooks){
+    this.m = m; this.h = hooks;
+    this.pre = true;      // before kick-off lineup changes are free swaps
+    this.auto = true;     // AI manager makes substitutions / shape changes
+    this.sa = this.makeSide(m.a);
+    this.sb = this.makeSide(m.b);
+    this.team = {a:this.blankTeamStats(), b:this.blankTeamStats()};
+  }
+  blankTeamStats(){ return {fouls:0, corners:0, offsides:0, possSum:0, possN:0}; }
+  makeSide(team){
+    const {xi, bench} = buildStartingXI(team);
+    const baseFormation = defaultFormationFor(team);
+    const formation = (team.formation && FORMATION_DEFS[team.formation]) ? team.formation : baseFormation;
+    return {
+      team, baseFormation, formation, bench,
+      entries: assignSlots(xi, formation),
+      subs: 0, userFormation: false,
+      plan: makeAiPlan(),
+      fPlan: {chase: randInt(58,72), protect: randInt(78,86), chaseDone:false, protectDone:false},
+      baseQ: groupAverages(assignSlots(team.players.slice(0,11), baseFormation), 0)
+    };
+  }
+  side(team){ return team===this.m.a ? this.sa : this.sb; }
+  opp(side){ return side===this.sa ? this.sb : this.sa; }
+  key(side){ return side===this.sa ? 'a' : 'b'; }
+  active(side){ return side.entries.filter(isActive); }
+  gkEntry(side){ return side.entries.find(e=>isActive(e) && e.slot==='GK') || null; }
+  entryFor(side, num){ return side.entries.find(e=>e.p.number===num) || null; }
+  maxSubs(){ return this.h.minute()>90 ? 6 : 5; }
+  canSub(side){ return this.pre || side.subs < this.maxSubs(); }
+  mods(side){ return computeMods(side, this.h.minute()); }
+
+  reslot(side, key){
+    const act = this.active(side);
+    const gkE = act.find(e=>e.slot==='GK');
+    const assigned = assignSlots(act.map(e=>e.p), key, gkE ? gkE.p : null);
+    assigned.forEach(ne=>{ const old = act.find(e=>e.p===ne.p); if(old) old.slot = ne.slot; });
+    side.formation = key;
+  }
+  setFormation(side, key, byUser){
+    if(!FORMATION_DEFS[key] || key===side.formation) return false;
+    this.reslot(side, key);
+    if(byUser) side.userFormation = true;
+    if(this.pre){
+      side.team.formation = key;   // a pre-match choice sticks to the team for later matches
+    } else {
+      this.h.log(`📐 ${side.team.name} switch to a ${key}${byUser?'':' shape'}.`, {ty:'form', tm:side.team.id});
+    }
+    return true;
+  }
+  /* Bring a bench player on for `entry`. Before kick-off it's a free swap; afterwards it
+     costs one of the team's substitutions (5, or 6 once extra time starts). */
+  sub(side, entry, benchPlayer, opts){
+    opts = opts || {};
+    if(!this.canSub(side)) return null;
+    const bi = side.bench.indexOf(benchPlayer);
+    if(bi<0 || !entry || !isActive(entry)) return null;
+    if(this.pre){
+      side.bench.splice(bi,1);
+      side.bench.push(entry.p);
+      entry.p = benchPlayer;
+      this.reslot(side, side.formation);
+      return entry;
+    }
+    const min = this.h.minute();
+    side.bench.splice(bi,1);
+    entry.off = min;
+    const ne = makeEntry(benchPlayer, opts.slot || entry.slot, min);
+    side.entries.push(ne);
+    side.subs++;
+    const why = opts.reason==='injury' ? ' (injury)' : opts.reason==='red' ? ' (emergency keeper)' : '';
+    this.h.log(`🔁 ${side.team.name}: ${playerLabel(entry.p)} off, ${playerLabel(benchPlayer)} on${why}.`, {ty:'sub', tm:side.team.id});
+    return ne;
+  }
+
+  /* ----- weighted picks ----- */
+  pickScorer(side){
+    return weightedEntry(this.active(side), e=> (SCORER_W[slotPos(e)]||1) * Math.max(20, e.p.rating));
+  }
+  pickAssist(side, exceptEntry){
+    return weightedEntry(this.active(side).filter(e=>e!==exceptEntry),
+      e=> (ASSIST_W[e.slot]||1) * Math.max(20, e.p.rating));
+  }
+  pickCardTarget(side){
+    return weightedEntry(this.active(side), e=> CARD_W[e.slot]||1);
+  }
+
+  /* ----- discipline ----- */
+  yellow(side, e){
+    const tm = {tm:side.team.id};
+    if(e.yc>=1){
+      e.yc = 2;
+      this.h.log(`🟨🟥 ${playerLabel(e.p)} (${side.team.name}) picks up a second yellow and is sent off!`, {ty:'rc', k:2, ...tm});
+      this.sendOff(side, e);
+    } else {
+      e.yc = 1;
+      const lines = [
+        `🟨 ${playerLabel(e.p)} (${side.team.name}) goes into the book.`,
+        `🟨 Yellow card for ${playerLabel(e.p)} (${side.team.name}) after a late challenge.`,
+        `🟨 ${playerLabel(e.p)} (${side.team.name}) cautioned for dissent.`,
+        `🟨 The referee has a word and shows ${playerLabel(e.p)} (${side.team.name}) a yellow.`
+      ];
+      this.h.log(pick(lines), {ty:'yc', ...tm});
+    }
+  }
+  directRed(side, e){
+    this.h.log(`🟥 RED CARD! ${playerLabel(e.p)} (${side.team.name}) is sent off for a reckless challenge!`, {ty:'rc', k:2, tm:side.team.id});
+    this.sendOff(side, e);
+  }
+  sendOff(side, e){
+    e.red = true;
+    e.off = this.h.minute();
+    const n = this.active(side).length;
+    this.h.log(`${side.team.name} are down to ${n} men.`, {ty:'info', tm:side.team.id});
+    if(e.slot==='GK') this.emergencyKeeper(side);
+    this.h.changed();
+  }
+  emergencyKeeper(side){
+    const benchGK = side.bench.filter(p=>p.position==='GK').sort((a,b)=>b.rating-a.rating)[0];
+    const outfield = this.active(side).filter(x=>x.slot!=='GK');
+    if(benchGK && side.subs<this.maxSubs() && outfield.length){
+      const sacrifice = outfield.slice().sort((a,b)=>effRating(a,this.h.minute())-effRating(b,this.h.minute()))
+        .find(x=>x.slot==='AT') || outfield[0];
+      this.sub(side, sacrifice, benchGK, {slot:'GK', reason:'red'});
+    } else if(outfield.length){
+      const volunteer = outfield.slice().sort((a,b)=>b.p.rating-a.p.rating)[0];
+      volunteer.slot = 'GK';
+      this.h.log(`${playerLabel(volunteer.p)} (${side.team.name}) has to go in goal!`, {ty:'info', tm:side.team.id});
+    }
+  }
+  injure(side, e){
+    e.inj = true;
+    const canCover = this.auto && side.subs<this.maxSubs() && side.bench.length;
+    this.h.log(`🚑 ${playerLabel(e.p)} (${side.team.name}) goes down injured${canCover?'':' — and has to play on'}.`, {ty:'inj', tm:side.team.id});
+    this.h.changed();
+  }
+
+  /* One game-minute of fouls / cards / injuries / offsides, then the AI manager. */
+  tickDiscipline(min){
+    [this.sa, this.sb].forEach(side=>{
+      const k = this.key(side);
+      if(Math.random()<0.14) this.team[k].fouls++;
+      if(Math.random()<0.03) this.team[k].offsides++;
+      if(Math.random()<0.0175){
+        const e = this.pickCardTarget(side);
+        if(e) this.yellow(side, e);
+      }
+      if(Math.random()<0.0005){
+        const e = this.pickCardTarget(side);
+        if(e) this.directRed(side, e);
+      }
+      if(Math.random()<0.0022){
+        const cands = this.active(side).filter(e=>!e.inj && e.slot!=='GK');
+        const e = cands[Math.floor(Math.random()*cands.length)];
+        if(e) this.injure(side, e);
+      }
+    });
+  }
+
+  /* ----- AI manager ----- */
+  aiTick(min){
+    if(!this.auto || this.pre) return;
+    [this.sa, this.sb].forEach(side=>{
+      const opp = this.opp(side);
+      const diff = this.h.score(side.team) - this.h.score(opp.team);
+      // shape changes
+      if(!side.userFormation){
+        if(!side.fPlan.chaseDone && min>=side.fPlan.chase && diff<0){
+          side.fPlan.chaseDone = true;
+          const to = diff<=-2 ? '3-4-3' : '4-3-3';
+          if(side.formation!==to){ this.setFormation(side, to, false); this.h.changed(); }
+        }
+        if(!side.fPlan.protectDone && min>=side.fPlan.protect && diff>0){
+          side.fPlan.protectDone = true;
+          const to = (diff>=2 && min>=84) ? '5-4-1' : '5-3-2';
+          if(side.formation!==to){ this.setFormation(side, to, false); this.h.changed(); }
+        }
+      }
+      // substitutions
+      const cap = this.maxSubs();
+      const inj = this.active(side).find(e=>e.inj && e.slot!=='GK');
+      if(inj && side.subs<cap && side.bench.length){ this.aiSub(side, inj, min, 'injury'); return; }
+      if(min===91 && side.subs<cap && side.bench.length && Math.random()<0.5){ this.aiSub(side, null, min, 'tactical'); return; }
+      const item = side.plan.find(p=>!p.done && min>=p.min);
+      if(item && min<=100){
+        item.done = true;
+        for(let i=0;i<item.n;i++){
+          if(side.subs>=cap || !side.bench.length) break;
+          this.aiSub(side, null, min, 'tactical');
+        }
+      }
+    });
+  }
+  aiSub(side, forcedOff, min, reason){
+    const opp = this.opp(side);
+    const diff = this.h.score(side.team) - this.h.score(opp.team);
+    const cands0 = this.active(side).filter(e=>e.slot!=='GK');
+    if(!cands0.length) return;
+    let off = forcedOff;
+    if(!off){
+      let cands = cands0;
+      if(diff<0 && min>=60){ const c = cands0.filter(e=>e.slot==='DF'||e.slot==='MF'); if(c.length) cands = c; }
+      else if(diff>0 && min>=75){ const c = cands0.filter(e=>e.slot==='AT'||e.slot==='MF'); if(c.length) cands = c; }
+      cands = cands.slice().sort((a,b)=>effRating(a,min)-effRating(b,min));
+      off = cands[0];
+    }
+    const pool = side.bench.filter(p=>p.position!=='GK');
+    if(!pool.length) return;
+    const wantGroup = off.slot;
+    const same = pool.filter(p=>naturalGroup(p.position)===wantGroup).sort((a,b)=>b.rating-a.rating);
+    const on = same[0] || pool.slice().sort((a,b)=>b.rating-a.rating)[0];
+    this.sub(side, off, on, {reason});
+    this.h.changed();
+  }
+
+  /* ----- shots / goals bookkeeping for a side ----- */
+  recordPossession(poss){
+    this.team.a.possSum += poss; this.team.a.possN++;
+    this.team.b.possSum += (100-poss); this.team.b.possN++;
+  }
+}
+
+
+/* ---------- match report: per-player lines, team stats, ratings ---------- */
+/* m.report = {v, fa, fb, ts:{a,b}, pl:[…], motm:{team,num}, endMin}
+   Stored on the match itself, so undo / save / load / replay all just work, and every
+   tournament-wide player statistic is computed by aggregating these (never incremented
+   separately — which is what keeps undo and renames from corrupting anything). */
+function rateReport(report, m){
+  const gA = m.scoreA||0, gB = m.scoreB||0;
+  report.pl.forEach(l=>{
+    const isA = l.team===m.a.id;
+    const ga = isA ? gB : gA;
+    const won = m.winner ? (m.winner.id===l.team) : null;
+    let r = 6.0;
+    r += l.g>0 ? (0.9 + (l.g-1)*0.7) : 0;
+    r += l.a*0.6;
+    r += Math.min(l.sot,4)*0.12;
+    r += l.sv*0.28;
+    if(l.cs && l.min>=60){
+      if(l.pos==='GK' || l.slot==='GK') r += 0.9;
+      else if(l.slot==='DF') r += 0.5;
+      else if(l.slot==='MF') r += 0.15;
+    } else if(ga>0 && l.min>=30){
+      const concede = Math.min(ga,4);
+      if(l.slot==='GK') r -= 0.25*concede;
+      else if(l.slot==='DF') r -= 0.15*concede;
+    }
+    r -= l.yc>=1 && !l.rc ? 0.3 : 0;
+    r -= l.rc ? 1.8 : 0;
+    r += l.pk*0.2 - l.pkm*0.5 + l.pks*0.7;
+    if(won===true) r += 0.4; else if(won===false) r -= 0.3;
+    const scale = Math.min(1, (l.min+25)/90);
+    r = 6 + (r-6)*scale;
+    r += (Math.random()-0.5)*0.5;
+    l.rt = l.min>0 ? Math.round(clampN(r, 3.0, 10.0)*10)/10 : 0;
+  });
+  // Man of the Match: best rating, with a small lean to the winning side
+  let best=null, bestScore=-1;
+  report.pl.forEach(l=>{
+    if(!l.min) return;
+    const won = m.winner && m.winner.id===l.team;
+    const score = l.rt + (won?0.25:0) + l.g*0.05;
+    if(score>bestScore){ bestScore=score; best=l; }
+  });
+  report.motm = best ? {team:best.team, num:best.num} : null;
+  return report;
+}
+
+/* Builds the stored report from a finished LiveMatch (or the instant-sim equivalent). */
+function buildReport(L, res, finalMin, shotStats, penLog){
+  const m = L.m;
+  const lines = [];
+  [L.sa, L.sb].forEach(side=>{
+    const ga = side===L.sa ? res.scoreB : res.scoreA;
+    side.entries.forEach(e=>{
+      const offAt = e.off!=null ? Math.min(e.off, finalMin) : finalMin;
+      const min = Math.max(0, offAt - e.on);
+      const grp = e.slot;
+      lines.push({
+        team:side.team.id, num:e.p.number, name:e.p.name, pos:e.p.position, slot:e.slot,
+        age:e.p.age||null, on:e.on, off:e.off, min,
+        g:e.g, a:e.a, sh:e.sh, sot:e.sot, sv:e.sv, yc:e.yc, rc:e.red?1:0,
+        pk:e.pk, pkm:e.pkm, pks:e.pks,
+        cs: (ga===0 && (grp==='GK'||grp==='DF'||grp==='MF')) ? 1 : 0
+      });
+    });
+  });
+  const tsFor = (side, shots)=>{
+    const k = L.key(side);
+    const t = L.team[k];
+    const ents = side.entries;
+    return {
+      poss: t.possN ? Math.round(t.possSum/t.possN) : 50,
+      sh: shots.shots, sot: shots.sot,
+      fouls: t.fouls, corners: t.corners, offsides: t.offsides,
+      yc: ents.reduce((s,e)=>s+e.yc,0),
+      rc: ents.filter(e=>e.red).length,
+      subs: side.subs
+    };
+  };
+  const report = {
+    v:1, fa:L.sa.formation, fb:L.sb.formation, fa0:L.sa.baseFormation, fb0:L.sb.baseFormation,
+    endMin: finalMin,
+    ts:{a:tsFor(L.sa, shotStats.a), b:tsFor(L.sb, shotStats.b)},
+    pl:lines, motm:null
+  };
+  if(penLog && penLog.length) report.pen = penLog;
+  return rateReport(report, m);
+}
+
+function reportMotm(m){
+  if(!m.report || !m.report.motm) return null;
+  const team = state.allTeams.find(t=>t.id===m.report.motm.team);
+  if(!team) return null;
+  const p = findSquadPlayer(team, m.report.motm.num);
+  const line = m.report.pl.find(l=>l.team===team.id && l.num===m.report.motm.num);
+  return {name: p ? playerLabel(p) : ('Player #'+m.report.motm.num), team, num:m.report.motm.num, rt: line?line.rt:null, line};
+}
+
+/* ---------- instant-sim reports & recaps ---------- */
+/* Matches decided by the instant simulator get the same stored shape as watched ones:
+   cards, substitutions, assists, shots, ratings and a replay built from the real
+   goal events (so scorers still match the Golden Boot tally exactly). */
+function clockText(min){ return min+"'"; }
+function synthesizeMatchRecord(m, res){
+  try{
+    const etPlayed = (res.events||[]).some(e=>e.minute>90) || (res.penalties && state.extraTime);
+    const finalMin = etPlayed ? 120 : 90;
+    let curMin = 0;
+    const evs = []; // {min, ord, ty, tm, x, k}
+    const hooks = {
+      minute: ()=>curMin,
+      score: ()=>0,
+      changed: ()=>{},
+      log: (text, meta)=>{ meta = meta||{}; evs.push({min:curMin, ord:2, ty:meta.ty||'info', tm:meta.tm!=null?meta.tm:null, x:text, k:meta.k||0}); }
+    };
+    const L = new LiveMatch(m, hooks);
+    L.pre = false; L.auto = false;
+
+    // goals: scorers are already fixed (and credited to the Golden Boot) — map them onto XI entries
+    (res.events||[]).forEach(ev=>{
+      const side = L.side(ev.teamRef);
+      let e = ev.playerNumber!=null ? L.entryFor(side, ev.playerNumber) : null;
+      if(!e) e = L.pickScorer(side);
+      if(!e) return;
+      e.g++; e.sh++; e.sot++;
+      let assistE = null;
+      if(Math.random()<0.7){
+        assistE = L.pickAssist(side, e);
+        if(assistE){ assistE.a++; ev.assist = playerLabel(assistE.p); ev.assistNumber = assistE.p.number; }
+      }
+      e._goalMins = (e._goalMins||[]).concat(ev.minute);
+      if(assistE) assistE._goalMins = (assistE._goalMins||[]).concat(ev.minute);
+    });
+    const lastInvolved = e => (e._goalMins && e._goalMins.length) ? Math.max(...e._goalMins) : 0;
+
+    // substitutions
+    [L.sa, L.sb].forEach(side=>{
+      const n = [0,2,3,3,4,5][Math.floor(Math.random()*6)];
+      for(let i=0;i<n;i++){
+        const t = randInt(52, 88);
+        const cands = L.active(side).filter(e=>e.slot!=='GK' && lastInvolved(e)<t);
+        if(!cands.length) break;
+        const off = cands[Math.floor(Math.random()*cands.length)];
+        const pool = side.bench.filter(p=>p.position!=='GK');
+        if(!pool.length) break;
+        const same = pool.filter(p=>naturalGroup(p.position)===off.slot).sort((a,b)=>b.rating-a.rating);
+        const on = same[0] || pool.slice().sort((a,b)=>b.rating-a.rating)[0];
+        curMin = t;
+        L.sub(side, off, on, {});
+      }
+    });
+    // cards
+    [L.sa, L.sb].forEach(side=>{
+      const yellows = Math.min(5, poissonSample(1.6));
+      for(let i=0;i<yellows;i++){
+        const t = randInt(8, 89);
+        const e = weightedEntry(side.entries.filter(x=>!x.red && x.on<=t && (x.off==null || x.off>t)), x=>CARD_W[x.slot]||1);
+        if(!e || e.yc>=2 || lastInvolved(e)>t) continue;
+        curMin = t;
+        if(e.yc===1 && Math.random()<0.18){ L.yellow(side, e); }   // second yellow → off
+        else if(e.yc===0){ L.yellow(side, e); }
+      }
+      if(Math.random()<0.04){
+        const t = randInt(25, 88);
+        const e = weightedEntry(side.entries.filter(x=>!x.red && x.on<=t && (x.off==null || x.off>t) && lastInvolved(x)<t), x=>CARD_W[x.slot]||1);
+        if(e){ curMin = t; L.directRed(side, e); }
+      }
+    });
+    // minor stats: possession, fouls, corners, offsides, shots
+    const effA = effectiveTeamRating(m.a), effB = effectiveTeamRating(m.b);
+    const possA = Math.round(clampN(50 + (effA-effB)*0.35 + (Math.random()-0.5)*10, 30, 70));
+    L.team.a.possSum = possA; L.team.a.possN = 1;
+    L.team.b.possSum = 100-possA; L.team.b.possN = 1;
+    const shotStats = {a:{shots:0,sot:0}, b:{shots:0,sot:0}};
+    [L.sa, L.sb].forEach(side=>{
+      const k = L.key(side);
+      const goals = k==='a' ? res.scoreA : res.scoreB;
+      const poss = k==='a' ? possA : 100-possA;
+      const shots = goals + Math.max(2, Math.round(shotsFromPossession(poss)));
+      const sot = Math.min(shots, goals + poissonSample(2.4));
+      shotStats[k] = {shots, sot};
+      L.team[k].fouls = randInt(8, 16); L.team[k].corners = randInt(2, 9); L.team[k].offsides = randInt(0, 4);
+      // spread the non-goal shots over the lineup
+      let extraShots = shots - goals, extraSot = sot - goals;
+      while(extraShots>0){
+        const e = weightedEntry(side.entries, x=> (SCORER_W[slotPos(x)]||1)*Math.max(20,x.p.rating)*(x.off!=null?0.5:1));
+        if(!e) break;
+        e.sh++; extraShots--;
+        if(extraSot>0){ e.sot++; extraSot--; }
+      }
+    });
+    [L.sa, L.sb].forEach(side=>{
+      const opp = L.opp(side);
+      const oppK = L.key(opp);
+      const saves = Math.max(0, shotStats[oppK].sot - (oppK==='a'?res.scoreA:res.scoreB));
+      const gkE = side.entries.find(e=>e.slot==='GK');
+      if(gkE) gkE.sv = saves;
+    });
+    // shootout (instant sims only know the final tally — attribute it plausibly)
+    if(res.penalties){
+      [[L.sa,res.penA],[L.sb,res.penB]].forEach(([side,scored])=>{
+        const takers = side.entries.filter(isActive).filter(e=>e.slot!=='GK').sort((a,b)=>b.p.rating-a.p.rating).slice(0,5);
+        takers.forEach((e,i)=>{ if(i<scored) e.pk++; else e.pkm++; });
+        const misses = Math.max(0, 5-scored);
+        const gkE = L.gkEntry(L.opp(side));
+        if(gkE) gkE.pks += Math.round(misses*0.7);
+      });
+    }
+
+    const report = buildReport(L, res, finalMin, shotStats, null);
+
+    // replay: kickoff → goals / cards / subs in order → HT → FT (→ ET → shootout)
+    const events = [];
+    const tA = m.a, tB = m.b;
+    evs.push({min:0, ord:0, ty:'ko', tm:null, x:kickoffCommentary(tA.name, tB.name), k:0});
+    (res.events||[]).forEach(ev=>{
+      const lbl = ev.scorer;
+      const base = (state.dramaEnabled && isStoppageTimeMinute(ev.minute))
+        ? lateDramaGoalCommentary(ev.teamRef.name, lbl, ev.minute)
+        : goalCommentary(ev.teamRef.name, lbl, ev.minute);
+      evs.push({min:ev.minute, ord:1, ty:'goal', tm:ev.teamRef.id, x: base + (ev.assist?` — assist ${ev.assist}`:''), k:2});
+    });
+    evs.sort((p,q)=> p.min-q.min || p.ord-q.ord);
+    let sa=0, sb=0;
+    const withHT = [];
+    let htDone = false;
+    evs.forEach(e=>{
+      if(!htDone && e.min>45){
+        withHT.push({c:"45'", ty:'ht', tm:null, x:halftimeCommentary(tA.name, tB.name, sa, sb), sc:[sa,sb], k:0});
+        htDone = true;
+      }
+      if(e.ty==='goal'){ if(e.tm===tA.id) sa++; else sb++; }
+      withHT.push({c:clockText(e.min), ty:e.ty, tm:e.tm, x:e.x, sc:[sa,sb], k:e.k});
+    });
+    if(!htDone) withHT.splice(Math.min(1,withHT.length), 0, {c:"45'", ty:'ht', tm:null, x:halftimeCommentary(tA.name, tB.name, 0, 0), sc:[0,0], k:0});
+    const fin = [res.scoreA, res.scoreB];
+    if(res.penalties){
+      withHT.push({c:"120'", ty:'et', tm:null, x:`Full-time: level at ${res.scoreA}-${res.scoreB}.`, sc:fin, k:0});
+      withHT.push({c:'PEN', ty:'penend', tm:res.winner?res.winner.id:null,
+        x:`${res.winner.name} win it on penalties ${res.penA}-${res.penB}`, sc:fin, k:2});
+    } else if(res.winner){
+      withHT.push({c:'FT', ty:'ft', tm:res.winner.id, x:fulltimeCommentary(res.winner.name, res.scoreA, res.scoreB), sc:fin, k:1});
+    } else {
+      withHT.push({c:'FT', ty:'ft', tm:null, x:fulltimeDrawCommentary(tA.name, tB.name, res.scoreA, res.scoreB), sc:fin, k:1});
+    }
+    m.report = report;
+    m.replay = {v:1, syn:true, ev:withHT};
+  } catch(err){
+    console.warn('Could not synthesize match record', err);
+  }
+}
+function shotsFromPossession(poss){ return clampN(4 + (poss-50)*0.12 + poissonSample(5), 2, 24); }
+
 /* ===================== LIVE WATCH ENGINE ===================== */
 function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
@@ -4372,6 +5301,10 @@ async function runShootoutAnimation(container, pA, teamA, teamB, onKick){
 }
 
 async function watchMatch(m, decisive=true, roundLabelOverride=null){
+  try{ await watchMatchInner(m, decisive, roundLabelOverride); }
+  finally{ LIVE_GK = {}; }
+}
+async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   if(m.played) return;
   ensurePlayers(m.a); ensurePlayers(m.b);
 
@@ -4431,6 +5364,16 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const winProbFillB = document.getElementById('winProbFillB');
   const winProbLabelA = document.getElementById('winProbLabelA');
   const winProbLabelB = document.getElementById('winProbLabelB');
+  const lineupBar = document.getElementById('lineupBar');
+  const lineupPanel = document.getElementById('lineupPanel');
+  const lineupKickoff = document.getElementById('lineupKickoff');
+  const kickoffBtn = document.getElementById('kickoffBtn');
+  const lineupToggleBtn = document.getElementById('lineupToggleBtn');
+  const autoSubsChk = document.getElementById('autoSubsChk');
+  const skipSheetChk = document.getElementById('skipSheetChk');
+  const penPanel = document.getElementById('penPanel');
+  const watchReplayBtn = document.getElementById('watchReplayBtn');
+  const watchReportBtn = document.getElementById('watchReportBtn');
 
   document.getElementById('watchTitle').textContent = `${m.a.name} vs ${m.b.name}`;
   document.getElementById('watchFlagA').textContent = flagFor(m.a);
@@ -4448,6 +5391,11 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   const commentaryTickerBoxEl = document.getElementById('commentaryTickerBox');
   if(commentaryTickerBoxEl){ commentaryTickerBoxEl.classList.remove('flash'); }
   shootoutRow.classList.add('hidden'); shootoutRow.innerHTML='';
+  penPanel.classList.add('hidden');
+  document.getElementById('penStage').classList.add('hidden');
+  document.getElementById('penModes').classList.add('hidden');
+  lineupBar.classList.add('hidden'); lineupPanel.classList.add('hidden');
+  watchReplayBtn.classList.add('hidden'); watchReportBtn.classList.add('hidden');
   closeBtn.classList.add('hidden');
   skipBtn.classList.remove('hidden'); skipBtn.disabled=false;
   clockEl.textContent = "0'";
@@ -4470,6 +5418,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   let liveScoreA=0, liveScoreB=0, skipRequested=false, goldenGoalEnded=false;
   let matchEvents=[];
   let paused=false, speedIndex=0, halfEndBonus=0;
+  let autoPaused=false, lineupOpen=false;
   let tacticMultA=1, tacticMultB=1;
   let currentHalfEvents=[], currentHalfEi=0, currentMin=0, currentHalfEndMin=0, matchLive=false;
   const SPEEDS=[250,125,83,63,50];
@@ -4551,8 +5500,11 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     const spread = outcome==='goal' ? 30 : outcome==='saved' ? 45 : outcome==='post' ? 20 : 70;
     const x = goalX + inwardSign*Math.random()*spread;
     const y = 90 + (Math.random()-0.5)*(outcome==='wide' ? 150 : 80);
-    shotMapPoints.push({ x: Math.max(6, Math.min(294, x)), y: Math.max(6, Math.min(174, y)), outcome });
+    const pt = { x: Math.max(6, Math.min(294, x)), y: Math.max(6, Math.min(174, y)), outcome };
+    shotMapPoints.push(pt);
     renderShotMap();
+    const lastEv = replayEvents[replayEvents.length-1];
+    if(lastEv && !lastEv.sh) lastEv.sh = {x:Math.round(pt.x), y:Math.round(pt.y), o:outcome, tm:team.id};
   }
   renderShotMap();
 
@@ -4572,40 +5524,154 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   }
   renderWinProbability();
 
+  /* ---------- replay recording, live lineups, formations & substitutions ---------- */
+  const replayEvents = [];
+  let currentPhase = '1H';
+  let etStarted = false, lastTickMin = 0;
+  function clockLabel(min){
+    if(currentPhase==='FT') return 'FT';
+    if(currentPhase==='PEN') return 'PEN';
+    if(currentPhase==='1H' && min>45) return '45+'+(min-45)+"'";
+    if(currentPhase==='2H' && min>90) return '90+'+(min-90)+"'";
+    if(currentPhase==='ET1' && min>105) return '105+'+(min-105)+"'";
+    if(currentPhase==='ET2' && min>120) return '120+'+(min-120)+"'";
+    return min+"'";
+  }
+
+  const L = new LiveMatch(m, {
+    minute: ()=> currentMin||0,
+    score: (team)=> team===m.a ? liveScoreA : liveScoreB,
+    log: (text, meta)=> addFeed(text, false, undefined, meta),
+    changed: ()=> onLineupChanged()
+  });
+  let modsA = L.mods(L.sa), modsB = L.mods(L.sb);
+  LIVE_GK = {}; LIVE_GK[m.a.id] = modsA.gk; LIVE_GK[m.b.id] = modsB.gk;
+  let etFactor = 1;
+  function refreshMods(){
+    modsA = L.mods(L.sa); modsB = L.mods(L.sb);
+    LIVE_GK[m.a.id] = modsA.gk; LIVE_GK[m.b.id] = modsB.gk;
+  }
+  /* Goal-rate multiplier for one side right now: its tactic × its lineup/formation attack
+     strength × how leaky the OTHER side's lineup/formation is × the extra-time damper. */
+  function teamMult(team){
+    const isA = team===m.a;
+    return (isA?tacticMultA:tacticMultB) * (isA?modsA.att:modsB.att) * (isA?modsB.leak:modsA.leak) * etFactor;
+  }
+  function onLineupChanged(){
+    refreshMods();
+    if(matchLive) regenerateBoth();
+    if(lineupOpen) renderLineupPanel();
+  }
+
+  let pendingOff = null;
+  function renderLineupPanel(){
+    document.getElementById('lineupColA').innerHTML = lineupColumnHtml(L, L.sa, pendingOff);
+    document.getElementById('lineupColB').innerHTML = lineupColumnHtml(L, L.sb, pendingOff);
+    document.getElementById('lineupTitle').textContent = L.pre ? '📋 Team sheet — set your formation and starting XI' : '📋 Lineups, formations & substitutions';
+    document.getElementById('lineupHint').textContent = L.pre
+      ? 'Pick a formation, or tap ⇄ on a starter then ↑ On a bench player to swap them. Changes before kick-off are free.'
+      : `Tap ⇄ on a player, then ↑ On a bench player. Each side may use 5 substitutions (6 in extra time). The match is paused while this panel is open.`;
+  }
+  function showLineupPanel(open, pre){
+    lineupOpen = open;
+    lineupPanel.classList.toggle('hidden', !open);
+    lineupKickoff.classList.toggle('hidden', !pre);
+    lineupToggleBtn.textContent = open ? '✖ Close lineups' : '📋 Lineups, Formations & Subs';
+    if(open){
+      renderLineupPanel();
+      if(!L.pre && matchLive && !paused){ paused = true; autoPaused = true; godPauseBtn.textContent = '▶ Resume'; }
+    } else if(autoPaused){
+      paused = false; autoPaused = false; godPauseBtn.textContent = '⏸ Pause';
+    }
+  }
+  lineupToggleBtn.onclick = ()=> showLineupPanel(lineupPanel.classList.contains('hidden'), false);
+  lineupPanel.onclick = (ev)=>{
+    const btn = ev.target.closest('button[data-act]');
+    if(!btn) return;
+    const row = btn.closest('[data-key]');
+    if(!row) return;
+    const key = row.dataset.key, num = +row.dataset.num;
+    const side = key==='a' ? L.sa : L.sb;
+    if(btn.dataset.act==='off'){
+      pendingOff = (pendingOff && pendingOff.key===key && pendingOff.num===num) ? null : {key, num};
+      renderLineupPanel();
+    } else if(btn.dataset.act==='on'){
+      if(!pendingOff || pendingOff.key!==key) return;
+      const entry = side.entries.find(e=>e.p.number===pendingOff.num && isActive(e));
+      const bp = side.bench.find(p=>p.number===num);
+      pendingOff = null;
+      if(entry && bp && L.sub(side, entry, bp, {})) onLineupChanged();
+      renderLineupPanel();
+    }
+  };
+  lineupPanel.onchange = (ev)=>{
+    const sel = ev.target.closest('select.lu-form');
+    if(!sel) return;
+    const side = sel.dataset.key==='a' ? L.sa : L.sb;
+    if(L.setFormation(side, sel.value, true)) onLineupChanged();
+    renderLineupPanel();
+  };
+  autoSubsChk.checked = true;
+  autoSubsChk.onchange = ()=>{ L.auto = autoSubsChk.checked; };
+  lineupBar.classList.remove('hidden');
+  lineupToggleBtn.textContent = '📋 Lineups, Formations & Subs';
+
   function maybeChance(){
     if(Math.random()>=0.14) return;
-    const wA = tacticMultA * (100-momentum) + 5;
-    const wB = tacticMultB * momentum + 5;
+    const wA = tacticMultA * modsA.att * (100-momentum) + 5;
+    const wB = tacticMultB * modsB.att * momentum + 5;
     const attackingTeam = Math.random() < wA/(wA+wB) ? m.a : m.b;
     const defendingTeam = attackingTeam===m.a ? m.b : m.a;
-    const attacker = weightedPickPlayer(availablePlayers(attackingTeam));
-    const attackerLabel = state.useRealNames ? attacker.name : ('Player #'+attacker.number);
+    const aSide = L.side(attackingTeam), dSide = L.side(defendingTeam);
+    const attackerE = L.pickScorer(aSide);
+    if(!attackerE) return;
+    const attackerLabel = playerLabel(attackerE.p);
     const roll = Math.random();
+    const tk = L.key(aSide);
     if(roll<0.45){
-      const keeper = defendingTeam.players.find(p=>p.position==='GK') || defendingTeam.players[0];
-      const keeperLabel = state.useRealNames ? keeper.name : ('Player #'+keeper.number);
-      addFeed(saveCommentary(keeperLabel, attackerLabel, attackingTeam.name), false);
+      const keeperE = L.gkEntry(dSide);
+      const keeperLabel = keeperE ? playerLabel(keeperE.p) : 'the keeper';
+      addFeed(saveCommentary(keeperLabel, attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
+      attackerE.sh++; attackerE.sot++; if(keeperE) keeperE.sv++;
+      if(Math.random()<0.35) L.team[tk].corners++;
       recordShot(attackingTeam, true);
       addShotMapPoint(attackingTeam, 'saved');
       nudgeMomentum(attackingTeam===m.a ? -4 : 4);
     } else if(roll<0.85){
-      addFeed(wideCommentary(attackerLabel, attackingTeam.name), false);
+      addFeed(wideCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
+      attackerE.sh++;
+      if(Math.random()<0.2) L.team[tk].corners++;
       recordShot(attackingTeam, false);
       addShotMapPoint(attackingTeam, 'wide');
     } else {
-      addFeed(woodworkCommentary(attackerLabel, attackingTeam.name), false);
+      addFeed(woodworkCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id, k:1});
+      attackerE.sh++;
+      if(Math.random()<0.3) L.team[tk].corners++;
       recordShot(attackingTeam, false);
       addShotMapPoint(attackingTeam, 'post');
       nudgeMomentum(attackingTeam===m.a ? -6 : 6);
     }
   }
 
-  function addFeed(text, isGoal, scoringTeam){
+  function addFeed(text, isGoal, scoringTeam, meta){
+    meta = meta || {};
     const li = document.createElement('li');
     if(isGoal) li.className='goal';
+    else if(meta.ty==='rc') li.className='card-red';
+    else if(meta.ty==='yc') li.className='card-yellow';
+    else if(meta.ty==='sub' || meta.ty==='form') li.className='sub';
     li.textContent = text;
     feedEl.prepend(li);
     updateCommentaryTicker(text, isGoal, scoringTeam);
+    const ev = {
+      n: currentMin||0, c: clockLabel(currentMin||0),
+      ty: meta.ty || (isGoal ? 'goal' : 'info'),
+      tm: meta.tm!=null ? meta.tm : (scoringTeam ? scoringTeam.id : null),
+      x: text, sc:[liveScoreA, liveScoreB],
+      k: meta.k!=null ? meta.k : ((isGoal && !meta.ty) ? 2 : 0)
+    };
+    if(meta.pen) ev.pen = meta.pen;
+    replayEvents.push(ev);
   }
   /* Flash color reflects who just scored, relative to what the viewer follows:
      green when it's a followed team's goal, red when it's the followed team's
@@ -4639,19 +5705,28 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
       }
     }
   }
-  function pickScorer(team){
-    const pool = availablePlayers(team);
-    const p = weightedPickPlayer(pool);
-    return { label: state.useRealNames ? p.name : ("Player #"+p.number), number: p.number };
+
+  /* Credits a goal (and its assist) to real on-pitch players: whoever is actually in the
+     lineup at this moment, weighted by the slot they're playing — so a substitute can score
+     and a sent-off player can't. */
+  function creditGoal(team){
+    const side = L.side(team);
+    const e = L.pickScorer(side) || side.entries[0];
+    e.g++; e.sh++; e.sot++;
+    const assistE = Math.random()<0.7 ? L.pickAssist(side, e) : null;
+    if(assistE) assistE.a++;
+    creditBoot(team, e.p.number);
+    return {entry:e, label:playerLabel(e.p), number:e.p.number, assistE,
+            assistLabel: assistE ? playerLabel(assistE.p) : null};
   }
   function forceGoal(team, tag){
-    const scorer = pickScorer(team);
+    const g = creditGoal(team);
     const minute = currentMin || 1;
     if(team===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
-    matchEvents.push({minute, teamRef:team, scorer: `${scorer.label} (${tag||'God Mode'})`, playerNumber: scorer.number});
-    creditBoot(team, scorer.number);
-    addFeed(`${tag||'GOD MODE'}: ${team.name} — ${scorer.label}!`, true, team);
+    matchEvents.push({minute, teamRef:team, scorer: `${g.label} (${tag||'God Mode'})`, playerNumber: g.number,
+      assist: g.assistLabel||undefined, assistNumber: g.assistE ? g.assistE.p.number : undefined});
+    addFeed(`${tag||'GOD MODE'}: ${team.name} — ${g.label}!${g.assistLabel?` (assist ${g.assistLabel})`:''}`, true, team);
     nudgeMomentum(team===m.a ? -22 : 22);
     recordShot(team, true);
     addShotMapPoint(team, 'goal');
@@ -4675,6 +5750,7 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   };
   godPauseBtn.onclick = ()=>{
     paused = !paused;
+    autoPaused = false;
     godPauseBtn.textContent = paused ? '▶ Resume' : '⏸ Pause';
   };
   godSpeedBtn.onclick = ()=>{
@@ -4693,26 +5769,32 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     currentHalfEvents.sort((e,f)=>e.minute-f.minute);
     currentHalfEi = currentHalfEvents.filter(e=>e.minute<=currentMin).length;
   }
+  /* Any change to tactics, shape, lineup or discipline shifts BOTH sides' odds for the rest
+     of the half, so both sides' remaining goals are re-rolled from the new rates. */
+  function regenerateBoth(){
+    regenerateRemainingEvents(m.a, teamMult(m.a));
+    regenerateRemainingEvents(m.b, teamMult(m.b));
+  }
   function applyLiveTactic(team, key){
     const opt = LIVE_TACTICS[key];
     if(team===m.a) tacticMultA = opt.mult; else tacticMultB = opt.mult;
     addFeed(`GOD MODE: ${team.name} switch to ${opt.label}${matchLive?'':' for the next half'}.`, false);
-    if(matchLive) regenerateRemainingEvents(team, opt.mult);
+    if(matchLive) regenerateBoth();
   }
   godTacticA.onchange = ()=>applyLiveTactic(m.a, godTacticA.value);
   godTacticB.onchange = ()=>applyLiveTactic(m.b, godTacticB.value);
 
   function applyGoal(ev){
-    const scorer = pickScorer(ev.teamRef);
+    const g = creditGoal(ev.teamRef);
     if(ev.teamRef===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
-    matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer: scorer.label, playerNumber: scorer.number});
-    creditBoot(ev.teamRef, scorer.number);
+    matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer: g.label, playerNumber: g.number,
+      assist: g.assistLabel||undefined, assistNumber: g.assistE ? g.assistE.p.number : undefined});
     const lateDrama = state.dramaEnabled && isStoppageTimeMinute(ev.minute);
     const commentaryText = lateDrama
-      ? lateDramaGoalCommentary(ev.teamRef.name, scorer.label, ev.minute)
-      : goalCommentary(ev.teamRef.name, scorer.label, ev.minute);
-    addFeed(commentaryText, true, ev.teamRef);
+      ? lateDramaGoalCommentary(ev.teamRef.name, g.label, ev.minute)
+      : goalCommentary(ev.teamRef.name, g.label, ev.minute);
+    addFeed(commentaryText + (g.assistLabel ? `  ·  Assist: ${g.assistLabel}` : ''), true, ev.teamRef);
     nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
     recordShot(ev.teamRef, true);
     addShotMapPoint(ev.teamRef, 'goal');
@@ -4721,72 +5803,71 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   function maybeDrama(){
     if(Math.random()>=0.025) return;
     const team = Math.random()<0.5 ? m.a : m.b;
-    const p = team.players[Math.floor(Math.random()*team.players.length)];
-    const dname = state.useRealNames ? p.name : ("Player #"+p.number);
+    const side = L.side(team);
+    const e = weightedEntry(L.active(side), ()=>1);
+    if(!e) return;
+    const dname = playerLabel(e.p);
     const lines = [
-      `${dname} (${team.name}) booked for a late challenge.`,
       `${dname} (${team.name}) down and receiving treatment after a heavy tackle.`,
       `Drinks break — both sides take on fluids.`,
       `${team.name}'s bench is up, animated, shouting instructions.`,
       `${dname} (${team.name}) picks up a knock, but plays on.`,
-      `${dname} (${team.name}) shown a stern word by the referee.`,
+      `${dname} (${team.name}) is given a stern word by the referee.`,
       `Brief stoppage while ${dname} (${team.name}) gets some attention.`,
-      `${team.name} make a tactical switch on the touchline.`,
-      `${dname} (${team.name}) into the referee's notebook for dissent.`,
+      `${team.name} make a tactical tweak on the touchline.`,
       `A tetchy moment there between the two benches.`,
       `${dname} (${team.name}) pulls up briefly, but is fine to continue.`
     ];
     addFeed(lines[Math.floor(Math.random()*lines.length)], false);
   }
-  async function playHalf(events, startMin, endMin, isExtraTime){
+
+  /* One game-minute of everything that isn't a pre-rolled goal. Runs identically whether
+     the clock is ticking in real time or the viewer hit "skip" (just without the waits). */
+  function tickMinute(min){
+    lastTickMin = min;
+    if(state.dramaEnabled) maybeDrama();
+    L.tickDiscipline(min);
+    L.aiTick(min);
+    maybeChance();
+    momentum += (50-momentum)*0.05 + (tacticMultB-tacticMultA)*1.1 + (Math.random()-0.5)*3;
+    momentum = Math.max(5, Math.min(95, momentum));
+    renderMomentum();
+    const possessionTarget = 50 + (effectiveTeamRating(m.a)-effectiveTeamRating(m.b))*0.4
+      + (tacticMultA-tacticMultB)*8 + (modsA.mid-modsB.mid)*25;
+    possessionA += (possessionTarget-possessionA)*0.04 + (Math.random()-0.5)*1.4;
+    possessionA = Math.max(26, Math.min(74, possessionA));
+    renderPossession();
+    L.recordPossession(possessionA);
+    renderWinProbability();
+    // tired legs: re-evaluate strength a few times late on
+    if(min===60 || min===70 || min===80 || min===105){ refreshMods(); if(matchLive) regenerateBoth(); }
+    if(lineupOpen && min%4===0) renderLineupPanel();
+  }
+
+  async function playHalf(events, startMin, endMin, isExtraTime, phaseKey){
     events.sort((e,f)=>e.minute-f.minute);
     currentHalfEvents = events;
     currentHalfEi = 0;
     currentMin = startMin;
     currentHalfEndMin = endMin+halfEndBonus;
+    currentPhase = phaseKey;
     matchLive = true;
+    refreshMods();
     const goldenActive = isExtraTime && (decisive || isTieDecidingLeg) && state.extraTime && state.goldenGoal;
     while(currentMin <= currentHalfEndMin){
-      if(skipRequested){
-        while(currentHalfEi<currentHalfEvents.length){
-          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
-          if(goldenActive){ matchLive=false; return; }
-        }
-        clockEl.textContent = currentHalfEndMin+"'";
-        matchLive = false;
-        return;
-      }
       while(paused && !skipRequested){ await wait(120); }
-      if(skipRequested){
-        while(currentHalfEi<currentHalfEvents.length){
-          applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
-          if(goldenActive){ matchLive=false; return; }
-        }
-        clockEl.textContent = currentHalfEndMin+"'";
-        matchLive = false;
-        return;
-      }
-      clockEl.textContent = currentMin+"'";
+      clockEl.textContent = clockLabel(currentMin);
       while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){
         applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
         if(goldenActive){
-          addFeed(`GOLDEN GOAL! ${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true, liveScoreA>liveScoreB?m.a:m.b);
+          addFeed(`GOLDEN GOAL! ${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true, liveScoreA>liveScoreB?m.a:m.b, {ty:'goldengoal', k:1});
           matchLive = false;
           return;
         }
       }
       if(goldenGoalEnded){ matchLive=false; return; }
-      if(state.dramaEnabled) maybeDrama();
-      maybeChance();
-      momentum += (50-momentum)*0.05 + (tacticMultB-tacticMultA)*1.1 + (Math.random()-0.5)*3;
-      momentum = Math.max(5, Math.min(95, momentum));
-      renderMomentum();
-      const possessionTarget = 50 + (effectiveTeamRating(m.a)-effectiveTeamRating(m.b))*0.4 + (tacticMultA-tacticMultB)*8;
-      possessionA += (possessionTarget-possessionA)*0.04 + (Math.random()-0.5)*1.4;
-      possessionA = Math.max(26, Math.min(74, possessionA));
-      renderPossession();
-      renderWinProbability();
-      await wait(SPEEDS[speedIndex]);
+      tickMinute(currentMin);
+      if(!skipRequested) await wait(SPEEDS[speedIndex]);
       currentMin++;
       currentHalfEndMin = endMin+halfEndBonus;
     }
@@ -4794,78 +5875,99 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
     matchLive = false;
   }
 
-  addFeed(kickoffCommentary(m.a.name, m.b.name), false);
+  /* ---------- team sheet (pre-match) ---------- */
+  phaseEl.textContent = "Team sheet";
+  skipBtn.classList.add('hidden');
+  let skipSheet = false;
+  try{ skipSheet = localStorage.getItem('globalCup.skipTeamSheet')==='1'; }catch(e){}
+  skipSheetChk.checked = skipSheet;
+  if(!skipSheet){
+    showLineupPanel(true, true);
+    await new Promise(res=>{ kickoffBtn.onclick = ()=>res(); });
+    try{ localStorage.setItem('globalCup.skipTeamSheet', skipSheetChk.checked ? '1' : '0'); }catch(e){}
+    showLineupPanel(false, false);
+  } else {
+    lineupKickoff.classList.add('hidden');
+  }
+  L.pre = false;
+  pendingOff = null;
+  refreshMods();
+  const startFormA = L.sa.formation, startFormB = L.sb.formation;
+  skipBtn.classList.remove('hidden');
+  phaseEl.textContent = "Kick-off — 1st half";
+
+  addFeed(kickoffCommentary(m.a.name, m.b.name), false, undefined, {ty:'ko'});
+  addFeed(`Formations: ${m.a.name} ${startFormA} · ${m.b.name} ${startFormB}.`, false, undefined, {ty:'form'});
   const stoppage1 = 1+Math.floor(Math.random()*3);
-  const h1EventsA = simulateHalfGoals(m.a, m.b, 1, 45+stoppage1, tacticMultA, 45);
-  const h1EventsB = simulateHalfGoals(m.b, m.a, 1, 45+stoppage1, tacticMultB, 45);
-  await playHalf([...h1EventsA,...h1EventsB], 1, 45+stoppage1, false);
+  const h1EventsA = simulateHalfGoals(m.a, m.b, 1, 45+stoppage1, teamMult(m.a), 45);
+  const h1EventsB = simulateHalfGoals(m.b, m.a, 1, 45+stoppage1, teamMult(m.b), 45);
+  await playHalf([...h1EventsA,...h1EventsB], 1, 45+stoppage1, false, '1H');
 
   phaseEl.textContent = "Half-time";
-  addFeed(halftimeCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false);
+  addFeed(halftimeCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false, undefined, {ty:'ht'});
   await wait(400);
 
   phaseEl.textContent = "2nd half";
   halfEndBonus = 0;
   const stoppage2 = 2+Math.floor(Math.random()*4);
-  const h2EventsA = simulateHalfGoals(m.a, m.b, 46, 90+stoppage2, tacticMultA, 90);
-  const h2EventsB = simulateHalfGoals(m.b, m.a, 46, 90+stoppage2, tacticMultB, 90);
-  await playHalf([...h2EventsA,...h2EventsB], 46, 90+stoppage2, false);
+  refreshMods();
+  const h2EventsA = simulateHalfGoals(m.a, m.b, 46, 90+stoppage2, teamMult(m.a), 90);
+  const h2EventsB = simulateHalfGoals(m.b, m.a, 46, 90+stoppage2, teamMult(m.b), 90);
+  await playHalf([...h2EventsA,...h2EventsB], 46, 90+stoppage2, false, '2H');
 
   if(needsDecider() && state.extraTime && !skipRequested){
     const levelMsg = isTieDecidingLeg
       ? `Full-time: leg ${liveScoreA}-${liveScoreB}, level on aggregate. Extra time!`
       : `Full-time: level at ${liveScoreA}-${liveScoreB}. Extra time!`;
-    addFeed(levelMsg, false);
+    addFeed(levelMsg, false, undefined, {ty:'et'});
+    etStarted = true;
+    etFactor = 0.65;
     phaseEl.textContent = state.goldenGoal ? "Extra Time — Golden Goal" : "Extra Time — 1st period";
     halfEndBonus = 0;
-    const et1A = simulateHalfGoals(m.a, m.b, 91, 105, tacticMultA*0.65);
-    const et1B = simulateHalfGoals(m.b, m.a, 91, 105, tacticMultB*0.65);
-    await playHalf([...et1A,...et1B], 91, 105, true);
+    refreshMods();
+    const et1A = simulateHalfGoals(m.a, m.b, 91, 105, teamMult(m.a));
+    const et1B = simulateHalfGoals(m.b, m.a, 91, 105, teamMult(m.b));
+    await playHalf([...et1A,...et1B], 91, 105, true, 'ET1');
 
     if(needsDecider() && !skipRequested){
       phaseEl.textContent = state.goldenGoal ? "Extra Time — Golden Goal continues" : "Extra Time — 2nd period";
       await wait(300);
       halfEndBonus = 0;
-      const et2A = simulateHalfGoals(m.a, m.b, 106, 120, tacticMultA*0.65);
-      const et2B = simulateHalfGoals(m.b, m.a, 106, 120, tacticMultB*0.65);
-      await playHalf([...et2A,...et2B], 106, 120, true);
+      refreshMods();
+      const et2A = simulateHalfGoals(m.a, m.b, 106, 120, teamMult(m.a));
+      const et2B = simulateHalfGoals(m.b, m.a, 106, 120, teamMult(m.b));
+      await playHalf([...et2A,...et2B], 106, 120, true, 'ET2');
     }
   }
 
+  currentPhase = 'FT';
   phaseEl.textContent = "Full-time";
   clockEl.textContent = "FT";
   skipBtn.classList.add('hidden');
   godmodePanel.classList.add('hidden');
+  showLineupPanel(false, false);
+  lineupBar.classList.add('hidden');
+  lineupOpen = false;
 
-  let penalties=false, penA=0, penB=0, winner=null;
+  let penalties=false, penA=0, penB=0, winner=null, penLog=null;
   if(needsDecider()){
+    if(!etStarted) addFeed(`Full-time: level at ${liveScoreA}-${liveScoreB}. Penalties!`, false, undefined, {ty:'et'});
     phaseEl.textContent = "Penalty shootout";
+    currentPhase = 'PEN';
+    clockEl.textContent = 'PEN';
     shootoutRow.classList.remove('hidden');
-    const scale = styleScale(state.style);
-    const diff = effectiveTeamRating(m.a)-effectiveTeamRating(m.b);
-    const pA = 1/(1+Math.pow(10,-diff/scale));
-    const result = await runShootoutAnimation(shootoutRow, pA, m.a, m.b, (kickingTeam, hit, penAAfter, penBAfter)=>{
-      const oppTeam = kickingTeam===m.a ? m.b : m.a;
-      const kicker = weightedPickPlayer(availablePlayers(kickingTeam));
-      const kickerLabel = state.useRealNames ? kicker.name : ('Player #'+kicker.number);
-      let text;
-      if(hit){
-        text = penaltyScoredCommentary(kickerLabel, kickingTeam.name);
-      } else {
-        const keeper = oppTeam.players.find(p=>p.position==='GK') || oppTeam.players[0];
-        const keeperLabel = state.useRealNames ? keeper.name : ('Player #'+keeper.number);
-        text = penaltyMissedCommentary(kickerLabel, kickingTeam.name, keeperLabel);
-      }
-      addFeed(`${text} (${penAAfter}-${penBAfter})`, hit, kickingTeam);
+    const result = await runInteractiveShootout({
+      m, L, shootoutRow,
+      feed: (text, hit, team, meta)=> addFeed(text, hit, team, meta)
     });
-    penA=result.penA; penB=result.penB; winner = result.aWon?m.a:m.b; penalties=true;
-    addFeed(`${winner.name} win it on penalties ${penA}-${penB}${isTieDecidingLeg?' to win the tie':''}`, true, winner);
+    penA=result.penA; penB=result.penB; winner = result.aWon?m.a:m.b; penalties=true; penLog = result.log;
+    addFeed(`${winner.name} win it on penalties ${penA}-${penB}${isTieDecidingLeg?' to win the tie':''}`, true, winner, {ty:'penend', k:2, tm:winner.id});
   } else if(liveScoreA===liveScoreB){
     phaseEl.textContent = "Full-time — Draw";
-    addFeed(fulltimeDrawCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false);
+    addFeed(fulltimeDrawCommentary(m.a.name, m.b.name, liveScoreA, liveScoreB), false, undefined, {ty:'ft', k:1});
   } else {
     winner = liveScoreA>liveScoreB ? m.a : m.b;
-    addFeed(fulltimeCommentary(winner.name, liveScoreA, liveScoreB), false);
+    addFeed(fulltimeCommentary(winner.name, liveScoreA, liveScoreB), false, undefined, {ty:'ft', k:1, tm:winner.id});
   }
 
   const suspSnapA = state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined;
@@ -4873,6 +5975,15 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   m.played=true; m.revealed=true;
   m.scoreA=liveScoreA; m.scoreB=liveScoreB; m.winner=winner; m.penalties=penalties; m.penA=penA; m.penB=penB;
   m.events = matchEvents.slice().sort((x,y)=>x.minute-y.minute);
+
+  // stored report (lineups, cards, assists, minutes, ratings) and replay
+  const finalMinute = etStarted ? Math.min(120, Math.max(91, lastTickMin)) : 90;
+  m.report = buildReport(L, {scoreA:liveScoreA, scoreB:liveScoreB, winner}, finalMinute, shotStats, penLog);
+  const motm = reportMotm(m);
+  if(motm) addFeed(`⭐ Man of the Match: ${motm.name} (${motm.team.name})${motm.rt?` — rated ${motm.rt.toFixed(1)}`:''}`, false, undefined, {ty:'motm', k:1, tm:motm.team.id});
+  m.replay = {v:1, ev: replayEvents, fa0:startFormA, fb0:startFormB};
+  checkReportAchievements(m);
+
   state.matchesPlayed++; state.totalMatchesPlayed++;
   state._watchedCount = (state._watchedCount||0)+1;
   clearSuspensions(m.a); clearSuspensions(m.b);
@@ -4911,8 +6022,724 @@ async function watchMatch(m, decisive=true, roundLabelOverride=null){
   }
 
   closeBtn.classList.remove('hidden');
-  closeBtn.onclick = ()=>{ overlay.classList.add('hidden'); render(); };
+  watchReplayBtn.classList.remove('hidden');
+  watchReportBtn.classList.remove('hidden');
+  const closeWatch = ()=>{ overlay.classList.add('hidden'); penPanel.classList.add('hidden'); };
+  closeBtn.onclick = ()=>{ closeWatch(); render(); };
+  watchReplayBtn.onclick = ()=>{ closeWatch(); render(); openReplay(m, roundLabel, 'full'); };
+  watchReportBtn.onclick = ()=>{ closeWatch(); render(); openMatchDetail(m, roundLabel); };
   render();
+}
+
+
+
+/* ===================== PENALTY SHOOTOUT (interactive) ===================== */
+/* The six aiming zones, and the odds model behind them. A shot has to (1) stay on target
+   — top corners are riskiest, the middle of the goal safest, and a better taker misses
+   less — and then (2) beat the keeper, who is far more likely to stop it if he dives the
+   same way (and a better keeper than the taker raises that chance further). The AI picks
+   zones and dives with the same table, so an auto-simmed shootout and a played one come
+   out at the same ~74% conversion rate. */
+const PEN_ZONES = [
+  {id:'TL', dir:'L', h:'H', label:'top-left corner'},
+  {id:'TC', dir:'C', h:'H', label:'top-centre'},
+  {id:'TR', dir:'R', h:'H', label:'top-right corner'},
+  {id:'BL', dir:'L', h:'L', label:'bottom-left corner'},
+  {id:'BC', dir:'C', h:'L', label:'down the middle'},
+  {id:'BR', dir:'R', h:'L', label:'bottom-right corner'}
+];
+const PEN_ZONE_BY_ID = Object.fromEntries(PEN_ZONES.map(z=>[z.id,z]));
+const PEN_DIVE_LABEL = {L:'left', C:'centre', R:'right'};
+const PEN_AI_ZONE_W = {BL:0.28, BR:0.28, TL:0.14, TR:0.14, BC:0.08, TC:0.08};
+const PEN_AI_DIVE_W = {L:0.42, R:0.42, C:0.16};
+
+function penWeightedKey(table){
+  const keys = Object.keys(table);
+  let r = Math.random()*keys.reduce((s,k)=>s+table[k],0);
+  for(const k of keys){ r -= table[k]; if(r<=0) return k; }
+  return keys[keys.length-1];
+}
+function resolvePenalty(zone, dive, kickerRating, keeperRating, pressure){
+  const k = Math.min(kickerRating, 140), g = Math.min(keeperRating, 140);
+  const high = zone.h==='H', corner = zone.dir!=='C';
+  const missP = clampN(0.05 + (high ? (corner?0.09:0.05) : (corner?0.02:0)) - (k-70)*0.002 + (pressure||0), 0.02, 0.45);
+  if(Math.random()<missP) return Math.random()<0.35 ? 'post' : 'wide';
+  let saveP;
+  if(dive===zone.dir){
+    saveP = (high ? 0.30 : 0.50) + (zone.dir==='C' ? (high?0.28:0.25) : 0) + (g-k)*0.004;
+    saveP = clampN(saveP, 0.05, 0.85);
+  } else {
+    saveP = (dive==='C' && zone.dir!=='C') ? 0.07 : 0.03;
+  }
+  return Math.random()<saveP ? 'saved' : 'goal';
+}
+
+/* cfg: {m, L, feed(text, hit, team, meta), shootoutRow} — returns {penA, penB, aWon, log} */
+async function runInteractiveShootout(cfg){
+  const {m, L, shootoutRow} = cfg;
+  const panel = document.getElementById('penPanel');
+  const modesEl = document.getElementById('penModes');
+  const stageEl = document.getElementById('penStage');
+  const promptEl = document.getElementById('penPrompt');
+  const resultEl = document.getElementById('penResult');
+  const zonesEl = document.getElementById('penZones');
+  const goalEl = document.getElementById('penGoal');
+  const keeperEl = document.getElementById('penKeeper');
+  const ballEl = document.getElementById('penBall');
+  const kickerPickEl = document.getElementById('penKickerPick');
+  const kickerSel = document.getElementById('penKickerSel');
+  const boardEl = document.getElementById('penBoard');
+  const autoBtn = document.getElementById('penAutoBtn');
+  const tokenEl = document.getElementById('penTokenNote');
+
+  shootoutRow.innerHTML = '';
+  let pending = null;
+  let autoRest = false;
+  const waitFor = (setup)=> new Promise(res=>{ pending = res; setup(res); });
+
+  /* 1) who is in control? */
+  panel.classList.remove('hidden');
+  stageEl.classList.add('hidden');
+  modesEl.classList.remove('hidden');
+  const mode = await new Promise(res=>{
+    const defs = [
+      ['penModeA', 'a', `🎮 Control ${m.a.name}`],
+      ['penModeB', 'b', `🎮 Control ${m.b.name}`],
+      ['penModeBoth', 'both', '🎮 Both sides'],
+      ['penModeAuto', 'auto', '🤖 Auto-sim']
+    ];
+    defs.forEach(([id,val,text])=>{
+      const b = document.getElementById(id);
+      b.textContent = text;
+      b.onclick = ()=>res(val);
+    });
+  });
+  modesEl.classList.add('hidden');
+  const fast = mode==='auto';
+  if(fast){ panel.classList.add('hidden'); }
+  else { stageEl.classList.remove('hidden'); }
+
+  autoBtn.onclick = ()=>{
+    autoRest = true;
+    if(pending){ const p = pending; pending = null; p(null); }
+  };
+
+  /* 2) kicker queues: only players still on the pitch at full-time may take one */
+  const queues = {a:[], b:[]};
+  const refill = (k)=>{
+    const side = k==='a' ? L.sa : L.sb;
+    const act = L.active(side);
+    const outfield = act.filter(e=>e.slot!=='GK').sort((x,y)=>y.p.rating-x.p.rating);
+    const gks = act.filter(e=>e.slot==='GK');
+    queues[k] = [...outfield, ...gks];
+  };
+  refill('a'); refill('b');
+  const nextTakers = (k)=>{ if(!queues[k].length) refill(k); return queues[k]; };
+
+  const log = [];
+  let penA = 0, penB = 0, kicksA = 0, kicksB = 0, turn = 'a', winnerKey = null;
+  const check = ()=>{
+    if(kicksA>=5 && kicksB>=5){
+      if(kicksA===kicksB && penA!==penB) return penA>penB ? 'a' : 'b';
+      return null;
+    }
+    const remA = 5-Math.min(5,kicksA), remB = 5-Math.min(5,kicksB);
+    if(penA>penB+remB) return 'a';
+    if(penB>penA+remA) return 'b';
+    return null;
+  };
+  const addDot = (label, hit)=>{
+    const dot = document.createElement('div');
+    dot.className = 'kick-dot '+(hit?'hit':'miss');
+    dot.textContent = label;
+    shootoutRow.appendChild(dot);
+  };
+  const setBoard = ()=>{ boardEl.textContent = `${m.a.name} ${penA} – ${penB} ${m.b.name}`; };
+  setBoard();
+
+  const ZONE_POS = {
+    L:{x:17}, C:{x:50}, R:{x:83}
+  };
+  const resetBall = ()=>{
+    ballEl.style.transition = 'none';
+    ballEl.style.left = '50%'; ballEl.style.top = '118%';
+    ballEl.style.opacity = '1';
+    keeperEl.style.transition = 'none';
+    keeperEl.style.left = '50%'; keeperEl.style.transform = 'translate(-50%,0) rotate(0deg)';
+    void ballEl.offsetWidth;
+    ballEl.style.transition = ''; keeperEl.style.transition = '';
+  };
+  const animate = async (zone, dive, outcome)=>{
+    resetBall();
+    await wait(60);
+    // keeper dives
+    const kx = ZONE_POS[dive].x;
+    keeperEl.style.left = kx+'%';
+    keeperEl.style.transform = `translate(-50%,${dive==='C'?'-18px':'-8px'}) rotate(${dive==='L'?-52:dive==='R'?52:0}deg)`;
+    // ball flies
+    let bx = ZONE_POS[zone.dir].x, by = zone.h==='H' ? 24 : 74;
+    if(outcome==='wide'){ bx = zone.dir==='L' ? -8 : zone.dir==='R' ? 108 : 50; by = zone.dir==='C' ? -22 : (zone.h==='H'?10:60); }
+    if(outcome==='post'){ bx = zone.dir==='L' ? 2 : zone.dir==='R' ? 98 : (Math.random()<0.5?2:98); by = zone.h==='H' ? 4 : 62; }
+    ballEl.style.left = bx+'%'; ballEl.style.top = by+'%';
+    await wait(520);
+  };
+  const showResult = (outcome, kickerLabel, zone, dive)=>{
+    const words = {goal:'GOAL!', saved:'SAVED!', post:'OFF THE POST!', wide:'MISSED!'};
+    resultEl.textContent = `${words[outcome]} — ${zone.label}, keeper dived ${PEN_DIVE_LABEL[dive]}`;
+    resultEl.className = 'pen-result '+(outcome==='goal'?'good':'bad');
+    goalEl.classList.remove('flash-good','flash-bad');
+    void goalEl.offsetWidth;
+    goalEl.classList.add(outcome==='goal'?'flash-good':'flash-bad');
+  };
+
+  const pickFromZones = (kind)=> waitFor((res)=>{
+    zonesEl.innerHTML = '';
+    zonesEl.className = 'pen-zones '+kind;
+    if(kind==='shoot'){
+      PEN_ZONES.forEach(z=>{
+        const b = document.createElement('button');
+        b.className = 'pen-zone'; b.textContent = z.id==='TC'||z.id==='BC' ? '●' : '◎'; b.title = z.label;
+        b.onclick = ()=>{ pending = null; res(z); };
+        zonesEl.appendChild(b);
+      });
+    } else {
+      ['L','C','R'].forEach(d=>{
+        const b = document.createElement('button');
+        b.className = 'pen-zone dive'; b.textContent = d==='L'?'⟵ Dive left':d==='C'?'Stay centre':'Dive right ⟶';
+        b.onclick = ()=>{ pending = null; res(d); };
+        zonesEl.appendChild(b);
+      });
+    }
+    zonesEl.classList.remove('locked');
+  });
+  const lockZones = ()=>{ zonesEl.innerHTML = ''; zonesEl.className = 'pen-zones'; };
+
+  /* 3) the kicks */
+  while(!winnerKey){
+    const k = turn;
+    const kickingTeam = k==='a' ? m.a : m.b;
+    const defendingTeam = k==='a' ? m.b : m.a;
+    const side = k==='a' ? L.sa : L.sb;
+    const defSide = k==='a' ? L.sb : L.sa;
+    const kickNo = (k==='a' ? kicksA : kicksB) + 1;
+    const queue = nextTakers(k);
+    const gkE = L.gkEntry(defSide) || defSide.entries.find(isActive);
+    const shooterUser = !fast && !autoRest && (mode==='both' || mode===k);
+    const keeperUser = !fast && !autoRest && (mode==='both' || mode===(k==='a'?'b':'a'));
+
+    let takerEntry = queue[0];
+    let zone = null, dive = null;
+    const sudden = kicksA>=5 && kicksB>=5;
+    const pressure = (sudden ? 0.02 : 0) + ((k==='a' ? (kicksA===4 && penA<penB+1) : (kicksB===4 && penB<penA+1)) ? 0.03 : 0);
+
+    if(!fast){
+      resultEl.textContent = ''; resultEl.className = 'pen-result';
+      resetBall();
+      const gkLabel = gkE ? playerLabel(gkE.p) : 'the keeper';
+      promptEl.innerHTML = `<b>Kick ${kickNo}${sudden?' · sudden death':''}</b> — ${flagFor(kickingTeam)} ${kickingTeam.name} to take${shooterUser?'':` (${playerLabel(takerEntry.p)}, ${takerEntry.p.rating})`}. ${flagFor(defendingTeam)} ${gkLabel} in goal.`;
+      tokenEl.textContent = shooterUser && keeperUser ? 'Hot-seat: the shooter picks first — keeper, look away!' :
+        shooterUser ? 'You are taking this one — choose the taker and where to aim.' :
+        keeperUser ? 'You are in goal — guess which way to dive.' : 'Both sides on auto — sit back.';
+    }
+
+    // shooter
+    if(shooterUser){
+      kickerPickEl.classList.remove('hidden');
+      kickerSel.innerHTML = queue.map((e,i)=>`<option value="${i}">#${e.p.number} ${playerLabel(e.p)} — ${e.p.position} ${e.p.rating}${e.slot==='GK'?' (GK)':''}</option>`).join('');
+      kickerSel.value = '0';
+      const z = await pickFromZones('shoot');
+      kickerPickEl.classList.add('hidden');
+      if(z){ zone = z; takerEntry = queue[+kickerSel.value] || queue[0]; }
+      lockZones();
+    }
+    if(!zone){ zone = PEN_ZONE_BY_ID[penWeightedKey(PEN_AI_ZONE_W)]; takerEntry = takerEntry || queue[0]; }
+
+    // keeper
+    if(keeperUser && !autoRest){
+      if(shooterUser) promptEl.innerHTML += `<br><i>Shot chosen — ${flagFor(defendingTeam)} keeper, pick your dive.</i>`;
+      const d = await pickFromZones('dive');
+      if(d) dive = d;
+      lockZones();
+    }
+    if(!dive) dive = penWeightedKey(PEN_AI_DIVE_W);
+
+    // resolve
+    queues[k] = queues[k].filter(e=>e!==takerEntry);
+    const keeperRating = gkE ? Math.max(15, gkE.p.rating - oopPenalty(gkE.p.position, gkE.slot) - (gkE.inj?18:0)) : 50;
+    const outcome = resolvePenalty(zone, dive, takerEntry.p.rating, keeperRating, pressure);
+    const hit = outcome==='goal';
+
+    if(!fast){
+      await animate(zone, dive, outcome);
+      showResult(outcome, playerLabel(takerEntry.p), zone, dive);
+    } else {
+      await wait(260);
+    }
+
+    if(k==='a'){ kicksA++; if(hit) penA++; } else { kicksB++; if(hit) penB++; }
+    if(hit) takerEntry.pk++; else takerEntry.pkm++;
+    if(outcome==='saved' && gkE) gkE.pks++;
+    addDot(k==='a'?'A':'B', hit);
+    setBoard();
+
+    const kLabel = playerLabel(takerEntry.p);
+    const gLabel = gkE ? playerLabel(gkE.p) : 'the keeper';
+    let text;
+    if(hit) text = penaltyScoredCommentary(kLabel, kickingTeam.name);
+    else if(outcome==='saved') text = `${gLabel} guesses right and keeps out ${kLabel}'s effort! ${kickingTeam.name} miss!`;
+    else if(outcome==='post') text = `Off the post! ${kLabel} can't convert for ${kickingTeam.name}!`;
+    else text = `${kLabel} blazes it ${Math.random()<0.5?'over':'wide'}! ${kickingTeam.name} miss out!`;
+
+    winnerKey = check();
+    const nowA = penA, nowB = penB;
+    log.push({team:kickingTeam.id, num:takerEntry.p.number, zone:zone.id, dive, outcome});
+    cfg.feed(`${text} (${nowA}-${nowB})`, hit, kickingTeam, {
+      ty:'pen', k: winnerKey?2:1, tm:kickingTeam.id,
+      pen:{team:kickingTeam.id, num:takerEntry.p.number, name:kLabel, zone:zone.id, dive, outcome}
+    });
+    if(!fast) await wait(winnerKey ? 900 : 650);
+    turn = k==='a' ? 'b' : 'a';
+  }
+
+  if(!fast){
+    promptEl.innerHTML = `<b>${(winnerKey==='a'?m.a:m.b).name} win the shootout ${penA}–${penB}!</b>`;
+    tokenEl.textContent = '';
+    lockZones();
+    kickerPickEl.classList.add('hidden');
+    await wait(600);
+  }
+  autoBtn.onclick = null;
+  return {penA, penB, aWon: winnerKey==='a', log};
+}
+
+/* ===================== LINEUP PANEL RENDERING ===================== */
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function lineupColumnHtml(L, side, pending){
+  const key = L.key(side), team = side.team, min = L.h.minute();
+  const active = L.active(side);
+  const gone = side.entries.filter(e=>!isActive(e));
+  const canSub = L.canSub(side);
+  const formOpts = Object.keys(FORMATION_DEFS).map(k=>`<option value="${k}" ${k===side.formation?'selected':''}>${k} · ${FORMATION_DEFS[k].tag}</option>`).join('');
+  const subsText = L.pre ? 'free changes' : `Subs ${side.subs}/${L.maxSubs()}`;
+  const lines = {AT:[], MF:[], DF:[], GK:[]};
+  active.forEach(e=>lines[e.slot].push(e));
+  const ys = {AT:16, MF:42, DF:68, GK:90};
+  const pitch = ['AT','MF','DF','GK'].map(g=>{
+    const arr = lines[g];
+    return arr.map((e,i)=>`<span class="lu-dot ${key}${e.inj?' inj':''}${e.yc?' yc':''}" style="left:${((i+1)/(arr.length+1))*100}%;top:${ys[g]}%" title="${escHtml(playerLabel(e.p))} · ${e.p.position} ${e.p.rating}">${e.p.number}</span>`).join('');
+  }).join('');
+  const rows = ['GK','DF','MF','AT'].flatMap(g=>lines[g]).map(e=>{
+    const sel = pending && pending.key===key && pending.num===e.p.number;
+    const stam = Math.round(staminaPct(e, min));
+    const badges = (e.yc?'🟨':'') + (e.inj?'🚑':'') + (e.g?'⚽'+(e.g>1?e.g:''):'') + (e.a?'🅰'+(e.a>1?e.a:''):'');
+    return `<div class="lu-row${sel?' sel':''}${e.inj?' inj':''}" data-key="${key}" data-num="${e.p.number}">
+      <span class="lu-slot s-${e.slot}">${e.slot}</span><span class="lu-num">#${e.p.number}</span>
+      <span class="lu-name">${escHtml(playerLabel(e.p))}</span><span class="lu-badges">${badges}</span>
+      <span class="lu-rt">${Math.round(effRating(e,min))}</span>
+      <span class="lu-stam" title="Stamina ${stam}%"><i style="width:${stam}%"></i></span>
+      <button class="ghost lu-btn" data-act="off" ${canSub?'':'disabled'} title="Substitute this player">⇄</button></div>`;
+  }).join('');
+  const benchRows = side.bench.slice().sort((a,b)=>b.rating-a.rating).map(p=>{
+    const enabled = pending && pending.key===key && canSub;
+    return `<div class="lu-row bench" data-key="${key}" data-num="${p.number}">
+      <span class="lu-slot s-${naturalGroup(p.position)}">${p.position}</span><span class="lu-num">#${p.number}</span>
+      <span class="lu-name">${escHtml(playerLabel(p))}</span><span class="lu-badges">${p.age?p.age+'y':''}</span>
+      <span class="lu-rt">${p.rating}</span><span class="lu-stam"></span>
+      <button class="ghost lu-btn" data-act="on" ${enabled?'':'disabled'}>↑ On</button></div>`;
+  }).join('');
+  const goneText = gone.length ? `<div class="lu-gone">Off: ${gone.map(e=>`${escHtml(playerLabel(e.p))} ${e.red?'🟥':''}(${e.off}')`).join(', ')}</div>` : '';
+  return `<div class="lu-head"><span>${flagFor(team)} <b>${escHtml(team.name)}</b></span>
+      <select class="lu-form" data-key="${key}">${formOpts}</select><span class="lu-subs">${subsText}</span></div>
+    <div class="lu-pitch">${pitch}</div>
+    <div class="lu-sub-title">On the pitch</div>${rows}
+    <div class="lu-sub-title">Bench</div>${benchRows}${goneText}`;
+}
+
+/* ===================== TEAM STAT BARS / LINEUP TABLES (shared) ===================== */
+function teamStatBarsHtml(m){
+  if(!m.report) return '';
+  const a = m.report.ts.a, b = m.report.ts.b;
+  const row = (label, va, vb, suffix)=>{
+    const tot = (va+vb)||1;
+    return `<div class="tsb-row"><span class="tsb-v">${va}${suffix||''}</span>
+      <div class="tsb-mid"><div class="tsb-label">${label}</div><div class="tsb-track"><i class="a" style="width:${va/tot*100}%"></i><i class="b" style="width:${vb/tot*100}%"></i></div></div>
+      <span class="tsb-v">${vb}${suffix||''}</span></div>`;
+  };
+  return `<div class="tsb">${row('Possession',a.poss,b.poss,'%')}${row('Shots',a.sh,b.sh)}${row('On target',a.sot,b.sot)}
+    ${row('Corners',a.corners,b.corners)}${row('Fouls',a.fouls,b.fouls)}${row('Offsides',a.offsides,b.offsides)}
+    ${row('Yellow cards',a.yc,b.yc)}${row('Red cards',a.rc,b.rc)}</div>`;
+}
+function lineupTablesHtml(m){
+  if(!m.report) return '';
+  const order = {GK:0, DF:1, MF:2, AT:3};
+  return [m.a, m.b].map(team=>{
+    const lines = m.report.pl.filter(l=>l.team===team.id).sort((x,y)=> (x.on>0)-(y.on>0) || order[x.slot]-order[y.slot] || x.on-y.on);
+    const fm = team===m.a ? m.report : m.report;
+    const form = team===m.a ? m.report.fa : m.report.fb;
+    const form0 = team===m.a ? m.report.fa0 : m.report.fb0;
+    const body = lines.map(l=>{
+      const p = findSquadPlayer(team, l.num);
+      const nm = p ? playerLabel(p) : ('Player #'+l.num);
+      const isM = m.report.motm && m.report.motm.team===l.team && m.report.motm.num===l.num;
+      return `<tr class="${l.on>0?'sub':''}"><td>${l.slot}</td><td>${escHtml(nm)}${l.on>0?' <span class="lt-in">↑'+l.on+"'</span>":''}${l.off!=null&&!l.rc?' <span class="lt-out">↓'+l.off+"'</span>":''}${isM?' ⭐':''}</td>
+        <td>${l.min}'</td><td>${l.g||''}</td><td>${l.a||''}</td><td>${l.rc?'🟥':(l.yc?'🟨'.repeat(l.yc>1?1:l.yc):'')}</td><td><b>${l.rt?l.rt.toFixed(1):'–'}</b></td></tr>`;
+    }).join('');
+    return `<div class="lt-team"><div class="lt-head">${flagFor(team)} ${escHtml(team.name)} <span class="lt-form">${form0&&form0!==form?form0+' → '+form:form}</span></div>
+      <table class="lt-table"><thead><tr><th></th><th>Player</th><th>Min</th><th>G</th><th>A</th><th>Cards</th><th>Rt</th></tr></thead><tbody>${body}</tbody></table></div>`;
+  }).join('');
+}
+
+/* ===================== ACHIEVEMENTS (report-based) ===================== */
+ACHIEVEMENT_DEFS.push(
+  {id:'hat_trick', name:'Hat-Trick Hero', icon:'🎩', desc:'Have a single player score 3+ goals in one match.'},
+  {id:'super_sub', name:'Super Sub', icon:'🦸', desc:'A substitute scores in a match his side wins.'},
+  {id:'spot_kick_stopper', name:'Spot-Kick Stopper', icon:'🧤', desc:'A keeper saves 2+ penalties in a shootout you watched.'}
+);
+Object.assign(ACHIEVEMENT_BY_ID, Object.fromEntries(ACHIEVEMENT_DEFS.map(a=>[a.id,a])));
+function checkReportAchievements(m){
+  if(!m.report) return;
+  m.report.pl.forEach(l=>{
+    const team = state.allTeams.find(t=>t.id===l.team);
+    const p = team && findSquadPlayer(team, l.num);
+    const nm = p ? playerLabel(p) : ('Player #'+l.num);
+    if(l.g>=3) unlockAchievement('hat_trick', `${nm} — ${l.g} goals`);
+    if(l.on>0 && l.g>=1 && m.winner && m.winner.id===l.team) unlockAchievement('super_sub', `${nm} (${team?team.name:''})`);
+    if(l.pks>=2 && m.report.pen) unlockAchievement('spot_kick_stopper', `${nm} (${team?team.name:''})`);
+  });
+}
+
+/* ===================== STATS: AGGREGATION, AWARDS ===================== */
+function aggregatePlayerStats(){
+  const map = new Map();
+  const teamAgg = {};
+  state.matchHistory.forEach(h=>{
+    const m = h.m;
+    if(!m.played || !m.report) return;
+    [['a',m.a],['b',m.b]].forEach(([k,team])=>{
+      const ts = m.report.ts[k];
+      const t = teamAgg[team.id] || (teamAgg[team.id] = {team, mp:0, poss:0, sh:0, sot:0, goals:0, fouls:0, corners:0, offsides:0, yc:0, rc:0});
+      t.mp++; t.poss+=ts.poss; t.sh+=ts.sh; t.sot+=ts.sot; t.goals += (k==='a'?m.scoreA:m.scoreB);
+      t.fouls+=ts.fouls; t.corners+=ts.corners; t.offsides+=ts.offsides; t.yc+=ts.yc; t.rc+=ts.rc;
+    });
+    const mo = m.report.motm;
+    m.report.pl.forEach(l=>{
+      const key = l.team+'|'+l.num;
+      let r = map.get(key);
+      if(!r){
+        const team = state.allTeams.find(t=>t.id===l.team);
+        const p = team ? findSquadPlayer(team, l.num) : null;
+        r = {key, team, num:l.num, p, pos:l.pos, age:l.age, mp:0, min:0, g:0, a:0, sh:0, sot:0, sv:0, yc:0, rc:0, pk:0, pkm:0, pks:0, cs:0, rtW:0, motm:0};
+        map.set(key, r);
+      }
+      if(l.min>0){ r.mp++; r.min+=l.min; r.rtW += (l.rt||6)*l.min; }
+      r.g+=l.g; r.a+=l.a; r.sh+=l.sh; r.sot+=l.sot; r.sv+=l.sv; r.yc+=l.yc; r.rc+=l.rc;
+      r.pk+=l.pk; r.pkm+=l.pkm; r.pks+=l.pks;
+      if(l.cs && l.min>=60 && (l.pos==='GK'||l.slot==='GK')) r.cs++;
+      if(mo && mo.team===l.team && mo.num===l.num) r.motm++;
+      if(r.p) r.pos = r.p.position;
+    });
+  });
+  const rows = Array.from(map.values()).map(r=>({...r,
+    name: r.p ? playerLabel(r.p) : ('Player #'+r.num),
+    avgRt: r.min ? r.rtW/r.min : 0, ga: r.g+r.a}));
+  return {rows, teams:Object.values(teamAgg)};
+}
+function computeAwards(rows){
+  if(!rows.length) return null;
+  const maxMP = Math.max(...rows.map(r=>r.mp));
+  const minApps = Math.max(1, Math.ceil(maxMP*0.5));
+  const champId = state.champion ? state.champion.id : null;
+  const score = r => r.avgRt + (r.team && r.team.id===champId ? 0.2 : 0) + r.g*0.04 + r.a*0.02;
+  const elig = rows.filter(r=>r.mp>=minApps && r.min>=60);
+  const pool = elig.length ? elig : rows.filter(r=>r.mp>0);
+  const best = arr => arr.slice().sort((x,y)=>score(y)-score(x))[0] || null;
+  const gks = pool.filter(r=>naturalGroup(r.pos)==='GK');
+  const glove = gks.slice().sort((x,y)=> (y.avgRt+y.cs*0.35+y.pks*0.5+y.sv*0.05) - (x.avgRt+x.cs*0.35+x.pks*0.5+x.sv*0.05))[0] || null;
+  const young = best(pool.filter(r=>r.age!=null && r.age<=21));
+  const assists = rows.slice().sort((x,y)=>y.a-x.a||y.g-x.g)[0];
+  const motms = rows.slice().sort((x,y)=>y.motm-x.motm||y.avgRt-x.avgRt)[0];
+  // Team of the tournament: 4-3-3 by rating
+  const used = new Set();
+  const take = (grp, n)=>{
+    const out = pool.filter(r=>naturalGroup(r.pos)===grp && !used.has(r.key)).sort((x,y)=>score(y)-score(x)).slice(0,n);
+    out.forEach(r=>used.add(r.key)); return out;
+  };
+  const xi = {GK:take('GK',1), DF:take('DF',4), MF:take('MF',3), AT:take('AT',3)};
+  return {ball:best(pool), glove, young, assists:(assists&&assists.a>0)?assists:null, motms:(motms&&motms.motm>0)?motms:null, xi, minApps};
+}
+function awardTile(title, r, detail){
+  if(!r) return '';
+  return `<div class="stat-card"><div class="stat-label">${title}</div>
+    <div class="stat-value" style="font-size:16px;">${escHtml(r.name)}</div>
+    <div class="stat-sub">${r.team?flagFor(r.team)+' '+escHtml(r.team.name):''}<br>${detail}</div></div>`;
+}
+function renderAwardsTab(){
+  const el = document.getElementById('statsTabAwards');
+  const {rows, teams} = aggregatePlayerStats();
+  const aw = computeAwards(rows);
+  if(!aw){ el.innerHTML = '<div class="stats-empty">No player data yet — play or watch some matches.</div>'; return; }
+  const boot = getBootLeaderboard()[0];
+  const tiles = [];
+  if(boot) tiles.push(`<div class="stat-card"><div class="stat-label">🥇 Golden Boot</div><div class="stat-value" style="font-size:16px;">${escHtml(boot.label)}</div><div class="stat-sub">${boot.count} goals</div></div>`);
+  tiles.push(awardTile('⚽ Golden Ball', aw.ball, aw.ball?`avg rating ${aw.ball.avgRt.toFixed(2)} · ${aw.ball.g}G ${aw.ball.a}A in ${aw.ball.mp} matches`:''));
+  tiles.push(awardTile('🧤 Golden Glove', aw.glove, aw.glove?`${aw.glove.cs} clean sheets · ${aw.glove.sv} saves${aw.glove.pks?` · ${aw.glove.pks} shootout saves`:''} · avg ${aw.glove.avgRt.toFixed(2)}`:''));
+  tiles.push(awardTile('🌱 Best Young Player (U21)', aw.young, aw.young?`age ${aw.young.age} · avg rating ${aw.young.avgRt.toFixed(2)} · ${aw.young.g}G ${aw.young.a}A`:''));
+  tiles.push(awardTile('🎯 Playmaker', aw.assists, aw.assists?`${aw.assists.a} assists`:''));
+  tiles.push(awardTile('⭐ Most Man-of-the-Match awards', aw.motms, aw.motms?`${aw.motms.motm} awards`:''));
+  const fair = teams.filter(t=>t.mp>=1).map(t=>({t, pts:(t.yc+3*t.rc)/t.mp})).sort((x,y)=>x.pts-y.pts)[0];
+  if(fair) tiles.push(`<div class="stat-card"><div class="stat-label">🤝 Fair Play</div><div class="stat-value" style="font-size:16px;">${flagFor(fair.t.team)} ${escHtml(fair.t.team.name)}</div><div class="stat-sub">${fair.t.yc} yellow, ${fair.t.rc} red in ${fair.t.mp} matches</div></div>`);
+  const line = (arr, y)=>`<div class="tot-line" style="top:${y}%">${arr.map(r=>`<div class="tot-p"><b>${escHtml(r.name.split(' ').slice(-1)[0])}</b><small>${r.avgRt.toFixed(1)}</small></div>`).join('')}</div>`;
+  el.innerHTML = `<div class="stats-grid">${tiles.join('')}</div>
+    <h3 class="stats-h3">Team of the Tournament · 4-3-3</h3>
+    <div class="tot-pitch">${line(aw.xi.AT,14)}${line(aw.xi.MF,40)}${line(aw.xi.DF,66)}${line(aw.xi.GK,89)}</div>
+    <p class="stat-sub" style="margin-top:8px;">Awards need at least ${aw.minApps} appearance${aw.minApps===1?'':'s'}. Ratings come from goals, assists, shots, saves, clean sheets, cards and the result.</p>`;
+}
+let playersSort = {key:'avgRt', dir:'desc'};
+function renderPlayersTab(){
+  const el = document.getElementById('statsTabPlayers');
+  const {rows} = aggregatePlayerStats();
+  if(!rows.length){ el.innerHTML = '<div class="stats-empty">No player data yet.</div>'; return; }
+  const posF = document.getElementById('playersPosFilter') ? document.getElementById('playersPosFilter').value : 'all';
+  const q = document.getElementById('playersSearch') ? document.getElementById('playersSearch').value.trim().toLowerCase() : '';
+  let list = rows.filter(r=> (posF==='all' || naturalGroup(r.pos)===posF) && (!q || r.name.toLowerCase().includes(q) || (r.team&&r.team.name.toLowerCase().includes(q))));
+  const {key, dir} = playersSort;
+  list.sort((x,y)=>{
+    const vx = x[key], vy = y[key];
+    const c = (typeof vx==='string') ? vx.localeCompare(vy) : (vx-vy);
+    return (dir==='asc'?c:-c) || y.avgRt-x.avgRt;
+  });
+  const cols = [['name','Player'],['team','Team'],['pos','Pos'],['mp','MP'],['min','Min'],['g','G'],['a','A'],['ga','G+A'],['sh','Sh'],['sot','SoT'],['sv','Sv'],['cs','CS'],['yc','🟨'],['rc','🟥'],['motm','MOTM'],['avgRt','Rating']];
+  const head = cols.map(([k,l])=>`<th data-pk="${k}" class="${k===key?'sorted':''}">${l}${k===key?(dir==='asc'?' ▲':' ▼'):''}</th>`).join('');
+  const body = list.slice(0,60).map(r=>`<tr><td class="lb-name">${escHtml(r.name)}</td><td>${r.team?flagFor(r.team)+' '+escHtml(r.team.name):''}</td><td>${r.pos}</td>
+    <td class="lb-num">${r.mp}</td><td class="lb-num">${r.min}</td><td class="lb-num">${r.g}</td><td class="lb-num">${r.a}</td><td class="lb-num">${r.ga}</td>
+    <td class="lb-num">${r.sh}</td><td class="lb-num">${r.sot}</td><td class="lb-num">${r.sv}</td><td class="lb-num">${r.cs}</td>
+    <td class="lb-num">${r.yc}</td><td class="lb-num">${r.rc}</td><td class="lb-num">${r.motm}</td><td class="lb-num"><b>${r.avgRt.toFixed(2)}</b></td></tr>`).join('');
+  el.innerHTML = `<div class="replays-toolbar"><select id="playersPosFilter">
+      ${[['all','All positions'],['GK','Goalkeepers'],['DF','Defenders'],['MF','Midfielders'],['AT','Attackers']].map(([v,l])=>`<option value="${v}" ${v===posF?'selected':''}>${l}</option>`).join('')}</select>
+      <input type="text" id="playersSearch" placeholder="Search player or team…" value="${escHtml(q)}"></div>
+    <div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    <p class="stat-sub">Top 60 shown · click a column to sort.</p>`;
+  el.querySelectorAll('th[data-pk]').forEach(th=>th.onclick = ()=>{
+    const k = th.dataset.pk;
+    playersSort = {key:k, dir: playersSort.key===k && playersSort.dir==='desc' ? 'asc' : 'desc'};
+    if(k==='name'||k==='team'||k==='pos') playersSort.dir = playersSort.key===k && playersSort.dir==='asc' ? 'desc':'asc';
+    renderPlayersTab();
+  });
+  el.querySelector('#playersPosFilter').onchange = renderPlayersTab;
+  const si = el.querySelector('#playersSearch');
+  si.oninput = ()=>{ const pos = si.selectionStart; renderPlayersTab(); const n = document.getElementById('playersSearch'); n.focus(); n.setSelectionRange(pos,pos); };
+}
+function renderTeamsTab(){
+  const el = document.getElementById('statsTabTeams');
+  const {teams} = aggregatePlayerStats();
+  if(!teams.length){ el.innerHTML = '<div class="stats-empty">No team data yet.</div>'; return; }
+  const rows = teams.map(t=>({t:t.team, mp:t.mp, poss:t.poss/t.mp, sh:t.sh/t.mp, sot:t.sot/t.mp, conv: t.sh? t.goals/t.sh*100:0, fouls:t.fouls/t.mp, corners:t.corners/t.mp, yc:t.yc, rc:t.rc}))
+    .sort((x,y)=>y.poss-x.poss);
+  el.innerHTML = `<div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>Team</th><th>MP</th><th>Poss</th><th>Shots/g</th><th>SoT/g</th><th>Conv</th><th>Fouls/g</th><th>Corners/g</th><th>🟨</th><th>🟥</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td class="lb-name">${flagFor(r.t)} ${escHtml(r.t.name)}</td><td class="lb-num">${r.mp}</td><td class="lb-num">${r.poss.toFixed(0)}%</td><td class="lb-num">${r.sh.toFixed(1)}</td><td class="lb-num">${r.sot.toFixed(1)}</td><td class="lb-num">${r.conv.toFixed(0)}%</td><td class="lb-num">${r.fouls.toFixed(1)}</td><td class="lb-num">${r.corners.toFixed(1)}</td><td class="lb-num">${r.yc}</td><td class="lb-num">${r.rc}</td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+function showStatsTab(tab){
+  document.querySelectorAll('#statsTabs .rp-tab').forEach(b=>b.classList.toggle('active', b.dataset.stab===tab));
+  ['records','players','awards','teams'].forEach(t=>document.getElementById('statsTab'+t[0].toUpperCase()+t.slice(1)).classList.toggle('hidden', t!==tab));
+  if(tab==='players') renderPlayersTab();
+  if(tab==='awards') renderAwardsTab();
+  if(tab==='teams') renderTeamsTab();
+}
+document.querySelectorAll('#statsTabs .rp-tab').forEach(b=>b.addEventListener('click', ()=>showStatsTab(b.dataset.stab)));
+document.getElementById('statsBtn').addEventListener('click', ()=>showStatsTab('records'));
+
+/* ===================== REPLAY VIEWER ===================== */
+const RP = {items:[], i:0, timer:null, speed:1, playing:false, mode:'full', m:null, label:'', reel:false};
+const RP_SPEEDS = [1,2,4];
+function roundLabelFor(m){
+  const h = state.matchHistory.find(x=>x.m===m);
+  return h ? h.roundLabel : '';
+}
+function rpItemsFor(m, mode){
+  const ev = (m.replay && m.replay.ev) || [];
+  return (mode==='highlights' ? ev.filter(e=>e.k>=1) : ev).map(e=>({m, e}));
+}
+function openReplay(m, label, mode){
+  if(!m || !m.replay){ alert('No replay was stored for this match.'); return; }
+  RP.reel = false; RP.m = m; RP.label = label || roundLabelFor(m);
+  RP.mode = mode || 'full';
+  rpLoad();
+  document.getElementById('rpTabs').classList.remove('hidden');
+  document.getElementById('replayOverlay').classList.remove('hidden');
+}
+function openReel(items, title){
+  if(!items.length){ alert('No highlights to show yet.'); return; }
+  RP.reel = true; RP.items = items; RP.m = items[0].m; RP.mode = 'highlights'; RP.i = 0; RP.label = title;
+  document.getElementById('rpTabs').classList.add('hidden');
+  document.getElementById('replayOverlay').classList.remove('hidden');
+  rpSetup();
+}
+function rpLoad(){
+  RP.items = rpItemsFor(RP.m, RP.mode);
+  RP.i = 0;
+  document.querySelectorAll('#rpTabs .rp-tab').forEach(b=>b.classList.toggle('active', b.dataset.mode===RP.mode));
+  rpSetup();
+}
+function rpSetup(){
+  const scrub = document.getElementById('rpScrub');
+  scrub.max = Math.max(0, RP.items.length-1); scrub.value = 0;
+  rpRender();
+  rpPlay(true);
+}
+function rpDelay(){
+  const it = RP.items[RP.i];
+  const base = RP.mode==='highlights' ? 2600 : 850;
+  const mult = it && it.e.k>=2 ? 1.8 : 1;
+  return base*mult/RP.speed;
+}
+function rpPlay(on){
+  clearTimeout(RP.timer);
+  RP.playing = on;
+  document.getElementById('rpPlayBtn').textContent = on ? '⏸ Pause' : '▶ Play';
+  if(!on) return;
+  const tick = ()=>{
+    if(!RP.playing) return;
+    if(RP.i >= RP.items.length-1){ rpPlay(false); return; }
+    RP.i++; rpRender();
+    RP.timer = setTimeout(tick, rpDelay());
+  };
+  RP.timer = setTimeout(tick, rpDelay());
+}
+function rpRender(){
+  const it = RP.items[RP.i];
+  const set = (id, v)=>{ document.getElementById(id).textContent = v; };
+  if(!it){
+    set('rpTitle', 'Replay'); document.getElementById('rpFeed').innerHTML = '<li>No events recorded.</li>';
+    return;
+  }
+  const {m, e} = it;
+  set('rpTitle', `${m.a.name} vs ${m.b.name}`);
+  set('rpSub', (RP.reel ? RP.label+' · '+roundLabelFor(m) : RP.label) + (m.replay.syn ? ' · quick recap (instant sim: goals, cards & subs)' : ' · full live replay'));
+  set('rpFlagA', flagFor(m.a)); set('rpFlagB', flagFor(m.b)); set('rpNameA', m.a.name); set('rpNameB', m.b.name);
+  set('rpScoreA', e.sc[0]); set('rpScoreB', e.sc[1]); set('rpClock', e.c);
+  const mom = document.getElementById('rpMoment');
+  mom.textContent = e.x;
+  mom.className = 'rp-moment ev-'+e.ty;
+  void mom.offsetWidth; mom.classList.add('pop');
+  // feed: events of the same match up to here (newest first)
+  const feed = [];
+  for(let j=RP.i; j>=0 && RP.items[j].m===m && feed.length<60; j--) feed.push(RP.items[j].e);
+  document.getElementById('rpFeed').innerHTML = feed.map(x=>`<li class="ev-${x.ty}${x.k>=2?' goal':''}"><b>${x.c}</b> ${escHtml(x.x)}</li>`).join('');
+  // shot map: same-match shots so far
+  const colors = {goal:'#4fc3ff', saved:'#ffcf3f', post:'#b23bff', wide:'#7086ad'};
+  let dots = '';
+  for(let j=RP.i; j>=0 && RP.items[j].m===m; j--){
+    const s = RP.items[j].e.sh;
+    if(s) dots += `<circle cx="${s.x}" cy="${s.y}" r="4" fill="${colors[s.o]||'#7086ad'}" fill-opacity="0.85" stroke="#0a1128" stroke-width="0.8"/>`;
+  }
+  document.getElementById('rpShotMap').innerHTML = `
+    <rect x="2" y="2" width="296" height="176" rx="8" fill="none" stroke="rgba(255,255,255,.15)"/>
+    <line x1="150" y1="2" x2="150" y2="178" stroke="rgba(255,255,255,.1)"/><circle cx="150" cy="90" r="18" fill="none" stroke="rgba(255,255,255,.1)"/>
+    <rect x="0" y="55" width="16" height="70" fill="none" stroke="rgba(255,255,255,.15)"/><rect x="284" y="55" width="16" height="70" fill="none" stroke="rgba(255,255,255,.15)"/>${dots}`;
+  document.getElementById('rpScrub').value = RP.i;
+  set('rpCount', `${RP.i+1} / ${RP.items.length}`);
+  document.getElementById('rpStats').innerHTML = (!RP.reel && m.report) ? teamStatBarsHtml(m) : '';
+}
+document.getElementById('rpPlayBtn').onclick = ()=>{
+  if(!RP.playing && RP.i>=RP.items.length-1){ RP.i = 0; rpRender(); }
+  rpPlay(!RP.playing);
+};
+document.getElementById('rpPrevBtn').onclick = ()=>{ rpPlay(false); RP.i = Math.max(0, RP.i-1); rpRender(); };
+document.getElementById('rpNextBtn').onclick = ()=>{ rpPlay(false); RP.i = Math.min(RP.items.length-1, RP.i+1); rpRender(); };
+document.getElementById('rpSpeedBtn').onclick = ()=>{
+  RP.speed = RP_SPEEDS[(RP_SPEEDS.indexOf(RP.speed)+1)%RP_SPEEDS.length];
+  document.getElementById('rpSpeedBtn').textContent = RP.speed+'x';
+  if(RP.playing) rpPlay(true);
+};
+document.getElementById('rpScrub').oninput = (ev)=>{ rpPlay(false); RP.i = +ev.target.value; rpRender(); };
+document.querySelectorAll('#rpTabs .rp-tab').forEach(b=>b.onclick = ()=>{ RP.mode = b.dataset.mode; rpLoad(); });
+document.getElementById('rpCloseBtn').onclick = ()=>{ rpPlay(false); document.getElementById('replayOverlay').classList.add('hidden'); };
+document.getElementById('rpReportBtn').onclick = ()=>{
+  const m = RP.m; rpPlay(false);
+  document.getElementById('replayOverlay').classList.add('hidden');
+  openMatchDetail(m, roundLabelFor(m));
+};
+
+/* ===================== REPLAY LIBRARY ===================== */
+function replayLibraryEntries(){
+  return state.matchHistory.filter(h=>h.m.played && h.m.revealed && h.m.replay);
+}
+function renderReplaysList(){
+  const filter = document.getElementById('replaysFilter').value;
+  const q = document.getElementById('replaysSearch').value.trim().toLowerCase();
+  let list = replayLibraryEntries().slice().reverse();
+  if(filter==='live') list = list.filter(h=>!h.m.replay.syn);
+  if(filter==='goals') list = list.filter(h=>h.m.scoreA+h.m.scoreB>=5);
+  if(filter==='shootouts') list = list.filter(h=>h.m.penalties);
+  if(filter==='reds') list = list.filter(h=>h.m.report && h.m.report.ts.a.rc+h.m.report.ts.b.rc>0);
+  if(q) list = list.filter(h=>(h.m.a.name+' '+h.m.b.name+' '+h.roundLabel).toLowerCase().includes(q));
+  const el = document.getElementById('replaysList');
+  if(!list.length){ el.innerHTML = '<div class="stats-empty">No stored replays match. Play or watch some matches first.</div>'; return; }
+  el.innerHTML = list.map((h,i)=>{
+    const m = h.m, motm = reportMotm(m);
+    return `<div class="rl-row"><div class="rl-main"><div class="rl-title">${flagFor(m.a)} ${escHtml(m.a.name)} <b>${m.scoreA}–${m.scoreB}</b>${m.penalties?` <small>(pens ${m.penA}-${m.penB})</small>`:''} ${escHtml(m.b.name)} ${flagFor(m.b)}</div>
+      <div class="rl-sub">${escHtml(h.roundLabel)} · ${m.replay.syn?'quick recap':'live replay'}${motm?` · ⭐ ${escHtml(motm.name)}`:''}</div></div>
+      <div class="rl-btns"><button class="ghost" data-rl="${i}" data-mode="full">▶ Replay</button><button class="ghost" data-rl="${i}" data-mode="highlights">✨ Highlights</button><button class="ghost" data-rl="${i}" data-mode="report">📋</button></div></div>`;
+  }).join('');
+  el.querySelectorAll('button[data-rl]').forEach(b=>b.onclick = ()=>{
+    const h = list[+b.dataset.rl];
+    document.getElementById('replaysOverlay').classList.add('hidden');
+    if(b.dataset.mode==='report') openMatchDetail(h.m, h.roundLabel);
+    else openReplay(h.m, h.roundLabel, b.dataset.mode);
+  });
+}
+document.getElementById('replaysBtn').addEventListener('click', ()=>{
+  renderReplaysList();
+  document.getElementById('replaysOverlay').classList.remove('hidden');
+});
+document.getElementById('replaysCloseBtn').addEventListener('click', ()=>document.getElementById('replaysOverlay').classList.add('hidden'));
+document.getElementById('replaysFilter').addEventListener('change', renderReplaysList);
+document.getElementById('replaysSearch').addEventListener('input', renderReplaysList);
+document.getElementById('reelAllBtn').addEventListener('click', ()=>{
+  const items = [];
+  replayLibraryEntries().forEach(h=>{ h.m.replay.ev.filter(e=>e.k>=2).forEach(e=>items.push({m:h.m, e})); });
+  document.getElementById('replaysOverlay').classList.add('hidden');
+  openReel(items, 'Tournament highlights');
+});
+
+/* ===================== AUTOSAVE ===================== */
+const AUTOSAVE_KEY = 'globalCup.autosave.v1';
+let autosavePaused = false, autosaveTimer = null;
+function autosaveNow(){
+  if(autosavePaused || !state || !state.totalMatchesPlayed) return;
+  try{
+    let payload = JSON.stringify(exportTournament());
+    try{ localStorage.setItem(AUTOSAVE_KEY, payload); }
+    catch(e){
+      payload = JSON.stringify(exportTournament({lite:true}));   // storage full: drop replays, keep the tournament
+      localStorage.setItem(AUTOSAVE_KEY, payload);
+    }
+  }catch(e){ /* storage unavailable — autosave is best-effort */ }
+}
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(autosaveNow, 700);
+}
+function checkForAutosave(){
+  let raw = null;
+  try{ raw = localStorage.getItem(AUTOSAVE_KEY); }catch(e){}
+  if(!raw) return;
+  let payload;
+  try{ payload = JSON.parse(raw); }catch(e){ return; }
+  if(!payload || !payload.state) return;
+  autosavePaused = true;
+  const banner = document.getElementById('autosaveBanner');
+  const when = payload.savedAt ? new Date(payload.savedAt).toLocaleString() : 'earlier';
+  document.getElementById('autosaveText').textContent = `💾 Autosaved tournament found (${when}, ${payload.state.totalMatchesPlayed||0} matches played).`;
+  banner.classList.remove('hidden');
+  document.getElementById('autosaveResumeBtn').onclick = ()=>{
+    banner.classList.add('hidden'); autosavePaused = false; importTournament(payload);
+  };
+  document.getElementById('autosaveDiscardBtn').onclick = ()=>{
+    banner.classList.add('hidden'); autosavePaused = false;
+    try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
+  };
 }
 
 /* ===================== SETUP MODAL ===================== */
@@ -5355,14 +7182,15 @@ document.getElementById('importRealSquadsTextBtn').addEventListener('click', ()=
 });
 
 /* ===================== SAVE / LOAD ===================== */
-function serializeMatch(m){
+function serializeMatch(m, opts){
   return {
     uid: m.uid, aId: m.a.id, bId: m.b.id,
     played: !!m.played, revealed: !!m.revealed,
     scoreA: m.scoreA ?? null, scoreB: m.scoreB ?? null,
     winnerId: m.winner ? m.winner.id : null,
     penalties: !!m.penalties, penA: m.penA ?? 0, penB: m.penB ?? 0,
-    events: (m.events||[]).map(e=>({minute:e.minute, teamId:e.teamRef.id, scorer:e.scorer})),
+    events: (m.events||[]).map(e=>({minute:e.minute, teamId:e.teamRef.id, scorer:e.scorer, playerNumber:e.playerNumber, assist:e.assist, assistNumber:e.assistNumber})),
+    report: m.report||null, replay: (opts&&opts.lite) ? null : (m.replay||null),
     tieId: m.tieId||null, legNumber: m.legNumber||null, legsTotal: m.legsTotal||null,
     roundLabelBase: m.roundLabelBase||null,
     tieResult: m.tieResult||null
@@ -5390,10 +7218,10 @@ function serializeTies(){
   return out;
 }
 
-function exportTournament(){
+function exportTournament(opts){
   const allMatches = collectAllMatches();
   const matchesOut = {};
-  allMatches.forEach((m,uid)=>{ matchesOut[uid] = serializeMatch(m); });
+  allMatches.forEach((m,uid)=>{ matchesOut[uid] = serializeMatch(m, opts); });
 
   return {
     fileType: 'global-cup-save',
@@ -5415,7 +7243,7 @@ function exportTournament(){
       allTeams: state.allTeams.map(t=>({
         id:t.id, name:t.name, code:t.code||null, rating:t.rating, flagOverride:t.flagOverride||null,
         isGuest:!!t.isGuest, isCustom:!!t.isCustom, isFictional:!!t.isFictional,
-        players:(t.players||[]).map(p=>({...p}))
+        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||null
       })),
       phase: state.phase,
       groups: state.groups.map(g=>({
@@ -5478,7 +7306,7 @@ function importTournament(payload){
       const team = {
         id:t.id, name:t.name, code:t.code, rating:t.rating, flagOverride:t.flagOverride,
         isGuest:!!t.isGuest, isCustom:!!t.isCustom, isFictional:!!t.isFictional,
-        players:(t.players||[]).map(p=>({...p}))
+        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||undefined
       };
       teamById[team.id] = team;
       return team;
@@ -5492,7 +7320,8 @@ function importTournament(payload){
         scoreA: sm.scoreA, scoreB: sm.scoreB,
         winner: sm.winnerId!=null ? teamById[sm.winnerId] : null,
         penalties: sm.penalties, penA: sm.penA, penB: sm.penB,
-        events: (sm.events||[]).map(e=>({minute:e.minute, teamRef:teamById[e.teamId], scorer:e.scorer})),
+        events: (sm.events||[]).map(e=>({minute:e.minute, teamRef:teamById[e.teamId], scorer:e.scorer, playerNumber:e.playerNumber, assist:e.assist, assistNumber:e.assistNumber})),
+        report: sm.report||undefined, replay: sm.replay||undefined,
         tieId: sm.tieId||undefined, legNumber: sm.legNumber||undefined, legsTotal: sm.legsTotal||undefined,
         roundLabelBase: sm.roundLabelBase||undefined,
         tieResult: sm.tieResult ? {...sm.tieResult} : undefined
@@ -5593,6 +7422,7 @@ loadFileInput.addEventListener('change', ()=>{
 /* ===================== BOOT ===================== */
 newTournament(64, "realistic", "normal", "balanced", false, true, false, false, false, "knockout", false, "normal");
 if(REAL_SQUADS_SOURCE_URL) loadRealSquadsFromUrl(REAL_SQUADS_SOURCE_URL, true);
+checkForAutosave();
 </script>
 </body>
 </html>
