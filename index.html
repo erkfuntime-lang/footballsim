@@ -551,6 +551,9 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
 .lineup-cols > div{min-width:0;}
 .lineup-kickoff{display:flex; gap:16px; align-items:center; margin-top:12px; flex-wrap:wrap;}
 .lineup-kickoff label{font-size:11.5px; color:var(--chalk-dim); display:flex; gap:6px; align-items:center;}
+.lu-sps{display:flex; flex-wrap:wrap; gap:6px 10px; margin:6px 0;}
+.lu-spl{display:flex; flex-direction:column; font-size:10px; color:var(--chalk-dim); text-transform:uppercase; letter-spacing:.05em; min-width:0; flex:1 1 30%;}
+.lu-spl select, .lu-style{font-size:11px; max-width:100%; min-width:0;}
 .lu-head{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; font-size:13px;}
 .lu-head select{font-size:11.5px; padding:5px 6px;}
 .lu-subs{margin-left:auto; font:11px 'Space Mono'; color:var(--amber);}
@@ -784,9 +787,16 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
     <h2 id="modalTitle">New Tournament</h2>
     <p class="sub">Choose the field size and how matches play out.</p>
 
+    <div class="field" id="presetField">
+      <label>Tournament preset</label>
+      <select id="presetSelect" style="width:100%;"></select>
+      <div class="hint" id="presetHint">Set field size, format and draw yourself.</div>
+    </div>
+
     <div class="field" id="sizeField">
       <label>Field size</label>
       <div class="opt-row" id="sizeRow">
+        <div class="opt" data-size="8">8</div>
         <div class="opt" data-size="16">16</div>
         <div class="opt" data-size="24" data-groups-only="true" style="display:none;">24</div>
         <div class="opt" data-size="32">32</div>
@@ -814,6 +824,16 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
         <div class="opt" data-seeding="seeded">Seeded Bracket</div>
       </div>
       <div class="hint">Seeded keeps top-rated teams apart until the later rounds — in Groups format, it pot-seeds the draw instead so groups aren't lopsided.</div>
+    </div>
+
+    <div class="field" id="pairingField">
+      <label>Knockout pairings (Groups format)</label>
+      <div class="opt-row" id="pairingRow">
+        <div class="opt active" data-pairing="random">Random draw</div>
+        <div class="opt" data-pairing="cross">Cross-group (1A v 2B)</div>
+        <div class="opt" data-pairing="seeded">Seeded by record</div>
+      </div>
+      <div class="hint">Random shuffles qualifiers, avoiding same-group first-round ties. Cross-group pairs group winners with the neighbouring group's runner-up. Seeded ranks every qualifier and matches strongest v weakest.</div>
     </div>
 
     <div class="field" id="legsField">
@@ -1209,7 +1229,15 @@ PLAYER: 2 | DF | Triton | 88
     <h2>Career Mode</h2>
     <p class="sub">Every tournament you've completed this session.</p>
     <div id="careerSummary" class="highlights-recap" style="margin-bottom:16px;"></div>
-    <div class="leaderboard-scroll">
+    <div class="rp-tabs" id="careerTabs">
+      <button class="rp-tab active" data-ctab="log">📜 Tournaments</button>
+      <button class="rp-tab" data-ctab="players">👤 Player careers</button>
+      <button class="rp-tab" data-ctab="teams">🛡 All-time table</button>
+      <button class="rp-tab" data-ctab="rivals">⚔ Rivalries</button>
+      <button class="rp-tab" data-ctab="hof">🏛 Hall of Fame</button>
+    </div>
+    <div id="careerExtra" style="display:none;"></div>
+    <div class="leaderboard-scroll" id="careerLogWrap">
       <table class="leaderboard-table" id="careerTable">
         <thead>
           <tr>
@@ -1764,6 +1792,9 @@ function penaltyMissedCommentary(scorer, team, keeper){ return pick(PENALTY_MISS
 let state = null;
 let customTeams = [];
 let careerLog = [];
+/* Session-long legacy: per-player careers, all-time team table and head-to-head records,
+   accumulated each time a tournament is completed. Keys are names (ids reset per tournament). */
+let legacy = {players:{}, teams:{}, h2h:{}, tournaments:0};
 let matchUidCounter = 0;
 function makeMatch(a,b){
   return {a, b, played:false, revealed:false, uid:matchUidCounter++};
@@ -2476,7 +2507,7 @@ function renderAchievementsGrid(){
 }
 
 /* ===================== TOURNAMENT FLOW ===================== */
-function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format, goldenGoal, chaosSensitivity, legsPerTie){
+function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format, goldenGoal, chaosSensitivity, legsPerTie, pairing, presetId){
   const teams = buildField(size, seeded);
   const isGroups = format==='groups';
   const groupCount = isGroups ? size/4 : 0;
@@ -2485,6 +2516,7 @@ function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, see
     size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format,
     goldenGoal: !!goldenGoal, chaosSensitivity: chaosSensitivity || 'normal',
     legsPerTie: legsPerTie || 1,
+    pairing: pairing || 'random', presetId: presetId || 'custom',
     allTeams: teams,
     phase: isGroups ? 'groups' : 'knockout',
     groups: isGroups ? assignGroups(teams, seeded) : [],
@@ -2976,6 +3008,76 @@ function advanceRound(){
   render();
 }
 
+/* ===================== PRESETS & KNOCKOUT PAIRING ===================== */
+const PRESETS = [
+  {id:'custom', name:'Custom', group:'Custom', desc:'Set field size, format and draw yourself.'},
+  {id:'wc32', name:'World Cup 32', group:'Global', size:32, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'8 groups of 4, top 2 through. Round of 16 is cross-paired: 1A v 2B, 1C v 2D … and 1B v 2A on the other side.'},
+  {id:'wc48', name:'World Cup 48', group:'Global', size:48, format:'groups', pairing:'seeded', seeding:'seeded', legs:1, extraTime:'on', desc:'12 groups of 4. Top 2 plus the 8 best thirds reach a Round of 32, seeded by group record.'},
+  {id:'olympic16', name:'Olympic Tournament 16', group:'Global', size:16, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'4 groups of 4, top 2 through to cross-paired quarter-finals.'},
+  {id:'club32', name:'Club World Cup 32', group:'Global', size:32, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'8 groups of 4, cross-paired Round of 16, single matches.'},
+  {id:'euro24', name:'Euros 24', group:'Europe', size:24, format:'groups', pairing:'seeded', seeding:'seeded', legs:1, extraTime:'on', desc:'6 groups of 4. Top 2 plus the 4 best thirds make a Round of 16, seeded by group record.'},
+  {id:'nl16', name:'Nations League Finals 16', group:'Europe', size:16, format:'groups', pairing:'cross', seeding:'seeded', legs:2, extraTime:'on', desc:'4 groups of 4, then two-legged knockout ties decided on aggregate.'},
+  {id:'ucl16', name:'Champions Cup Knockout 16', group:'Europe', size:16, format:'knockout', pairing:'random', seeding:'seeded', legs:2, extraTime:'on', desc:'Seeded 16-team knockout, every tie over two legs.'},
+  {id:'asian24', name:'Asian Cup 24', group:'Asia', size:24, format:'groups', pairing:'seeded', seeding:'seeded', legs:1, extraTime:'on', desc:'6 groups of 4. Top 2 plus the 4 best thirds reach the Round of 16.'},
+  {id:'aff8', name:'AFF Championship 8', group:'Asia', size:8, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'2 groups of 4. Top 2 go through to cross-paired semi-finals (1A v 2B, 1B v 2A).'},
+  {id:'aff16', name:'AFF Cup Expanded 16', group:'Asia', size:16, format:'groups', pairing:'cross', seeding:'seeded', legs:2, extraTime:'on', desc:'4 groups of 4, cross-paired quarter-finals, two-legged knockout ties.'},
+  {id:'afcon24', name:'Africa Cup of Nations 24', group:'Africa', size:24, format:'groups', pairing:'seeded', seeding:'seeded', legs:1, extraTime:'on', desc:'6 groups of 4. Top 2 plus the 4 best thirds reach the Round of 16.'},
+  {id:'copa16', name:'Copa América 16', group:'Americas', size:16, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'4 groups of 4, cross-paired quarter-finals.'},
+  {id:'gold16', name:'Gold Cup 16', group:'Americas', size:16, format:'groups', pairing:'cross', seeding:'random', legs:1, extraTime:'on', desc:'4 groups of 4 from a random draw, cross-paired quarter-finals.'},
+  {id:'cont16', name:'Continental Cup 16', group:'Americas', size:16, format:'groups', pairing:'cross', seeding:'seeded', legs:1, extraTime:'on', desc:'Generic continental cup: 4 groups of 4, cross-paired quarter-finals.'},
+  {id:'ko64', name:'Seeded Knockout 64', group:'Knockout cups', size:64, format:'knockout', pairing:'random', seeding:'seeded', legs:2, extraTime:'on', desc:'Straight 64-team knockout with a seeded bracket and two-legged ties.'},
+  {id:'cup128', name:'Domestic Cup 128', group:'Knockout cups', size:128, format:'knockout', pairing:'random', seeding:'random', legs:1, extraTime:'off', desc:'Pure random-draw cup, single matches, no extra time. Anything can happen.'},
+  {id:'lcup32', name:'League Cup 32', group:'Knockout cups', size:32, format:'knockout', pairing:'random', seeding:'seeded', legs:2, extraTime:'off', desc:'32-team seeded cup, two-legged ties.'},
+];
+function getPreset(id){ return PRESETS.find(p=>p.id===id) || PRESETS[0]; }
+
+/* Orders knockout qualifiers into adjacent-pair bracket slots (slot 2k v slot 2k+1).
+   'cross': winner of group 2k v runner-up of group 2k+1, in the first half; the mirrored
+   pairs (1B v 2A …) in the second half, so a group's winner and runner-up can only meet in the final.
+   Only possible when the number of groups is a power of two >=2 and no thirds are needed;
+   otherwise it falls back to 'seeded'.
+   'seeded': rank qualifiers (position, points, GD, GF, rating), lay them out in standard bracket
+   order (1 v N, 2 v N-1 …) and then fix any first-round pair from the same group. */
+function orderQualifiers(qualifiers, groupCount, mode){
+  const n = qualifiers.length;
+  if(mode==='cross' && isPow2(groupCount) && groupCount>=2 && n===groupCount*2){
+    const win = {}, run = {};
+    qualifiers.forEach(q=>{ (q.pos===0?win:run)[q.groupIdx] = q.team; });
+    const first = [], second = [];
+    for(let k=0;k<groupCount;k+=2){
+      first.push(win[k], run[k+1]);
+      second.push(win[k+1], run[k]);
+    }
+    return first.concat(second);
+  }
+  const rank = qualifiers.slice().sort((a,b)=>
+    a.pos-b.pos ||
+    b.row.Pts-a.row.Pts ||
+    (b.row.GF-b.row.GA)-(a.row.GF-a.row.GA) ||
+    b.row.GF-a.row.GF ||
+    b.team.rating-a.team.rating);
+  const order = seedOrder(n);
+  const slots = order.map(seedNum=> rank[seedNum-1]);
+  const pairs = n/2;
+  for(let p=0;p<pairs;p++){
+    if(slots[2*p].groupIdx!==slots[2*p+1].groupIdx) continue;
+    // swap the lower-seeded side with the lower side of the nearest pair that works for both
+    for(let d=1; d<pairs; d++){
+      let fixed = false;
+      for(const q of [p+d, p-d]){
+        if(q<0 || q>=pairs) continue;
+        const a = slots[2*p], b = slots[2*p+1], c = slots[2*q], e = slots[2*q+1];
+        // swap b<->e
+        if(a.groupIdx!==e.groupIdx && c.groupIdx!==b.groupIdx){
+          slots[2*p+1] = e; slots[2*q+1] = b; fixed = true; break;
+        }
+      }
+      if(fixed) break;
+    }
+  }
+  return slots.map(q=>q.team);
+}
+
 function advanceToKnockout(){
   const groupCount = state.groups.length;
   const thirdsNeeded = computeThirdsNeeded(groupCount);
@@ -2983,29 +3085,34 @@ function advanceToKnockout(){
   const qualifiers = [];
   state.groups.forEach((g,gi)=>{
     const standings = computeGroupStandings(g);
-    qualifiers.push({team:standings[0].team, groupIdx:gi});
-    qualifiers.push({team:standings[1].team, groupIdx:gi});
+    qualifiers.push({team:standings[0].team, groupIdx:gi, pos:0, row:standings[0]});
+    qualifiers.push({team:standings[1].team, groupIdx:gi, pos:1, row:standings[1]});
   });
 
   let bestThirds = [];
   if(thirdsNeeded>0){
     bestThirds = rankThirdPlacedTeams(state.groups).slice(0, thirdsNeeded);
-    bestThirds.forEach(row=> qualifiers.push({team:row.team, groupIdx:row.groupIdx}));
+    bestThirds.forEach(row=> qualifiers.push({team:row.team, groupIdx:row.groupIdx, pos:2, row}));
     const names = bestThirds.map(r=>r.team.name).join(', ');
     state.pulses.unshift({text:`🎟 Best third-place finishers through: ${names}`, hot:true});
     state._bestThirdIds = new Set(bestThirds.map(r=>r.team.id));
   }
 
-  const pool = shuffle(qualifiers);
-  const used = new Array(pool.length).fill(false);
-  const orderedTeams = [];
-  for(let i=0;i<pool.length;i++){
-    if(used[i]) continue;
-    used[i] = true;
-    let j = pool.findIndex((q,idx)=>!used[idx] && q.groupIdx!==pool[i].groupIdx);
-    if(j===-1) j = pool.findIndex((q,idx)=>!used[idx]);
-    used[j] = true;
-    orderedTeams.push(pool[i].team, pool[j].team);
+  let orderedTeams;
+  if(state.pairing==='cross' || state.pairing==='seeded'){
+    orderedTeams = orderQualifiers(qualifiers, groupCount, state.pairing);
+  } else {
+    const pool = shuffle(qualifiers);
+    const used = new Array(pool.length).fill(false);
+    orderedTeams = [];
+    for(let i=0;i<pool.length;i++){
+      if(used[i]) continue;
+      used[i] = true;
+      let j = pool.findIndex((q,idx)=>!used[idx] && q.groupIdx!==pool[i].groupIdx);
+      if(j===-1) j = pool.findIndex((q,idx)=>!used[idx]);
+      used[j] = true;
+      orderedTeams.push(pool[i].team, pool[j].team);
+    }
   }
 
   state.phase = 'knockout';
@@ -3056,6 +3163,7 @@ function crownChampion(team){
   state.champion = team;
   state._championFirstMatchUnderdog = !!(state._underdogInFirstMatch && state._underdogInFirstMatch.has(team.id));
   recordCareerEntry(team);
+  try{ recordLegacy(team); }catch(e){ console.error('legacy', e); }
   const newlyUnlocked = checkTournamentEndAchievements(team);
   render();
   showChampion(team, newlyUnlocked);
@@ -4190,11 +4298,128 @@ document.getElementById('bracketBtn').addEventListener('click', ()=>{
 });
 document.getElementById('bracketCloseBtn').addEventListener('click', ()=>bracketOverlay.classList.add('hidden'));
 
+
+/* ===================== LEGACY: PLAYER CAREERS, ALL-TIME TABLE, RIVALRIES ===================== */
+const HOF_MIN = 45;   // roughly: a title plus a couple of major awards across at least two tournaments
+function hofPoints(p){
+  return p.titles*10 + p.ball*8 + p.boot*8 + p.glove*6 + p.young*3 + p.g*0.5 + p.a*0.3 + p.motm*1 + p.t*0.5;
+}
+function recordLegacy(champion){
+  if(state._legacyRecorded) return;
+  state._legacyRecorded = true;
+  legacy.tournaments++;
+  const {rows} = aggregatePlayerStats();
+  const aw = computeAwards(rows) || {};
+  const topScorer = rows.slice().sort((x,y)=>y.g-x.g||y.a-x.a||y.avgRt-x.avgRt)[0];
+  const rowKey = r => (r.team?r.team.name:'?')+'|'+((r.p&&r.p.name)||r.num);
+  const winners = {
+    ball: aw.ball && rowKey(aw.ball), glove: aw.glove && rowKey(aw.glove),
+    young: aw.young && rowKey(aw.young), boot: topScorer && topScorer.g>0 && rowKey(topScorer)
+  };
+  rows.forEach(r=>{
+    if(!r.team || !(r.mp>0)) return;
+    const key = rowKey(r);
+    const L = legacy.players[key] || (legacy.players[key] = {
+      name:(r.p&&r.p.name)||('Player #'+r.num), team:r.team.name, flag:flagFor(r.team), pos:naturalGroup(r.pos),
+      t:0, mp:0, min:0, g:0, a:0, motm:0, rtW:0, titles:0, ball:0, boot:0, glove:0, young:0, bestG:0
+    });
+    L.t++; L.mp+=r.mp; L.min+=r.min; L.g+=r.g; L.a+=r.a; L.motm+=r.motm; L.rtW+=r.avgRt*r.min;
+    L.bestG = Math.max(L.bestG, r.g);
+    L.pos = naturalGroup(r.pos); L.flag = flagFor(r.team);
+    if(r.team.id===champion.id) L.titles++;
+    if(winners.ball===key) L.ball++;
+    if(winners.boot===key) L.boot++;
+    if(winners.glove===key) L.glove++;
+    if(winners.young===key) L.young++;
+  });
+  // teams + head-to-head from every played match
+  const entered = new Set();
+  state.matchHistory.forEach(h=>{
+    const m = h.m;
+    if(!m || !m.played) return;
+    [m.a, m.b].forEach(tm=>{
+      if(!entered.has(tm.id)){
+        entered.add(tm.id);
+        const T = legacy.teams[tm.name] || (legacy.teams[tm.name] = {flag:flagFor(tm), t:0, titles:0, finals:0, mp:0, w:0, d:0, l:0, gf:0, ga:0});
+        T.t++; T.flag = flagFor(tm);
+      }
+    });
+    const A = legacy.teams[m.a.name], B = legacy.teams[m.b.name];
+    A.mp++; B.mp++; A.gf+=m.scoreA; A.ga+=m.scoreB; B.gf+=m.scoreB; B.ga+=m.scoreA;
+    let res = m.scoreA>m.scoreB ? 'a' : m.scoreB>m.scoreA ? 'b' : 'd';
+    if(res==='a'){ A.w++; B.l++; } else if(res==='b'){ B.w++; A.l++; } else { A.d++; B.d++; }
+    // rivalry key is name-sorted so A v B and B v A share one record
+    const flip = m.a.name > m.b.name;
+    const x = flip?m.b:m.a, y = flip?m.a:m.b;
+    const key = x.name+'||'+y.name;
+    const H = legacy.h2h[key] || (legacy.h2h[key] = {x:x.name, y:y.name, xf:flagFor(x), yf:flagFor(y), xw:0, yw:0, d:0, gx:0, gy:0, m:0, pens:0});
+    H.m++; H.gx += flip?m.scoreB:m.scoreA; H.gy += flip?m.scoreA:m.scoreB;
+    let who = res;
+    if(res==='d' && m.winner){ who = (m.winner.id===m.a.id)?'a':'b'; H.pens++; }
+    if(who==='d') H.d++; else { const xWon = (who==='a') !== flip; if(xWon) H.xw++; else H.yw++; }
+  });
+  const C = legacy.teams[champion.name]; if(C){ C.titles++; C.finals++; }
+  const fin = state.round && state.round[0];
+  if(fin){
+    const ru = fin.a.id===champion.id ? fin.b : fin.a;
+    if(ru && legacy.teams[ru.name]) legacy.teams[ru.name].finals++;
+  }
+  const inducted = Object.values(legacy.players).filter(p=>p.t>=2 && hofPoints(p)>=HOF_MIN && !p.hof);
+  inducted.forEach(p=>{ p.hof = legacy.tournaments; });
+  if(inducted.length) state.pulses.unshift({text:`🏛 Hall of Fame inductee${inducted.length>1?'s':''}: ${inducted.map(p=>p.name).join(', ')}`, hot:true});
+}
+
+function careerTabHtml(tab){
+  if(tab==='players'){
+    const list = Object.values(legacy.players).map(p=>({...p, pts:hofPoints(p), rt:p.min?p.rtW/p.min:0}))
+      .sort((x,y)=>y.pts-x.pts).slice(0,40);
+    if(!list.length) return '<div class="stats-empty">Complete a tournament to start player careers.</div>';
+    return `<div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Tourn.</th><th>MP</th><th>G</th><th>A</th><th>🏆</th><th>🥇</th><th>⚽</th><th>🧤</th><th>Avg</th><th>Pts</th></tr></thead><tbody>`+
+      list.map(p=>`<tr><td class="lb-name">${p.hof?'🏛 ':''}${escHtml(p.name)}</td><td>${p.flag} ${escHtml(p.team)}</td><td>${p.pos}</td><td class="lb-num">${p.t}</td><td class="lb-num">${p.mp}</td><td class="lb-num">${p.g}</td><td class="lb-num">${p.a}</td><td class="lb-num">${p.titles}</td><td class="lb-num">${p.boot}</td><td class="lb-num">${p.ball}</td><td class="lb-num">${p.glove}</td><td class="lb-num">${p.rt.toFixed(2)}</td><td class="lb-num">${p.pts.toFixed(1)}</td></tr>`).join('')+
+      `</tbody></table></div><p class="stat-sub" style="margin-top:8px;">🥇 Golden Boots · ⚽ Golden Balls · 🧤 Golden Gloves. Pts drive Hall of Fame entry (${HOF_MIN} needed, over at least two tournaments).</p>`;
+  }
+  if(tab==='teams'){
+    const list = Object.entries(legacy.teams).map(([name,T])=>({name, ...T}))
+      .sort((x,y)=>y.titles-x.titles || y.finals-x.finals || (y.w*3+y.d)-(x.w*3+x.d));
+    if(!list.length) return '<div class="stats-empty">No all-time table yet.</div>';
+    return `<div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>#</th><th>Team</th><th>Tourn.</th><th>🏆</th><th>Finals</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th></tr></thead><tbody>`+
+      list.slice(0,40).map((T,i)=>`<tr><td class="lb-num">${i+1}</td><td class="lb-name">${T.flag} ${escHtml(T.name)}</td><td class="lb-num">${T.t}</td><td class="lb-num">${T.titles}</td><td class="lb-num">${T.finals}</td><td class="lb-num">${T.mp}</td><td class="lb-num">${T.w}</td><td class="lb-num">${T.d}</td><td class="lb-num">${T.l}</td><td class="lb-num">${T.gf}</td><td class="lb-num">${T.ga}</td></tr>`).join('')+
+      `</tbody></table></div>`;
+  }
+  if(tab==='rivals'){
+    const list = Object.values(legacy.h2h).filter(h=>h.m>=2).sort((x,y)=>y.m-x.m || (y.gx+y.gy)-(x.gx+x.gy)).slice(0,25);
+    if(!list.length) return '<div class="stats-empty">Rivalries appear once two teams have met at least twice.</div>';
+    return `<div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>Fixture</th><th>Met</th><th>Record</th><th>Goals</th><th>Shootouts</th></tr></thead><tbody>`+
+      list.map(h=>`<tr><td class="lb-name">${h.xf} ${escHtml(h.x)} v ${h.yf} ${escHtml(h.y)}</td><td class="lb-num">${h.m}</td><td class="lb-num">${h.xw}-${h.d}-${h.yw}</td><td class="lb-num">${h.gx}-${h.gy}</td><td class="lb-num">${h.pens}</td></tr>`).join('')+
+      `</tbody></table></div><p class="stat-sub" style="margin-top:8px;">Record reads wins for the first team – draws – wins for the second. Shootout wins count as wins.</p>`;
+  }
+  if(tab==='hof'){
+    const all = Object.values(legacy.players).map(p=>({...p, pts:hofPoints(p)})).sort((x,y)=>y.pts-x.pts);
+    const hof = all.filter(p=>p.hof);
+    const next = all.filter(p=>!p.hof).slice(0,5);
+    if(!hof.length && !next.length) return '<div class="stats-empty">The Hall of Fame is empty. Win titles and awards to get players in.</div>';
+    const card = p=>`<div class="stat-card"><div class="stat-label">${p.flag} ${escHtml(p.team)} · ${p.pos}</div><div class="stat-value" style="font-size:16px;">${p.hof?'🏛 ':''}${escHtml(p.name)}</div><div class="stat-sub">${p.t} tournament${p.t===1?'':'s'} · ${p.g}G ${p.a}A · ${p.titles} title${p.titles===1?'':'s'}${p.boot?` · ${p.boot} Boot`:''}${p.ball?` · ${p.ball} Ball`:''}${p.glove?` · ${p.glove} Glove`:''}<br>${p.pts.toFixed(1)} pts${p.hof?` · inducted after tournament ${p.hof}`:` · ${(HOF_MIN-p.pts).toFixed(1)} to go`}</div></div>`;
+    return `<h3 class="stats-h3">Inducted</h3><div class="stats-grid">${hof.length?hof.map(card).join(''):'<div class="stats-empty">Nobody yet.</div>'}</div>`+
+      (next.length?`<h3 class="stats-h3">Closest to induction</h3><div class="stats-grid">${next.map(card).join('')}</div>`:'');
+  }
+  return '';
+}
+let careerTab = 'log';
+function renderCareerTabs(){
+  document.querySelectorAll('#careerTabs .rp-tab').forEach(b=> b.classList.toggle('active', b.dataset.ctab===careerTab));
+  const isLog = careerTab==='log';
+  document.getElementById('careerLogWrap').style.display = isLog ? '' : 'none';
+  const ex = document.getElementById('careerExtra');
+  ex.style.display = isLog ? 'none' : '';
+  if(!isLog) ex.innerHTML = careerTabHtml(careerTab);
+}
+
 /* ===================== CAREER MODE ===================== */
 const careerOverlay = document.getElementById('careerOverlay');
 const careerBody = document.getElementById('careerBody');
 
 function renderCareerMode(){
+  renderCareerTabs();
   const summaryEl = document.getElementById('careerSummary');
   if(!careerLog.length){
     summaryEl.innerHTML = `<p>No tournaments completed yet this session — win one to start the record.</p>`;
@@ -4235,6 +4460,7 @@ function renderCareerMode(){
   }).join('');
 }
 
+document.querySelectorAll('#careerTabs .rp-tab').forEach(b=> b.addEventListener('click', ()=>{ careerTab = b.dataset.ctab; renderCareerTabs(); }));
 document.getElementById('careerBtn').addEventListener('click', ()=>{
   renderCareerMode();
   careerOverlay.classList.remove('hidden');
@@ -4244,6 +4470,7 @@ document.getElementById('careerClearBtn').addEventListener('click', ()=>{
   if(!careerLog.length) return;
   if(confirm('Clear the entire Career Mode history? This can\'t be undone.')){
     careerLog = [];
+    legacy = {players:{}, teams:{}, h2h:{}, tournaments:0};
     renderCareerMode();
   }
 });
@@ -4687,6 +4914,51 @@ function groupAverages(entries, minute){
   const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
   return {GK:avg(buckets.GK), DF:avg(buckets.DF), MF:avg(buckets.MF), AT:avg(buckets.AT)};
 }
+
+/* ---------- playing styles & set-piece ratings ---------- */
+/* A style sits on top of the formation. Like formations, its multipliers are measured against
+   the team's default style, so an average side is unchanged and only *switching* matters. */
+const STYLE_DEFS = {
+  balanced:   {label:'Balanced',        att:1.00, leak:1.00, mid:1.00, foul:1.00, tag:'No particular bias'},
+  press:      {label:'High press',      att:1.04, leak:0.96, mid:1.05, foul:1.30, tag:'Wins it high, tires from ~55\''},
+  counter:    {label:'Counter-attack',  att:0.97, leak:0.96, mid:0.94, foul:1.00, tag:'Sits deep, hits on the break'},
+  possession: {label:'Possession',      att:1.00, leak:0.96, mid:1.10, foul:0.80, tag:'Controls the ball and tempo'},
+  direct:     {label:'Direct / set pieces', att:1.02, leak:1.03, mid:0.93, foul:1.10, tag:'Long balls, wins corners and free kicks'}
+};
+/* how well a style suits the shape it is played in (small additive bonus/penalty to attack) */
+function styleSynergy(style, formation){
+  const F = FORMATION_DEFS[formation] || FORMATION_DEFS['4-4-2'];
+  if(style==='press')      return (F.at>=3 ? 0.025 : 0) - (F.df>=5 ? 0.03 : 0);
+  if(style==='counter')    return (F.df>=5 ? 0.03 : 0) - (F.at>=3 ? 0.02 : 0);
+  if(style==='possession') return (F.mf>=5 ? 0.03 : 0) - (F.mf<=3 ? 0.02 : 0);
+  if(style==='direct')     return F.at>=2 && F.df<=4 ? 0.01 : 0;
+  return 0;
+}
+function defaultStyleFor(formation){
+  const r = Math.random();
+  if(formation==='5-4-1' || formation==='5-3-2') return r<0.7 ? 'counter' : 'balanced';
+  if(formation==='4-3-3' || formation==='3-4-3') return r<0.6 ? 'press' : (r<0.8 ? 'direct' : 'balanced');
+  if(formation==='4-2-3-1' || formation==='3-5-2' || formation==='4-5-1') return r<0.6 ? 'possession' : 'balanced';
+  return r<0.5 ? 'balanced' : (r<0.7 ? 'direct' : (r<0.85 ? 'press' : 'possession'));
+}
+function hashStr(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+/* Deterministic per-player set-piece ability, derived from rating, position and name so it
+   never needs saving: corner delivery, free-kick striking, penalty taking and aerial threat. */
+function spRatings(p){
+  const h = hashStr((p.name||'')+'#'+p.number);
+  const g = naturalGroup(p.position);
+  const base = g==='GK' ? p.rating-35 : p.rating;
+  const j = k => ((h>>>k)%17)-8;
+  return {
+    corner: Math.round(base + (g==='MF'?3:g==='AT'?1:g==='DF'?-2:0) + j(0)),
+    fk:     Math.round(base + (g==='MF'?3:g==='AT'?1:g==='DF'?-2:0) + j(5)),
+    pen:    Math.round(base + (g==='AT'?3:g==='MF'?1:0) + j(10)),
+    air:    Math.round(base + (g==='DF'?4:g==='AT'?3:0) + j(15))
+  };
+}
+const SP_KINDS = {corner:'Corners', fk:'Free kicks', pen:'Penalties'};
+let SP_SCALE = 1;   // watched matches trim open-play goal rates so set pieces don't inflate totals
+
 /* Turns a side's current lineup into three multipliers (+ the keeper's live rating).
    Everything is relative to the team's default shape and starting XI, and the quality
    deltas are clamped so a god-tier player leaving can't flip a multiplier negative. */
@@ -4698,11 +4970,16 @@ function computeMods(side, minute){
   const dAT = d(g.AT, side.baseQ.AT), dMF = d(g.MF, side.baseQ.MF), dDF = d(g.DF, side.baseQ.DF);
   const reds = side.entries.filter(e=>e.red).length;
   const gkE = side.entries.find(e=>isActive(e) && e.slot==='GK');
+  const S = STYLE_DEFS[side.style] || STYLE_DEFS.balanced;
+  const S0 = STYLE_DEFS[side.baseStyle] || STYLE_DEFS.balanced;
+  const syn = (1+styleSynergy(side.style, side.formation)) / (1+styleSynergy(side.baseStyle, side.baseFormation));
+  const tire = side.style==='press' ? clampN((minute-55)/40, 0, 1) : 0;   // pressing burns legs late on
   return {
-    att:  clampN((F.att/F0.att) * (1 + dAT*0.010 + dMF*0.004) * Math.pow(0.86, reds), 0.35, 1.9),
-    leak: clampN((F.leak/F0.leak) * (1 - dDF*0.008 - dMF*0.002) * Math.pow(1.12, reds), 0.5, 2.0),
-    mid:  clampN((F.mid/F0.mid) * (1 + dMF*0.010), 0.6, 1.5),
-    gk:   gkE ? effRating(gkE, minute) : 30
+    att:  clampN((F.att/F0.att) * (S.att/S0.att) * syn * (1 - 0.07*tire) * (1 + dAT*0.010 + dMF*0.004) * Math.pow(0.86, reds), 0.35, 1.9),
+    leak: clampN((F.leak/F0.leak) * (S.leak/S0.leak) * (1 + 0.08*tire) * (1 - dDF*0.008 - dMF*0.002) * Math.pow(1.12, reds), 0.5, 2.0),
+    mid:  clampN((F.mid/F0.mid) * (S.mid/S0.mid) * (1 + dMF*0.010), 0.6, 1.5),
+    gk:   gkE ? effRating(gkE, minute) : 30,
+    style: side.style
   };
 }
 /* Live keeper override: keeperFactor() consults this so a mid-match keeper change (or an
@@ -4742,14 +5019,17 @@ class LiveMatch{
     this.sb = this.makeSide(m.b);
     this.team = {a:this.blankTeamStats(), b:this.blankTeamStats()};
   }
-  blankTeamStats(){ return {fouls:0, corners:0, offsides:0, possSum:0, possN:0}; }
+  blankTeamStats(){ return {fouls:0, corners:0, offsides:0, possSum:0, possN:0, fk:0, pen:0, spg:0}; }
   makeSide(team){
     const {xi, bench} = buildStartingXI(team);
     const baseFormation = defaultFormationFor(team);
     const formation = (team.formation && FORMATION_DEFS[team.formation]) ? team.formation : baseFormation;
+    const baseStyle = (team.style && STYLE_DEFS[team.style]) ? team.style : defaultStyleFor(formation);
     return {
       team, baseFormation, formation, bench,
       entries: assignSlots(xi, formation),
+      baseStyle, style: baseStyle, userStyle: false,
+      sp: Object.assign({corner:null, fk:null, pen:null}, team.sp || {}),
       subs: 0, userFormation: false,
       plan: makeAiPlan(),
       fPlan: {chase: randInt(58,72), protect: randInt(78,86), chaseDone:false, protectDone:false},
@@ -4783,6 +5063,29 @@ class LiveMatch{
       this.h.log(`📐 ${side.team.name} switch to a ${key}${byUser?'':' shape'}.`, {ty:'form', tm:side.team.id});
     }
     return true;
+  }
+  setStyle(side, key, byUser){
+    if(!STYLE_DEFS[key] || key===side.style) return false;
+    side.style = key;
+    if(byUser) side.userStyle = true;
+    if(this.pre){
+      side.team.style = key;   // pre-match choice sticks to the team
+    } else {
+      this.h.log(`🧠 ${side.team.name} switch to a ${STYLE_DEFS[key].label.toLowerCase()} approach.`, {ty:'form', tm:side.team.id});
+    }
+    return true;
+  }
+  /* Preferred set-piece taker if he is still on the pitch, otherwise the best available. */
+  spTaker(side, kind){
+    const act = this.active(side).filter(e=>e.slot!=='GK');
+    const want = side.sp[kind];
+    const chosen = want!=null ? act.find(e=>e.p.number===want) : null;
+    if(chosen) return chosen;
+    return act.slice().sort((a,b)=>spRatings(b.p)[kind]-spRatings(a.p)[kind])[0] || null;
+  }
+  setSpTaker(side, kind, num){
+    side.sp[kind] = num===''||num==null ? null : +num;
+    if(this.pre){ side.team.sp = Object.assign({}, side.team.sp||{}, side.sp); }
   }
   /* Bring a bench player on for `entry`. Before kick-off it's a free swap; afterwards it
      costs one of the team's substitutions (5, or 6 once extra time starts). */
@@ -4875,9 +5178,10 @@ class LiveMatch{
   tickDiscipline(min){
     [this.sa, this.sb].forEach(side=>{
       const k = this.key(side);
-      if(Math.random()<0.14) this.team[k].fouls++;
+      const ff = (STYLE_DEFS[side.style]||STYLE_DEFS.balanced).foul;
+      if(Math.random()<0.14*ff) this.team[k].fouls++;
       if(Math.random()<0.03) this.team[k].offsides++;
-      if(Math.random()<0.0175){
+      if(Math.random()<0.0175*ff){
         const e = this.pickCardTarget(side);
         if(e) this.yellow(side, e);
       }
@@ -4905,11 +5209,13 @@ class LiveMatch{
           side.fPlan.chaseDone = true;
           const to = diff<=-2 ? '3-4-3' : '4-3-3';
           if(side.formation!==to){ this.setFormation(side, to, false); this.h.changed(); }
+          if(!side.userStyle && side.style!=='press'){ this.setStyle(side, 'press', false); this.h.changed(); }
         }
         if(!side.fPlan.protectDone && min>=side.fPlan.protect && diff>0){
           side.fPlan.protectDone = true;
           const to = (diff>=2 && min>=84) ? '5-4-1' : '5-3-2';
           if(side.formation!==to){ this.setFormation(side, to, false); this.h.changed(); }
+          if(!side.userStyle && side.style!=='counter'){ this.setStyle(side, 'counter', false); this.h.changed(); }
         }
       }
       // substitutions
@@ -4985,6 +5291,7 @@ function rateReport(report, m){
     r -= l.yc>=1 && !l.rc ? 0.3 : 0;
     r -= l.rc ? 1.8 : 0;
     r += l.pk*0.2 - l.pkm*0.5 + l.pks*0.7;
+    r += (l.ips||0)*0.7 - (l.ipm||0)*0.5;
     if(won===true) r += 0.4; else if(won===false) r -= 0.3;
     const scale = Math.min(1, (l.min+25)/90);
     r = 6 + (r-6)*scale;
@@ -5018,6 +5325,7 @@ function buildReport(L, res, finalMin, shotStats, penLog){
         age:e.p.age||null, on:e.on, off:e.off, min,
         g:e.g, a:e.a, sh:e.sh, sot:e.sot, sv:e.sv, yc:e.yc, rc:e.red?1:0,
         pk:e.pk, pkm:e.pkm, pks:e.pks,
+        spg:e.spg||0, ipg:e.ipg||0, ipm:e.ipm||0, ips:e.ips||0,
         cs: (ga===0 && (grp==='GK'||grp==='DF'||grp==='MF')) ? 1 : 0
       });
     });
@@ -5030,6 +5338,7 @@ function buildReport(L, res, finalMin, shotStats, penLog){
       poss: t.possN ? Math.round(t.possSum/t.possN) : 50,
       sh: shots.shots, sot: shots.sot,
       fouls: t.fouls, corners: t.corners, offsides: t.offsides,
+      fk: t.fk||0, pens: t.pen||0, spg: t.spg||0, style: side.style,
       yc: ents.reduce((s,e)=>s+e.yc,0),
       rc: ents.filter(e=>e.red).length,
       subs: side.subs
@@ -5037,6 +5346,7 @@ function buildReport(L, res, finalMin, shotStats, penLog){
   };
   const report = {
     v:1, fa:L.sa.formation, fb:L.sb.formation, fa0:L.sa.baseFormation, fb0:L.sb.baseFormation,
+    sta:L.sa.style, stb:L.sb.style,
     endMin: finalMin,
     ts:{a:tsFor(L.sa, shotStats.a), b:tsFor(L.sb, shotStats.b)},
     pl:lines, motm:null
@@ -5227,7 +5537,7 @@ function halfLambda(team, opp, tacticMultOverride){
   const baseTacticMult = (TACTICS[state.tactic]||TACTICS.balanced).mult;
   const overrideMult = tacticMultOverride!=null ? tacticMultOverride : 1;
   const lambda = Math.max(0.05, (base+diff)*styleAdj*baseTacticMult*overrideMult);
-  return lambda * keeperFactor(opp);
+  return lambda * keeperFactor(opp) * SP_SCALE;
 }
 
 /* regularEnd marks where "normal time" for this half ends (45 or 90) — anything between
@@ -5302,7 +5612,7 @@ async function runShootoutAnimation(container, pA, teamA, teamB, onKick){
 
 async function watchMatch(m, decisive=true, roundLabelOverride=null){
   try{ await watchMatchInner(m, decisive, roundLabelOverride); }
-  finally{ LIVE_GK = {}; }
+  finally{ LIVE_GK = {}; SP_SCALE = 1; }
 }
 async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   if(m.played) return;
@@ -5546,6 +5856,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   });
   let modsA = L.mods(L.sa), modsB = L.mods(L.sb);
   LIVE_GK = {}; LIVE_GK[m.a.id] = modsA.gk; LIVE_GK[m.b.id] = modsB.gk;
+  SP_SCALE = 0.85;   // corners, free kicks and penalties supply the rest
   let etFactor = 1;
   function refreshMods(){
     modsA = L.mods(L.sa); modsB = L.mods(L.sb);
@@ -5555,7 +5866,13 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
      strength × how leaky the OTHER side's lineup/formation is × the extra-time damper. */
   function teamMult(team){
     const isA = team===m.a;
-    return (isA?tacticMultA:tacticMultB) * (isA?modsA.att:modsB.att) * (isA?modsB.leak:modsA.leak) * etFactor;
+    const me = isA?modsA:modsB, op = isA?modsB:modsA;
+    let sm = 1;
+    if(me.style==='counter') sm *= 1 + clampN((op.att-1)*0.5, 0, 0.1);       // counters feed on open opponents
+    if(me.style==='counter' && op.style==='press') sm *= 1.04;                  // space behind a high line
+    if(me.style==='press' && op.style==='possession') sm *= 1.04;               // pressing disrupts build-up
+    if(me.style==='possession' && op.style==='press') sm *= 0.97;
+    return (isA?tacticMultA:tacticMultB) * me.att * op.leak * etFactor * sm;
   }
   function onLineupChanged(){
     refreshMods();
@@ -5569,7 +5886,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     document.getElementById('lineupColB').innerHTML = lineupColumnHtml(L, L.sb, pendingOff);
     document.getElementById('lineupTitle').textContent = L.pre ? '📋 Team sheet — set your formation and starting XI' : '📋 Lineups, formations & substitutions';
     document.getElementById('lineupHint').textContent = L.pre
-      ? 'Pick a formation, or tap ⇄ on a starter then ↑ On a bench player to swap them. Changes before kick-off are free.'
+      ? 'Pick a formation, playing style and set-piece takers, or tap ⇄ on a starter then ↑ On a bench player to swap them. Changes before kick-off are free.'
       : `Tap ⇄ on a player, then ↑ On a bench player. Each side may use 5 substitutions (6 in extra time). The match is paused while this panel is open.`;
   }
   function showLineupPanel(open, pre){
@@ -5605,16 +5922,140 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     }
   };
   lineupPanel.onchange = (ev)=>{
-    const sel = ev.target.closest('select.lu-form');
+    const sel = ev.target.closest('select.lu-form, select.lu-style, select.lu-sp');
     if(!sel) return;
     const side = sel.dataset.key==='a' ? L.sa : L.sb;
-    if(L.setFormation(side, sel.value, true)) onLineupChanged();
+    if(sel.classList.contains('lu-form')){ if(L.setFormation(side, sel.value, true)) onLineupChanged(); }
+    else if(sel.classList.contains('lu-style')){ if(L.setStyle(side, sel.value, true)) onLineupChanged(); }
+    else L.setSpTaker(side, sel.dataset.kind, sel.value);
     renderLineupPanel();
   };
   autoSubsChk.checked = true;
   autoSubsChk.onchange = ()=>{ L.auto = autoSubsChk.checked; };
   lineupBar.classList.remove('hidden');
   lineupToggleBtn.textContent = '📋 Lineups, Formations & Subs';
+
+
+  /* ---------- set pieces: corners, free kicks and in-match penalties ---------- */
+  function setPieceGoal(team, scorerE, assistE, kind, text){
+    const tk = L.key(L.side(team));
+    scorerE.g++; scorerE.sh++; scorerE.sot++;
+    if(kind==='pen') scorerE.ipg = (scorerE.ipg||0)+1; else scorerE.spg = (scorerE.spg||0)+1;
+    if(assistE) assistE.a++;
+    L.team[tk].spg++;
+    creditBoot(team, scorerE.p.number);
+    if(team===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
+    else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
+    matchEvents.push({minute: currentMin||1, teamRef:team, scorer: playerLabel(scorerE.p), playerNumber: scorerE.p.number,
+      assist: assistE?playerLabel(assistE.p):undefined, assistNumber: assistE?assistE.p.number:undefined});
+    addFeed(text, true, team, {sp:kind});
+    nudgeMomentum(team===m.a ? -20 : 20);
+    recordShot(team, true);
+    addShotMapPoint(team, 'goal');
+    renderWinProbability();
+    if(matchLive && currentMin>90 && (decisive || isTieDecidingLeg) && state.extraTime && state.goldenGoal){
+      goldenGoalEnded = true;
+    }
+  }
+  function avgAir(side, slots){
+    const es = L.active(side).filter(e=>slots.includes(e.slot));
+    if(!es.length) return 60;
+    return es.reduce((s,e)=>s+spRatings(e.p).air,0)/es.length;
+  }
+  function keeperSpFactor(dSide){
+    const g = L.gkEntry(dSide);
+    return g ? clampN(1 - (effRating(g, currentMin||1)-75)*0.004, 0.75, 1.25) : 1.2;
+  }
+  function maybeSetPiece(){
+    const r = Math.random();
+    const kind = r<0.003 ? 'pen' : r<0.003+0.035 ? 'fk' : r<0.003+0.035+0.085 ? 'corner' : null;
+    if(!kind) return;
+    const dirA = L.sa.style==='direct' ? 1.2 : 1, dirB = L.sb.style==='direct' ? 1.2 : 1;
+    const wA = tacticMultA * modsA.att * dirA * (100-momentum) + 5;
+    const wB = tacticMultB * modsB.att * dirB * momentum + 5;
+    const attackingTeam = Math.random() < wA/(wA+wB) ? m.a : m.b;
+    const defendingTeam = attackingTeam===m.a ? m.b : m.a;
+    const aSide = L.side(attackingTeam), dSide = L.side(defendingTeam);
+    const tk = L.key(aSide);
+    const taker = L.spTaker(aSide, kind);
+    if(!taker) return;
+    const tr = spRatings(taker.p)[kind];
+    const tl = playerLabel(taker.p);
+    const keeperE = L.gkEntry(dSide);
+    const kl = keeperE ? playerLabel(keeperE.p) : 'the keeper';
+    const tid = attackingTeam.id;
+    if(kind==='corner'){
+      L.team[tk].corners++;
+      const deliv = clampN(1+(tr-72)*0.012, 0.6, 1.5);
+      const air = clampN(avgAir(aSide,['DF','AT']) / avgAir(dSide,['DF','MF']), 0.75, 1.3);
+      const pGoal = 0.03 * deliv * air * (aSide.style==='direct'?1.2:1) * keeperSpFactor(dSide);
+      const o = Math.random();
+      const heads = L.active(aSide).filter(e=>e.slot!=='GK' && e!==taker);
+      if(!heads.length) return;
+      const header = weightedEntry(heads, e=>(e.slot==='DF'?1.5:e.slot==='AT'?1.7:0.8)*Math.pow(Math.max(20,spRatings(e.p).air)/70,3));
+      const hl = playerLabel(header.p);
+      if(o<pGoal){
+        setPieceGoal(attackingTeam, header, taker, 'corner',
+          `⚽ GOAL from the corner! ${tl} swings it in and ${hl} (${attackingTeam.name}) heads home!  ·  Assist: ${tl}`);
+      } else if(o<pGoal+0.14){
+        header.sh++; header.sot++; if(keeperE) keeperE.sv++;
+        recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
+        addFeed(`🚩 Corner from ${tl}, ${hl} gets a header in but ${kl} saves it.`, false, undefined, {ty:'sp', tm:tid, sp:'corner'});
+        nudgeMomentum(attackingTeam===m.a ? -3 : 3);
+      } else if(o<pGoal+0.22){
+        header.sh++; recordShot(attackingTeam, false); addShotMapPoint(attackingTeam, 'wide');
+        addFeed(`🚩 ${tl}'s corner finds ${hl}, whose header drifts wide.`, false, undefined, {ty:'sp', tm:tid, sp:'corner'});
+      }
+      return;
+    }
+    if(kind==='fk'){
+      L.team[tk].fk++;
+      const dFouler = L.pickCardTarget(dSide);
+      if(dFouler && Math.random()<0.08) L.yellow(dSide, dFouler);
+      const pGoal = 0.05 * clampN(1+(tr-72)*0.014, 0.5, 1.7) * keeperSpFactor(dSide);
+      const o = Math.random();
+      if(o<pGoal){
+        setPieceGoal(attackingTeam, taker, null, 'fk', `⚽ GOAL! ${tl} (${attackingTeam.name}) curls the free kick past ${kl}!`);
+      } else if(o<pGoal+0.14){
+        taker.sh++; taker.sot++; if(keeperE) keeperE.sv++;
+        recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
+        addFeed(`🎯 Free kick from ${tl} — ${kl} tips it away!`, false, undefined, {ty:'sp', tm:tid, sp:'fk'});
+      } else if(o<pGoal+0.26){
+        taker.sh++; recordShot(attackingTeam, false); addShotMapPoint(attackingTeam, 'wide');
+        addFeed(`🎯 ${tl}'s free kick sails over the bar.`, false, undefined, {ty:'sp', tm:tid, sp:'fk'});
+      } else if(o<pGoal+0.38){
+        taker.sh++; recordShot(attackingTeam, false);
+        addFeed(`🎯 ${tl}'s free kick is blocked by the wall.`, false, undefined, {ty:'sp', tm:tid, sp:'fk'});
+      }
+      return;
+    }
+    // penalty
+    L.team[tk].pen++;
+    const foulE = L.pickCardTarget(dSide);
+    const fl = foulE ? playerLabel(foulE.p) : 'a defender';
+    addFeed(`🟨 PENALTY to ${attackingTeam.name}! ${fl} (${defendingTeam.name}) brings down an attacker in the box.`, false, undefined, {ty:'sp', tm:tid, sp:'pen', k:1});
+    if(foulE){
+      const rr = Math.random();
+      if(rr<0.06) L.directRed(dSide, foulE); else if(rr<0.35) L.yellow(dSide, foulE);
+    }
+    const zone = PEN_ZONE_BY_ID[penWeightedKey(PEN_AI_ZONE_W)];
+    const dive = penWeightedKey(PEN_AI_DIVE_W);
+    const kg = L.gkEntry(dSide);
+    const res = resolvePenalty(zone, dive, tr, kg ? effRating(kg, currentMin||1) : 40, 0.01);
+    taker.sh++;
+    if(res==='goal'){
+      setPieceGoal(attackingTeam, taker, null, 'pen', `⚽ PENALTY SCORED! ${tl} (${attackingTeam.name}) sends ${kl} the wrong way — ${zone.label}.`);
+    } else if(res==='saved'){
+      taker.sot++; taker.ipm = (taker.ipm||0)+1; if(kg){ kg.ips = (kg.ips||0)+1; kg.sv++; }
+      recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
+      addFeed(`🧤 PENALTY SAVED! ${kl} denies ${tl} (${attackingTeam.name})!`, false, undefined, {ty:'sp', tm:tid, sp:'pen', k:1});
+      nudgeMomentum(attackingTeam===m.a ? 8 : -8);
+    } else {
+      taker.ipm = (taker.ipm||0)+1;
+      recordShot(attackingTeam, false); addShotMapPoint(attackingTeam, res==='post'?'post':'wide');
+      addFeed(`${tl} (${attackingTeam.name}) ${res==='post'?'hits the post':'blazes it wide'} from the spot!`, false, undefined, {ty:'sp', tm:tid, sp:'pen', k:1});
+    }
+  }
 
   function maybeChance(){
     if(Math.random()>=0.14) return;
@@ -5633,20 +6074,17 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       const keeperLabel = keeperE ? playerLabel(keeperE.p) : 'the keeper';
       addFeed(saveCommentary(keeperLabel, attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
       attackerE.sh++; attackerE.sot++; if(keeperE) keeperE.sv++;
-      if(Math.random()<0.35) L.team[tk].corners++;
       recordShot(attackingTeam, true);
       addShotMapPoint(attackingTeam, 'saved');
       nudgeMomentum(attackingTeam===m.a ? -4 : 4);
     } else if(roll<0.85){
       addFeed(wideCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
       attackerE.sh++;
-      if(Math.random()<0.2) L.team[tk].corners++;
       recordShot(attackingTeam, false);
       addShotMapPoint(attackingTeam, 'wide');
     } else {
       addFeed(woodworkCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id, k:1});
       attackerE.sh++;
-      if(Math.random()<0.3) L.team[tk].corners++;
       recordShot(attackingTeam, false);
       addShotMapPoint(attackingTeam, 'post');
       nudgeMomentum(attackingTeam===m.a ? -6 : 6);
@@ -5671,6 +6109,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       k: meta.k!=null ? meta.k : ((isGoal && !meta.ty) ? 2 : 0)
     };
     if(meta.pen) ev.pen = meta.pen;
+    if(meta.sp) ev.sp = meta.sp;
     replayEvents.push(ev);
   }
   /* Flash color reflects who just scored, relative to what the viewer follows:
@@ -5829,6 +6268,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     L.tickDiscipline(min);
     L.aiTick(min);
     maybeChance();
+    maybeSetPiece();
     momentum += (50-momentum)*0.05 + (tacticMultB-tacticMultA)*1.1 + (Math.random()-0.5)*3;
     momentum = Math.max(5, Math.min(95, momentum));
     renderMomentum();
@@ -5898,6 +6338,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
 
   addFeed(kickoffCommentary(m.a.name, m.b.name), false, undefined, {ty:'ko'});
   addFeed(`Formations: ${m.a.name} ${startFormA} · ${m.b.name} ${startFormB}.`, false, undefined, {ty:'form'});
+  addFeed(`Approach: ${m.a.name} ${STYLE_DEFS[L.sa.style].label.toLowerCase()} · ${m.b.name} ${STYLE_DEFS[L.sb.style].label.toLowerCase()}.`, false, undefined, {ty:'form'});
   const stoppage1 = 1+Math.floor(Math.random()*3);
   const h1EventsA = simulateHalfGoals(m.a, m.b, 1, 45+stoppage1, teamMult(m.a), 45);
   const h1EventsB = simulateHalfGoals(m.b, m.a, 1, 45+stoppage1, teamMult(m.b), 45);
@@ -6348,8 +6789,17 @@ function lineupColumnHtml(L, side, pending){
       <button class="ghost lu-btn" data-act="on" ${enabled?'':'disabled'}>↑ On</button></div>`;
   }).join('');
   const goneText = gone.length ? `<div class="lu-gone">Off: ${gone.map(e=>`${escHtml(playerLabel(e.p))} ${e.red?'🟥':''}(${e.off}')`).join(', ')}</div>` : '';
+  const styleOpts = Object.keys(STYLE_DEFS).map(k=>`<option value="${k}" ${k===side.style?'selected':''}>${STYLE_DEFS[k].label}</option>`).join('');
+  const outf = active.filter(e=>e.slot!=='GK');
+  const spSel = Object.keys(SP_KINDS).map(kind=>{
+    const cur = L.spTaker(side, kind);
+    const opts = outf.slice().sort((a,b)=>spRatings(b.p)[kind]-spRatings(a.p)[kind]).map(e=>
+      `<option value="${e.p.number}" ${cur&&cur.p.number===e.p.number&&side.sp[kind]!=null?'selected':''}>#${e.p.number} ${escHtml(playerLabel(e.p))} (${spRatings(e.p)[kind]})</option>`).join('');
+    return `<label class="lu-spl">${SP_KINDS[kind]}<select class="lu-sp" data-key="${key}" data-kind="${kind}"><option value="" ${side.sp[kind]==null?'selected':''}>Auto${side.sp[kind]==null&&cur?' · '+escHtml(playerLabel(cur.p)):''}</option>${opts}</select></label>`;
+  }).join('');
   return `<div class="lu-head"><span>${flagFor(team)} <b>${escHtml(team.name)}</b></span>
-      <select class="lu-form" data-key="${key}">${formOpts}</select><span class="lu-subs">${subsText}</span></div>
+      <select class="lu-form" data-key="${key}">${formOpts}</select><select class="lu-style" data-key="${key}" title="${escHtml(STYLE_DEFS[side.style].tag)}">${styleOpts}</select><span class="lu-subs">${subsText}</span></div>
+    <div class="lu-sps">${spSel}</div>
     <div class="lu-pitch">${pitch}</div>
     <div class="lu-sub-title">On the pitch</div>${rows}
     <div class="lu-sub-title">Bench</div>${benchRows}${goneText}`;
@@ -6366,7 +6816,7 @@ function teamStatBarsHtml(m){
       <span class="tsb-v">${vb}${suffix||''}</span></div>`;
   };
   return `<div class="tsb">${row('Possession',a.poss,b.poss,'%')}${row('Shots',a.sh,b.sh)}${row('On target',a.sot,b.sot)}
-    ${row('Corners',a.corners,b.corners)}${row('Fouls',a.fouls,b.fouls)}${row('Offsides',a.offsides,b.offsides)}
+    ${row('Corners',a.corners,b.corners)}${a.fk!=null?row('Free kicks',a.fk,b.fk)+row('Penalties',a.pens,b.pens)+row('Set-piece goals',a.spg,b.spg):''}${row('Fouls',a.fouls,b.fouls)}${row('Offsides',a.offsides,b.offsides)}
     ${row('Yellow cards',a.yc,b.yc)}${row('Red cards',a.rc,b.rc)}</div>`;
 }
 function lineupTablesHtml(m){
@@ -6384,7 +6834,7 @@ function lineupTablesHtml(m){
       return `<tr class="${l.on>0?'sub':''}"><td>${l.slot}</td><td>${escHtml(nm)}${l.on>0?' <span class="lt-in">↑'+l.on+"'</span>":''}${l.off!=null&&!l.rc?' <span class="lt-out">↓'+l.off+"'</span>":''}${isM?' ⭐':''}</td>
         <td>${l.min}'</td><td>${l.g||''}</td><td>${l.a||''}</td><td>${l.rc?'🟥':(l.yc?'🟨'.repeat(l.yc>1?1:l.yc):'')}</td><td><b>${l.rt?l.rt.toFixed(1):'–'}</b></td></tr>`;
     }).join('');
-    return `<div class="lt-team"><div class="lt-head">${flagFor(team)} ${escHtml(team.name)} <span class="lt-form">${form0&&form0!==form?form0+' → '+form:form}</span></div>
+    return `<div class="lt-team"><div class="lt-head">${flagFor(team)} ${escHtml(team.name)} <span class="lt-form">${form0&&form0!==form?form0+' → '+form:form}${(team===m.a?m.report.sta:m.report.stb)&&STYLE_DEFS[team===m.a?m.report.sta:m.report.stb]?' · '+STYLE_DEFS[team===m.a?m.report.sta:m.report.stb].label:''}</span></div>
       <table class="lt-table"><thead><tr><th></th><th>Player</th><th>Min</th><th>G</th><th>A</th><th>Cards</th><th>Rt</th></tr></thead><tbody>${body}</tbody></table></div>`;
   }).join('');
 }
@@ -6428,10 +6878,11 @@ function aggregatePlayerStats(){
       if(!r){
         const team = state.allTeams.find(t=>t.id===l.team);
         const p = team ? findSquadPlayer(team, l.num) : null;
-        r = {key, team, num:l.num, p, pos:l.pos, age:l.age, mp:0, min:0, g:0, a:0, sh:0, sot:0, sv:0, yc:0, rc:0, pk:0, pkm:0, pks:0, cs:0, rtW:0, motm:0};
+        r = {key, team, num:l.num, p, pos:l.pos, age:l.age, sp:0, mp:0, min:0, g:0, a:0, sh:0, sot:0, sv:0, yc:0, rc:0, pk:0, pkm:0, pks:0, cs:0, rtW:0, motm:0};
         map.set(key, r);
       }
       if(l.min>0){ r.mp++; r.min+=l.min; r.rtW += (l.rt||6)*l.min; }
+      r.sp += (l.spg||0)+(l.ipg||0);
       r.g+=l.g; r.a+=l.a; r.sh+=l.sh; r.sot+=l.sot; r.sv+=l.sv; r.yc+=l.yc; r.rc+=l.rc;
       r.pk+=l.pk; r.pkm+=l.pkm; r.pks+=l.pks;
       if(l.cs && l.min>=60 && (l.pos==='GK'||l.slot==='GK')) r.cs++;
@@ -6508,10 +6959,10 @@ function renderPlayersTab(){
     const c = (typeof vx==='string') ? vx.localeCompare(vy) : (vx-vy);
     return (dir==='asc'?c:-c) || y.avgRt-x.avgRt;
   });
-  const cols = [['name','Player'],['team','Team'],['pos','Pos'],['mp','MP'],['min','Min'],['g','G'],['a','A'],['ga','G+A'],['sh','Sh'],['sot','SoT'],['sv','Sv'],['cs','CS'],['yc','🟨'],['rc','🟥'],['motm','MOTM'],['avgRt','Rating']];
+  const cols = [['name','Player'],['team','Team'],['pos','Pos'],['mp','MP'],['min','Min'],['g','G'],['a','A'],['ga','G+A'],['sp','SPG'],['sh','Sh'],['sot','SoT'],['sv','Sv'],['cs','CS'],['yc','🟨'],['rc','🟥'],['motm','MOTM'],['avgRt','Rating']];
   const head = cols.map(([k,l])=>`<th data-pk="${k}" class="${k===key?'sorted':''}">${l}${k===key?(dir==='asc'?' ▲':' ▼'):''}</th>`).join('');
   const body = list.slice(0,60).map(r=>`<tr><td class="lb-name">${escHtml(r.name)}</td><td>${r.team?flagFor(r.team)+' '+escHtml(r.team.name):''}</td><td>${r.pos}</td>
-    <td class="lb-num">${r.mp}</td><td class="lb-num">${r.min}</td><td class="lb-num">${r.g}</td><td class="lb-num">${r.a}</td><td class="lb-num">${r.ga}</td>
+    <td class="lb-num">${r.mp}</td><td class="lb-num">${r.min}</td><td class="lb-num">${r.g}</td><td class="lb-num">${r.a}</td><td class="lb-num">${r.ga}</td><td class="lb-num">${r.sp}</td>
     <td class="lb-num">${r.sh}</td><td class="lb-num">${r.sot}</td><td class="lb-num">${r.sv}</td><td class="lb-num">${r.cs}</td>
     <td class="lb-num">${r.yc}</td><td class="lb-num">${r.rc}</td><td class="lb-num">${r.motm}</td><td class="lb-num"><b>${r.avgRt.toFixed(2)}</b></td></tr>`).join('');
   el.innerHTML = `<div class="replays-toolbar"><select id="playersPosFilter">
@@ -6555,6 +7006,29 @@ const RP_SPEEDS = [1,2,4];
 function roundLabelFor(m){
   const h = state.matchHistory.find(x=>x.m===m);
   return h ? h.roundLabel : '';
+}
+/* Instant-sim recaps have no per-shot data, so build a plausible shot map from the stored
+   report (shots / on-target totals per team) plus the real goal minutes, once, and cache it. */
+function ensureReplayShots(m){
+  if(!m.replay || m.replay.shots || !m.report) return;
+  const shots = [];
+  const pt = (team, o, n)=>{
+    const isA = team===m.a, goalX = isA ? 284 : 16, sign = isA ? -1 : 1;
+    const spread = o==='goal' ? 30 : o==='saved' ? 45 : o==='post' ? 20 : 70;
+    const x = clampN(goalX + sign*Math.random()*spread, 6, 294);
+    const y = clampN(90 + (Math.random()-0.5)*(o==='wide' ? 150 : 80), 6, 174);
+    shots.push({n, x:Math.round(x), y:Math.round(y), o, tm:team.id});
+  };
+  [['a',m.a],['b',m.b]].forEach(([k,team])=>{
+    const ts = m.report.ts[k];
+    const goals = (m.events||[]).filter(e=>e.teamRef===team);
+    goals.forEach(e=>pt(team,'goal',e.minute));
+    const saved = Math.max(0, ts.sot-goals.length);
+    const off = Math.max(0, ts.sh-ts.sot);
+    for(let i=0;i<saved;i++) pt(team,'saved',randInt(1,90));
+    for(let i=0;i<off;i++) pt(team, Math.random()<0.2?'post':'wide', randInt(1,90));
+  });
+  m.replay.shots = shots;
 }
 function rpItemsFor(m, mode){
   const ev = (m.replay && m.replay.ev) || [];
@@ -6628,11 +7102,16 @@ function rpRender(){
   document.getElementById('rpFeed').innerHTML = feed.map(x=>`<li class="ev-${x.ty}${x.k>=2?' goal':''}"><b>${x.c}</b> ${escHtml(x.x)}</li>`).join('');
   // shot map: same-match shots so far
   const colors = {goal:'#4fc3ff', saved:'#ffcf3f', post:'#b23bff', wide:'#7086ad'};
-  let dots = '';
-  for(let j=RP.i; j>=0 && RP.items[j].m===m; j--){
-    const s = RP.items[j].e.sh;
-    if(s) dots += `<circle cx="${s.x}" cy="${s.y}" r="4" fill="${colors[s.o]||'#7086ad'}" fill-opacity="0.85" stroke="#0a1128" stroke-width="0.8"/>`;
-  }
+  ensureReplayShots(m);
+  // use the match's FULL event list (not just the filtered highlights) up to this moment
+  const full = m.replay.ev;
+  const pos = Math.max(0, full.indexOf(e));
+  const nowN = e.n!=null ? e.n : (parseInt(e.c)||0);
+  const atEnd = e.ty==='ft' || e.ty==='penend' || e.ty==='motm';
+  const pts = [];
+  for(let j=0;j<=pos && j<full.length;j++) if(full[j].sh) pts.push(full[j].sh);
+  (m.replay.shots||[]).forEach(s=>{ if(atEnd || s.n<=nowN) pts.push(s); });
+  const dots = pts.map(s=>`<circle cx="${s.x}" cy="${s.y}" r="4" fill="${colors[s.o]||'#7086ad'}" fill-opacity="0.85" stroke="#0a1128" stroke-width="0.8"/>`).join('');
   document.getElementById('rpShotMap').innerHTML = `
     <rect x="2" y="2" width="296" height="176" rx="8" fill="none" stroke="rgba(255,255,255,.15)"/>
     <line x1="150" y1="2" x2="150" y2="178" stroke="rgba(255,255,255,.1)"/><circle cx="150" cy="90" r="18" fill="none" stroke="rgba(255,255,255,.1)"/>
@@ -6745,6 +7224,7 @@ function checkForAutosave(){
 /* ===================== SETUP MODAL ===================== */
 const setupOverlay = document.getElementById('setupOverlay');
 let pendingSize=64, pendingStyle="realistic", pendingGoal="normal", pendingTactic="balanced", pendingSpoiler="off", pendingNames="real";
+let pendingPairing="random", pendingPreset="custom";
 let pendingSeeding="random", pendingExtraTime="off", pendingDrama="off", pendingFormat="knockout", pendingGoldenGoal="off", pendingChaos="normal", pendingLegs=1;
 
 function wireOptRow(rowId, dataAttr, onPick){
@@ -6756,10 +7236,43 @@ function wireOptRow(rowId, dataAttr, onPick){
     });
   });
 }
-wireOptRow('sizeRow','size', v=>pendingSize=+v);
-wireOptRow('formatRow','format', v=>{ pendingFormat=v; updateSizeOptionsForFormat(); });
-wireOptRow('seedingRow','seeding', v=>pendingSeeding=v);
-wireOptRow('legsRow','legs', v=>pendingLegs=+v);
+wireOptRow('sizeRow','size', v=>{ pendingSize=+v; markCustom(); });
+wireOptRow('formatRow','format', v=>{ pendingFormat=v; updateSizeOptionsForFormat(); markCustom(); });
+wireOptRow('seedingRow','seeding', v=>{ pendingSeeding=v; markCustom(); });
+wireOptRow('pairingRow','pairing', v=>{ pendingPairing=v; markCustom(); });
+function setRowActive(rowId, attr, val){
+  document.querySelectorAll('#'+rowId+' .opt').forEach(o=> o.classList.toggle('active', o.dataset[attr]===String(val)));
+}
+function markCustom(){
+  if(pendingPreset==='custom') return;
+  pendingPreset='custom';
+  document.getElementById('presetSelect').value='custom';
+  document.getElementById('presetHint').textContent = getPreset('custom').desc;
+}
+(function buildPresetSelect(){
+  const sel = document.getElementById('presetSelect');
+  const groups = [];
+  PRESETS.forEach(pr=>{ if(!groups.includes(pr.group)) groups.push(pr.group); });
+  sel.innerHTML = groups.map(g=>`<optgroup label="${g}">${PRESETS.filter(pr=>pr.group===g).map(pr=>`<option value="${pr.id}">${pr.name}</option>`).join('')}</optgroup>`).join('');
+})();
+document.getElementById('presetSelect').addEventListener('change', ev=>{
+  const v = ev.target.value;
+  pendingPreset = v;
+  const pr = getPreset(v);
+  document.getElementById('presetHint').textContent = pr.desc;
+  if(v==='custom') return;
+  pendingFormat = pr.format; pendingSize = pr.size; pendingSeeding = pr.seeding; pendingPairing = pr.pairing; pendingLegs = pr.legs;
+  pendingExtraTime = pr.extraTime;
+  updateSizeOptionsForFormat();
+  setRowActive('formatRow','format', pr.format);
+  setRowActive('sizeRow','size', pr.size);
+  setRowActive('seedingRow','seeding', pr.seeding);
+  setRowActive('pairingRow','pairing', pr.pairing);
+  setRowActive('legsRow','legs', pr.legs);
+  setRowActive('extraTimeRow','extratime', pr.extraTime);
+  updateGoldenGoalVisibility();
+});
+wireOptRow('legsRow','legs', v=>{ pendingLegs=+v; markCustom(); });
 wireOptRow('styleRow','style', v=>pendingStyle=v);
 wireOptRow('goalRow','goal', v=>pendingGoal=v);
 wireOptRow('tacticRow','tactic', v=>pendingTactic=v);
@@ -6787,6 +7300,8 @@ function updateSizeOptionsForFormat(){
 
 document.getElementById('newTournamentBtn').addEventListener('click', ()=>{
   document.getElementById('modalTitle').textContent = "New Tournament";
+  document.getElementById('presetField').style.display = "";
+  document.getElementById('pairingField').style.display = "";
   document.getElementById('sizeField').style.display = "";
   document.getElementById('formatField').style.display = "";
   document.getElementById('seedingField').style.display = "";
@@ -6797,6 +7312,8 @@ document.getElementById('newTournamentBtn').addEventListener('click', ()=>{
 });
 document.getElementById('settingsBtn').addEventListener('click', ()=>{
   document.getElementById('modalTitle').textContent = "Match Settings";
+  document.getElementById('presetField').style.display = "none";
+  document.getElementById('pairingField').style.display = "none";
   document.getElementById('sizeField').style.display = "none";
   document.getElementById('formatField').style.display = "none";
   document.getElementById('seedingField').style.display = "none";
@@ -6812,7 +7329,7 @@ document.getElementById('startBtn').addEventListener('click', ()=>{
   setupOverlay.classList.add('hidden');
   championOverlay.classList.add('hidden');
   if(isNewTournament){
-    newTournament(pendingSize, pendingStyle, pendingGoal, pendingTactic, pendingSpoiler==="on", pendingNames==="real", pendingSeeding==="seeded", pendingExtraTime==="on", pendingDrama==="on", pendingFormat, pendingGoldenGoal==="on", pendingChaos, pendingLegs);
+    newTournament(pendingSize, pendingStyle, pendingGoal, pendingTactic, pendingSpoiler==="on", pendingNames==="real", pendingSeeding==="seeded", pendingExtraTime==="on", pendingDrama==="on", pendingFormat, pendingGoldenGoal==="on", pendingChaos, pendingLegs, pendingPairing, pendingPreset);
   } else if(state){
     state.style = pendingStyle;
     state.goal = pendingGoal;
@@ -6837,7 +7354,7 @@ document.getElementById('nextRoundBtn').addEventListener('click', ()=>{
 });
 document.getElementById('runItBackBtn').addEventListener('click', ()=>{
   championOverlay.classList.add('hidden');
-  newTournament(state.size, state.style, state.goal, state.tactic, state.spoilerSafe, state.useRealNames, state.seeded, state.extraTime, state.dramaEnabled, state.format, state.goldenGoal, state.chaosSensitivity, state.legsPerTie);
+  newTournament(state.size, state.style, state.goal, state.tactic, state.spoilerSafe, state.useRealNames, state.seeded, state.extraTime, state.dramaEnabled, state.format, state.goldenGoal, state.chaosSensitivity, state.legsPerTie, state.pairing, state.presetId);
 });
 
 spectateSelect.addEventListener('change', ()=>{
@@ -7231,6 +7748,7 @@ function exportTournament(opts){
     tieUidCounter,
     customTeams,
     careerLog,
+    legacy,
     achievements,
     realSquadData,
     formatsCompleted: Array.from(formatsCompleted),
@@ -7240,10 +7758,11 @@ function exportTournament(opts){
       extraTime:state.extraTime, dramaEnabled:state.dramaEnabled, format:state.format,
       goldenGoal:state.goldenGoal, chaosSensitivity:state.chaosSensitivity,
       legsPerTie: state.legsPerTie||1,
+      pairing: state.pairing||'random', presetId: state.presetId||'custom',
       allTeams: state.allTeams.map(t=>({
         id:t.id, name:t.name, code:t.code||null, rating:t.rating, flagOverride:t.flagOverride||null,
         isGuest:!!t.isGuest, isCustom:!!t.isCustom, isFictional:!!t.isFictional,
-        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||null
+        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||null, style:t.style||null, sp:t.sp||null
       })),
       phase: state.phase,
       groups: state.groups.map(g=>({
@@ -7295,6 +7814,7 @@ function importTournament(payload){
   try{
     customTeams = payload.customTeams || [];
     careerLog = payload.careerLog || careerLog;
+    if(payload.legacy && payload.legacy.players) legacy = payload.legacy;
     achievements = payload.achievements || achievements;
     realSquadData = payload.realSquadData || realSquadData;
     formatsCompleted = new Set(payload.formatsCompleted || Array.from(formatsCompleted));
@@ -7306,7 +7826,7 @@ function importTournament(payload){
       const team = {
         id:t.id, name:t.name, code:t.code, rating:t.rating, flagOverride:t.flagOverride,
         isGuest:!!t.isGuest, isCustom:!!t.isCustom, isFictional:!!t.isFictional,
-        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||undefined
+        players:(t.players||[]).map(p=>({...p})), bench:(t.bench||[]).map(p=>({...p})), formation:t.formation||undefined, style:t.style||undefined, sp:t.sp||undefined
       };
       teamById[team.id] = team;
       return team;
@@ -7357,6 +7877,7 @@ function importTournament(payload){
       extraTime:payload.state.extraTime, dramaEnabled:payload.state.dramaEnabled, format:payload.state.format,
       goldenGoal:payload.state.goldenGoal, chaosSensitivity:payload.state.chaosSensitivity||'normal',
       legsPerTie: payload.state.legsPerTie||1,
+      pairing: payload.state.pairing||'random', presetId: payload.state.presetId||'custom',
       allTeams,
       phase: payload.state.phase,
       groups,
