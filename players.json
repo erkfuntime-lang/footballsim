@@ -7197,49 +7197,49 @@
       "region": "Europe",
       "source": "generated",
       "players": [
-        {
-          "name": "Tarvo Dubois",
-          "position": "GK"
-        },
-        {
-          "name": "Tarvo Larsson",
-          "position": "RB"
-        },
-        {
-          "name": "Aleksander Tamm",
-          "position": "CB"
-        },
-        {
-          "name": "Anders Dubois",
-          "position": "CB"
-        },
-        {
-          "name": "Jonas Rossi",
-          "position": "LB"
-        },
-        {
-          "name": "Vytautas Dubois",
-          "position": "CDM"
-        },
-        {
-          "name": "Vytautas Larsson",
-          "position": "CM"
-        },
-        {
-          "name": "Marek Bianchi",
-          "position": "CM"
-        },
-        {
-          "name": "Erik Kowalski",
-          "position": "RW"
-        },
-        {
-          "name": "Jonas Larsson",
-          "position": "ST"
-        },
-        {
-          "name": "Kestutis Muller",
-          "position": "LW"
+  {
+    "name": "Jordan Pickford",
+    "position": "GK"
+  },
+  {
+    "name": "Ezri Konsa",
+    "position": "RB"
+  },
+  {
+    "name": "John Stones",
+    "position": "CB"
+  },
+  {
+    "name": "Marc Guehi",
+    "position": "CB"
+  },
+  {
+    "name": "Nico O'Reilly",
+    "position": "LB"
+  },
+  {
+    "name": "Declan Rice",
+    "position": "CDM"
+  },
+  {
+    "name": "Jude Bellingham",
+    "position": "CM"
+  },
+  {
+    "name": "Elliot Anderson",
+    "position": "CM"
+  },
+  {
+    "name": "Bukayo Saka",
+    "position": "RW"
+  },
+  {
+    "name": "Harry Kane",
+    "position": "ST"
+  },
+  {
+    "name": "Marcus Rashford",
+    "position": "LW"
         }
       ]
     },
