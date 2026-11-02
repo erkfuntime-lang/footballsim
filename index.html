@@ -582,6 +582,14 @@ footer{text-align:center; color:var(--muted); font-size:11px; margin-top:36px; l
 .watch-feed li.card-yellow{border-left-color:#ffcf3f; color:var(--chalk);}
 .watch-feed li.card-red{border-left-color:var(--flare); color:#ffb3bd;}
 .watch-feed li.sub{border-left-color:#2be08a;}
+.watch-feed li.build{opacity:.8; font-size:.93em; border-left-color:#4a5d86;}
+.watch-feed li.amb{opacity:.6; font-size:.88em; border-left-color:transparent;}
+.rp-feed li.ev-amb{opacity:.55;}
+.slowmo{color:#4fc3ff !important; text-shadow:0 0 14px rgba(79,195,255,.7); animation:slowpulse 1.4s ease-in-out infinite;}
+@keyframes slowpulse{50%{opacity:.55;}}
+.watch-feed li.moment{border-left-color:var(--amber); background:rgba(255,207,63,.07); font-style:italic;}
+.rp-feed li.ev-moment{border-left-color:var(--amber);}
+.rp-moment.ev-moment{border-color:var(--amber); color:var(--amber);}
 
 /* ---------- penalty shootout ---------- */
 .pen-panel{background:var(--turf-light); border:1px solid var(--win); border-radius:10px; padding:14px; margin-bottom:14px; flex-shrink:0;}
@@ -1846,7 +1854,7 @@ function seedOrder(n){
 function isPow2(n){ return n>0 && (n & (n-1))===0; }
 function nextPow2(n){ let p=1; while(p<n) p*=2; return p; }
 
-function buildField(size, seeded){
+function buildField(size, seeded, poolTags){
   const customPool = customTeams.map(ct=>({
     name:ct.name, code:null, rating:ct.rating, flagOverride:ct.flagOverride||'🏳️', isGuest:false, isCustom:true,
     players:(ct.players||[]).map(p=>({...p}))
@@ -1854,6 +1862,9 @@ function buildField(size, seeded){
   const seededPool = shuffle(buildPool());
   const guestPool = shuffle(buildGuestPool());
   const teams = [];
+  if(poolTags && poolTags.length){
+    buildRegionalTeams(size, poolTags).forEach(t=>teams.push(t));   // regional cups ignore custom teams
+  } else {
   const customCount = Math.min(size, customPool.length);
   for(let i=0;i<customCount;i++) teams.push(customPool[i]);
   const seededCount = Math.min(size-teams.length, seededPool.length);
@@ -1862,6 +1873,7 @@ function buildField(size, seeded){
   while(teams.length<size && gi<guestPool.length){ teams.push(guestPool[gi++]); }
   let fi=0;
   while(teams.length<size){ teams.push(makeFictionalTeam(fi++)); }
+  }
 
   if(seeded && isPow2(size)){
     const ranked = teams.slice().sort((a,b)=>b.rating-a.rating);
@@ -2508,7 +2520,7 @@ function renderAchievementsGrid(){
 
 /* ===================== TOURNAMENT FLOW ===================== */
 function newTournament(size, style, goal, tactic, spoilerSafe, useRealNames, seeded, extraTime, dramaEnabled, format, goldenGoal, chaosSensitivity, legsPerTie, pairing, presetId){
-  const teams = buildField(size, seeded);
+  const teams = buildField(size, seeded, getPreset(presetId).pool);
   const isGroups = format==='groups';
   const groupCount = isGroups ? size/4 : 0;
   const knockoutSize = isGroups ? computeKnockoutSize(groupCount) : size;
@@ -3030,6 +3042,24 @@ const PRESETS = [
   {id:'lcup32', name:'League Cup 32', group:'Knockout cups', size:32, format:'knockout', pairing:'random', seeding:'seeded', legs:2, extraTime:'off', desc:'32-team seeded cup, two-legged ties.'},
 ];
 function getPreset(id){ return PRESETS.find(p=>p.id===id) || PRESETS[0]; }
+const CONFEDS = {"UEFA": ["England", "France", "Spain", "Portugal", "Netherlands", "Belgium", "Italy", "Germany", "Croatia", "Denmark", "Switzerland", "Ukraine", "Sweden", "Norway", "Austria", "Serbia", "Turkey", "Poland", "Wales", "Scotland", "Czechia", "Hungary", "Greece", "Romania", "Slovakia", "Ireland", "Iceland", "Bosnia and Herzegovina", "Israel", "Slovenia", "Finland", "Albania", "Georgia", "North Macedonia", "Bulgaria", "North. Ireland", "Montenegro", "Armenia", "Kosovo", "Moldova", "Belarus", "Estonia", "Latvia", "Lithuania", "Kazakhstan", "Azerbaijan", "Luxembourg", "Malta", "Cyprus", "Andorra", "San Marino", "Liechtenstein", "Faroe Islands", "Gibraltar"], "AFC": ["Japan", "South Korea", "Iran", "Australia", "Saudi Arabia", "Qatar", "Iraq", "Uzbekistan", "Jordan", "China", "UAE", "Kyrgyzstan", "Tajikistan", "Turkmenistan", "Mongolia", "Bhutan", "Nepal", "Bangladesh", "Sri Lanka", "Maldives", "Myanmar", "Cambodia", "Laos", "Brunei", "Timor-Leste", "Guam", "Yemen", "Syria", "Lebanon", "Kuwait", "Bahrain", "Oman", "Palestine", "Afghanistan", "Pakistan", "India", "Vietnam", "Indonesia", "Philippines", "Thailand", "Malaysia", "Singapore", "Hong Kong", "North Korea"], "ASEAN": ["Vietnam", "Indonesia", "Philippines", "Thailand", "Malaysia", "Singapore", "Cambodia", "Laos", "Myanmar", "Brunei", "Timor-Leste"], "CAF": ["Morocco", "Senegal", "Ivory Coast", "Nigeria", "Algeria", "Egypt", "Ghana", "Cameroon", "Tunisia", "South Africa", "Mali", "Burkina Faso", "DR Congo", "Zambia", "Zimbabwe", "Botswana", "Namibia", "Angola", "Mozambique", "Malawi", "Tanzania", "Kenya", "Uganda", "Rwanda", "Burundi", "Ethiopia", "Sudan", "Libya", "Niger", "Chad", "Benin", "Togo", "Sierra Leone", "Liberia", "Guinea", "Guinea-Bissau", "Gambia", "Mauritania", "Comoros", "Madagascar", "Mauritius", "Seychelles", "Cape Verde", "Sao Tome and Principe", "Eswatini", "Lesotho", "Djibouti", "Somalia", "Eritrea", "South Sudan", "Central African Republic", "Gabon", "Congo", "Equatorial Guinea"], "CONMEBOL": ["Argentina", "Brazil", "Uruguay", "Colombia", "Ecuador", "Chile", "Peru", "Paraguay", "Venezuela", "Bolivia"], "CONCACAF": ["USA", "Mexico", "Canada", "Costa Rica", "Panama", "Jamaica", "Honduras", "Haiti", "Cuba", "Dominican Republic", "Guatemala", "El Salvador", "Nicaragua", "Belize", "Guyana", "Suriname", "Trinidad and Tobago", "Bahamas", "Barbados"], "OFC": ["New Zealand", "Fiji", "Papua New Guinea", "Solomon Islands", "Vanuatu", "Samoa", "Tonga", "Kiribati", "Tuvalu"]};
+const PRESET_POOLS = {euro24:['UEFA'], nl16:['UEFA'], ucl16:['UEFA'], asian24:['AFC'], aff8:['ASEAN'], aff16:['ASEAN','AFC'], afcon24:['CAF'], copa16:['CONMEBOL','CONCACAF'], gold16:['CONCACAF']};
+PRESETS.forEach(pr=>{ if(PRESET_POOLS[pr.id]) pr.pool = PRESET_POOLS[pr.id]; });
+const POOL_LABEL = {UEFA:'European (UEFA)', AFC:'Asian (AFC)', ASEAN:'Southeast Asian (ASEAN)', CAF:'African (CAF)', CONMEBOL:'South American (CONMEBOL)', CONCACAF:'North/Central American & Caribbean (CONCACAF)', OFC:'Oceanian (OFC)'};
+/* Builds a field from only the nations in the given confederation tags, filling in priority
+   order (real nations first within each tag), then fictional sides if the pool runs short. */
+function buildRegionalTeams(size, tags){
+  const teams = [], taken = new Set();
+  tags.forEach(tag=>{
+    const names = new Set(CONFEDS[tag]||[]);
+    [buildPool(), buildGuestPool()].map(l=>l.map(t=>({t, k:t.rating+Math.random()*14})).sort((x,y)=>y.k-x.k).map(o=>o.t)).forEach(list=>{   // stronger nations usually qualify, with some upsets in the draw
+      list.forEach(t=>{ if(teams.length<size && names.has(t.name) && !taken.has(t.name)){ taken.add(t.name); teams.push(t); } });
+    });
+  });
+  let fi=0;
+  while(teams.length<size) teams.push(makeFictionalTeam(fi++));
+  return teams;
+}
 
 /* Orders knockout qualifiers into adjacent-pair bracket slots (slot 2k v slot 2k+1).
    'cross': winner of group 2k v runner-up of group 2k+1, in the first half; the mirrored
@@ -4354,6 +4384,7 @@ function recordLegacy(champion){
     const key = x.name+'||'+y.name;
     const H = legacy.h2h[key] || (legacy.h2h[key] = {x:x.name, y:y.name, xf:flagFor(x), yf:flagFor(y), xw:0, yw:0, d:0, gx:0, gy:0, m:0, pens:0});
     H.m++; H.gx += flip?m.scoreB:m.scoreA; H.gy += flip?m.scoreA:m.scoreB;
+    H.l = {gx: flip?m.scoreB:m.scoreA, gy: flip?m.scoreA:m.scoreB, pw: (m.scoreA===m.scoreB && m.winner) ? m.winner.name : null};
     let who = res;
     if(res==='d' && m.winner){ who = (m.winner.id===m.a.id)?'a':'b'; H.pens++; }
     if(who==='d') H.d++; else { const xWon = (who==='a') !== flip; if(xWon) H.xw++; else H.yw++; }
@@ -5006,6 +5037,84 @@ function weightedEntry(list, wfn){
   let r = Math.random()*ws.reduce((a,b)=>a+b,0);
   for(let i=0;i<list.length;i++){ r -= ws[i]; if(r<=0) return list[i]; }
   return list[list.length-1];
+}
+
+/* ===================== RIVALRY & PLAYER-MOMENT HELPERS ===================== */
+function legacyKeyFor(team, p){ return team.name+'|'+((p&&p.name)||(p&&p.number)); }
+/* Head-to-head between two teams from team A's point of view: every earlier tournament this
+   session (legacy) plus matches already played in this one. `last` is the most recent meeting. */
+function h2hSummary(tA, tB, excludeMatch){
+  const out = {n:0, aw:0, bw:0, d:0, last:null, sameTour:false};
+  const flip = tA.name > tB.name;
+  const H = legacy.h2h[(flip?tB.name:tA.name)+'||'+(flip?tA.name:tB.name)];
+  if(H){
+    out.n += H.m;
+    out.aw += flip ? H.yw : H.xw; out.bw += flip ? H.xw : H.yw; out.d += H.d;
+    if(H.l) out.last = {ga: flip?H.l.gy:H.l.gx, gb: flip?H.l.gx:H.l.gy, pw: H.l.pw};
+  }
+  (state.matchHistory||[]).forEach(h=>{
+    const x = h.m;
+    if(!x || !x.played || x===excludeMatch) return;
+    let ga, gb;
+    if(x.a.name===tA.name && x.b.name===tB.name){ ga=x.scoreA; gb=x.scoreB; }
+    else if(x.a.name===tB.name && x.b.name===tA.name){ ga=x.scoreB; gb=x.scoreA; }
+    else return;
+    out.n++;
+    const pw = (ga===gb && x.winner) ? x.winner.name : null;
+    if(ga>gb || pw===tA.name) out.aw++; else if(gb>ga || pw===tB.name) out.bw++; else out.d++;
+    out.last = {ga, gb, pw}; out.sameTour = true;
+  });
+  return out;
+}
+function seriesText(tA, tB, S){
+  if(S.aw===S.bw) return `the series is level at ${S.aw}-${S.d}-${S.bw}`;
+  const lead = S.aw>S.bw ? tA : tB;
+  return `${lead.name} lead the series ${Math.max(S.aw,S.bw)}-${S.d}-${Math.min(S.aw,S.bw)}`;
+}
+function rivalryIntro(tA, tB, excludeMatch){
+  const S = h2hSummary(tA, tB, excludeMatch);
+  if(!S.n) return [];
+  const lines = [];
+  if(S.n===1){
+    const L1 = S.last;
+    lines.push(`⚔ They have met once before: ${tA.name} ${L1.ga}-${L1.gb} ${tB.name}${L1.pw?` (${L1.pw} won on penalties)`:''}.`);
+  } else {
+    lines.push(`⚔ Meeting number ${S.n+1} between ${tA.name} and ${tB.name} — ${seriesText(tA,tB,S)}.`);
+  }
+  const lst = S.last;
+  if(lst){
+    if(S.sameTour && S.n>=1) lines.push(`🔁 A rematch: they already played each other earlier in this tournament (${tA.name} ${lst.ga}-${lst.gb} ${tB.name}).`);
+    else if(lst.pw) lines.push(`🎯 Last time it went to penalties, and ${lst.pw} came out on top.`);
+    else if(Math.abs(lst.ga-lst.gb)>=3){
+      const loser = lst.ga<lst.gb ? tA : tB;
+      lines.push(`😤 ${loser.name} are still smarting from that ${Math.max(lst.ga,lst.gb)}-${Math.min(lst.ga,lst.gb)} defeat and want revenge.`);
+    } else if(S.n>=4) lines.push(`🔥 A genuine rivalry: these two keep ending up in each other's way.`);
+  }
+  return lines.slice(0,2);
+}
+function momentsOnce(key){
+  state._moments = state._moments || new Set();
+  if(state._moments.has(key)) return false;
+  state._moments.add(key); return true;
+}
+/* Pre-match spotlights from careers: Hall of Famers, previous Golden Boot winners, veterans, teens. */
+function playerSpotlights(L){
+  const out = [];
+  [L.sa, L.sb].forEach(side=>{
+    side.entries.forEach(e=>{
+      const lp = legacy.players[legacyKeyFor(side.team, e.p)];
+      const nm = playerLabel(e.p), tn = side.team.name;
+      if(lp && lp.hof && momentsOnce('hof|'+side.team.id+'|'+e.p.number))
+        out.push({pri:0, t:`🏛 Hall of Famer ${nm} (${lp.titles} title${lp.titles===1?'':'s'}) lines up for ${tn}.`});
+      else if(lp && lp.boot>0 && momentsOnce('boot|'+side.team.id+'|'+e.p.number))
+        out.push({pri:1, t:`🥇 Former Golden Boot winner ${nm} starts for ${tn}.`});
+      else if(e.p.age>=34 && momentsOnce('old|'+side.team.id+'|'+e.p.number))
+        out.push({pri:2, t:`🎖 At ${e.p.age}, ${nm} may be playing in his last tournament for ${tn}.`});
+      else if(e.p.age && e.p.age<=19 && momentsOnce('teen|'+side.team.id+'|'+e.p.number))
+        out.push({pri:3, t:`🌟 Teenager ${nm}, just ${e.p.age}, is in the starting XI for ${tn}.`});
+    });
+  });
+  return out.sort((a,b)=>a.pri-b.pri).slice(0,3).map(o=>o.t);
 }
 
 class LiveMatch{
@@ -5708,7 +5817,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   watchReplayBtn.classList.add('hidden'); watchReportBtn.classList.add('hidden');
   closeBtn.classList.add('hidden');
   skipBtn.classList.remove('hidden'); skipBtn.disabled=false;
-  clockEl.textContent = "0'";
+  clockEl.textContent = "00:00";
   phaseEl.textContent = "Kick-off — 1st half";
   overlay.classList.remove('hidden');
   renderRadarChart(m.a, m.b);
@@ -5731,7 +5840,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   let autoPaused=false, lineupOpen=false;
   let tacticMultA=1, tacticMultB=1;
   let currentHalfEvents=[], currentHalfEi=0, currentMin=0, currentHalfEndMin=0, matchLive=false;
-  const SPEEDS=[250,125,83,63,50];
+  const SPEEDS=[2000,1000,500,250,100];   // ms of real time per game minute (1x = about 3 minutes plus narrated plays for a full match)
   const SPEED_LABELS=['1x','2x','3x','4x','5x'];
   skipBtn.onclick = ()=>{ skipRequested=true; };
 
@@ -5838,6 +5947,16 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   const replayEvents = [];
   let currentPhase = '1H';
   let etStarted = false, lastTickMin = 0;
+  const pad2 = n => String(Math.max(0,n)).padStart(2,'0');
+  /* Live scoreboard clock with seconds: minute N covers N-1:00 to N-1:59, stoppage reads 45+1:30. */
+  function liveClockText(min, sec){
+    const b = min-1;
+    if(currentPhase==='1H' && min>45) return '45+'+(b-45)+':'+pad2(sec);
+    if(currentPhase==='2H' && min>90) return '90+'+(b-90)+':'+pad2(sec);
+    if(currentPhase==='ET1' && min>105) return '105+'+(b-105)+':'+pad2(sec);
+    if(currentPhase==='ET2' && min>120) return '120+'+(b-120)+':'+pad2(sec);
+    return pad2(b)+':'+pad2(sec);
+  }
   function clockLabel(min){
     if(currentPhase==='FT') return 'FT';
     if(currentPhase==='PEN') return 'PEN';
@@ -5886,7 +6005,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     document.getElementById('lineupColB').innerHTML = lineupColumnHtml(L, L.sb, pendingOff);
     document.getElementById('lineupTitle').textContent = L.pre ? '📋 Team sheet — set your formation and starting XI' : '📋 Lineups, formations & substitutions';
     document.getElementById('lineupHint').textContent = L.pre
-      ? 'Pick a formation, playing style and set-piece takers, or tap ⇄ on a starter then ↑ On a bench player to swap them. Changes before kick-off are free.'
+      ? (typeof rivalLines!=='undefined' && rivalLines.length ? rivalLines[0]+' ' : '')+'Pick a formation, playing style and set-piece takers, or tap ⇄ on a starter then ↑ On a bench player to swap them. Changes before kick-off are free.'
       : `Tap ⇄ on a player, then ↑ On a bench player. Each side may use 5 substitutions (6 in extra time). The match is paused while this panel is open.`;
   }
   function showLineupPanel(open, pre){
@@ -5936,6 +6055,125 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   lineupToggleBtn.textContent = '📋 Lineups, Formations & Subs';
 
 
+
+  /* ---------- narrated plays: build-up lines, optional slow motion ---------- */
+  let curSec = 0;
+  const momentQueue = [];
+  function queueMoment(lines, finalFn, slow){ momentQueue.push({lines, finalFn, slow:!!slow}); }
+  function beatMs(slow){ return Math.max(110, (slow ? 1900 : 1000) * SPEEDS[speedIndex] / 2000); }
+  async function runMoment(mo){
+    const slow = mo.slow && !skipRequested;
+    const prevPhase = phaseEl.textContent;
+    if(slow){ phaseEl.textContent = '🎬 Slow motion'; clockEl.classList.add('slowmo'); }
+    let i = 0;
+    for(const ln of mo.lines){
+      addFeed(ln, false, undefined, {ty:'build'});
+      i++;
+      if(!skipRequested){
+        if(slow) clockEl.textContent = liveClockText(currentMin||1, Math.min(59, curSec + i*2));
+        while(paused && !skipRequested){ await wait(120); }
+        await wait(beatMs(slow));
+      }
+    }
+    mo.finalFn();
+    if(slow){
+      if(!skipRequested) await wait(beatMs(true)*0.9);
+      phaseEl.textContent = prevPhase; clockEl.classList.remove('slowmo');
+    }
+  }
+  async function flushMoments(){
+    while(momentQueue.length){ await runMoment(momentQueue.shift()); }
+  }
+  function buildUpLines(team, e, assistE, big){
+    const side = L.side(team), opp = L.side(team===m.a ? m.b : m.a);
+    const tn = team.name, sc = playerLabel(e.p);
+    const mid = assistE || L.pickAssist(side, e);
+    const pn = mid ? playerLabel(mid.p) : sc;
+    const def = weightedEntry(L.active(opp).filter(x=>x.slot==='DF'), ()=>1);
+    const dn = def ? playerLabel(def.p) : 'the defender';
+    const starts = [
+      `${pn} wins the ball in midfield and ${tn} break forward…`,
+      `${tn} work it down the flank, ${pn} carrying it…`,
+      `${pn} spots a gap and looks up…`,
+      `A loose ball drops to ${pn} and ${tn} spring forward…`,
+      `${tn} win it back high up the pitch through ${pn}…`
+    ];
+    const mids = [
+      `${pn} threads it through towards ${sc}!`,
+      `${sc} drifts away from ${dn} and calls for it…`,
+      `${pn} whips in a cross — ${sc} is lurking at the back post…`,
+      `${sc} takes it on the turn, ${dn} stumbling…`,
+      `One-two between ${pn} and ${sc}, ${dn} is left chasing…`
+    ];
+    const lines = [pick(starts)];
+    if(big || Math.random()<0.5) lines.push(pick(mids));
+    if(big && Math.random()<0.6) lines.push(`${sc} lines it up…`);
+    return lines;
+  }
+  function goalMoment(ev){
+    const team = ev.teamRef, side = L.side(team);
+    const e = L.pickScorer(side) || side.entries[0];
+    const assistE = Math.random()<0.7 ? L.pickAssist(side, e) : null;
+    return {lines: buildUpLines(team, e, assistE, true), slow:true, finalFn:()=>applyGoal(ev, {e, assistE})};
+  }
+  /* Ambient play-by-play so the feed never goes quiet between the big moments. */
+  function maybeAmbient(){
+    if(Math.random()>=0.28) return;
+    const wA = modsA.mid * (100-momentum) + 5, wB = modsB.mid * momentum + 5;
+    const team = Math.random() < wA/(wA+wB) ? m.a : m.b;
+    const opp = team===m.a ? m.b : m.a;
+    const side = L.side(team), oside = L.side(opp);
+    const x = weightedEntry(L.active(side), ()=>1), y = weightedEntry(L.active(oside), ()=>1);
+    if(!x || !y) return;
+    const xn = playerLabel(x.p), yn = playerLabel(y.p), tn = team.name, on = opp.name;
+    const lines = [
+      `${xn} (${tn}) shows good footwork to escape ${yn}.`,
+      `${tn} knock it around patiently, probing for an opening.`,
+      `${yn} (${on}) steps in with a well-timed interception.`,
+      `${on} clear their lines with a long ball upfield.`,
+      `${xn} tries his luck from distance for ${tn} — well over.`,
+      `Throw-in to ${tn} deep in the ${on} half.`,
+      `${tn} are pressing high now, ${on} struggling to get out.`,
+      `${xn} and ${yn} tangle on the touchline — the referee waves play on.`,
+      `The crowd are on their feet as ${tn} build another attack.`,
+      `${yn} (${on}) makes a crucial block as ${xn} looks to shoot.`,
+      `${tn} switch the play to the far side, looking for space.`,
+      `A cagey spell now — both sides are happy to keep the ball.`
+    ];
+    addFeed(pick(lines), false, undefined, {ty:'amb'});
+  }
+
+  /* ---------- player moments ---------- */
+  function sideTeamOfEntry(e){ return L.sa.entries.includes(e) ? m.a : m.b; }
+  function momentLine(text){ addFeed(text, false, undefined, {ty:'moment', k:1}); }
+  function momentsAfterGoal(team, e, assistE){
+    const nm = playerLabel(e.p), tn = team.name;
+    const mine = team===m.a ? liveScoreA : liveScoreB, theirs = team===m.a ? liveScoreB : liveScoreA;
+    const prevDiff = (mine-1)-theirs, nowDiff = mine-theirs;
+    const min = currentMin||1;
+    const lines = [];
+    if(e.g===2) lines.push(`✌ A brace for ${nm}!`);
+    else if(e.g===3) lines.push(`🎩 HAT-TRICK! ${nm} has three for ${tn}!`);
+    else if(e.g>=4) lines.push(`🔥 ${nm} has ${e.g} goals — a one-man show!`);
+    if(e.on>0 && e.g===1 && min-e.on<=15) lines.push(`🦸 Super-sub! ${nm} scores ${Math.max(1,min-e.on)} minute${min-e.on===1?'':'s'} after coming on.`);
+    if(prevDiff<0 && nowDiff===0 && min>=80) lines.push(`⏱ A late equaliser from ${nm} — ${tn} have clawed their way back!`);
+    else if(prevDiff<0 && nowDiff>0) lines.push(`🔄 Turnaround! ${tn} were behind and now lead.`);
+    const key = bootKeyFor(team, e.p.number), n = state.boot[key]||0;
+    const others = Object.entries(state.boot).filter(([k])=>k!==key).map(([,v])=>v);
+    const second = others.length ? Math.max(...others) : 0;
+    if(n>=3 && n>second && momentsOnce('bootlead|'+key+'|'+n)) lines.push(`🥇 ${nm} takes the lead in the Golden Boot race with ${n}.`);
+    const lp = legacy.players[legacyKeyFor(team, e.p)];
+    const career = (lp?lp.g:0) + n;
+    if([10,25,50,100].includes(career) && momentsOnce('career|'+key+'|'+career)) lines.push(`📈 ${nm} reaches ${career} career goals.`);
+    if(lp && lp.hof && lines.length<2) lines.push(`🏛 Hall of Famer ${nm} on the scoresheet again.`);
+    lines.slice(0,2).forEach(momentLine);
+  }
+  function keeperMoment(keeperE){
+    if(keeperE.sv===5 || keeperE.sv===8){
+      momentLine(`🧤 ${playerLabel(keeperE.p)} has made ${keeperE.sv} saves — a goalkeeping masterclass for ${sideTeamOfEntry(keeperE).name}.`);
+    }
+  }
+
   /* ---------- set pieces: corners, free kicks and in-match penalties ---------- */
   function setPieceGoal(team, scorerE, assistE, kind, text){
     const tk = L.key(L.side(team));
@@ -5949,6 +6187,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     matchEvents.push({minute: currentMin||1, teamRef:team, scorer: playerLabel(scorerE.p), playerNumber: scorerE.p.number,
       assist: assistE?playerLabel(assistE.p):undefined, assistNumber: assistE?assistE.p.number:undefined});
     addFeed(text, true, team, {sp:kind});
+    momentsAfterGoal(team, scorerE, assistE);
     nudgeMomentum(team===m.a ? -20 : 20);
     recordShot(team, true);
     addShotMapPoint(team, 'goal');
@@ -5985,6 +6224,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     const kl = keeperE ? playerLabel(keeperE.p) : 'the keeper';
     const tid = attackingTeam.id;
     if(kind==='corner'){
+      queueMoment([`🚩 ${attackingTeam.name} win a corner — ${tl} walks over to take it…`, `${tl} swings it into the box…`], ()=>{
       L.team[tk].corners++;
       const deliv = clampN(1+(tr-72)*0.012, 0.6, 1.5);
       const air = clampN(avgAir(aSide,['DF','AT']) / avgAir(dSide,['DF','MF']), 0.75, 1.3);
@@ -5998,7 +6238,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
         setPieceGoal(attackingTeam, header, taker, 'corner',
           `⚽ GOAL from the corner! ${tl} swings it in and ${hl} (${attackingTeam.name}) heads home!  ·  Assist: ${tl}`);
       } else if(o<pGoal+0.14){
-        header.sh++; header.sot++; if(keeperE) keeperE.sv++;
+        header.sh++; header.sot++; if(keeperE){ keeperE.sv++; keeperMoment(keeperE); }
         recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
         addFeed(`🚩 Corner from ${tl}, ${hl} gets a header in but ${kl} saves it.`, false, undefined, {ty:'sp', tm:tid, sp:'corner'});
         nudgeMomentum(attackingTeam===m.a ? -3 : 3);
@@ -6007,8 +6247,11 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
         addFeed(`🚩 ${tl}'s corner finds ${hl}, whose header drifts wide.`, false, undefined, {ty:'sp', tm:tid, sp:'corner'});
       }
       return;
+      }, false);
+      return;
     }
     if(kind==='fk'){
+      queueMoment([`${defendingTeam.name} give away a free kick in a dangerous position.`, `${tl} stands over it, the wall is set…`], ()=>{
       L.team[tk].fk++;
       const dFouler = L.pickCardTarget(dSide);
       if(dFouler && Math.random()<0.08) L.yellow(dSide, dFouler);
@@ -6017,7 +6260,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       if(o<pGoal){
         setPieceGoal(attackingTeam, taker, null, 'fk', `⚽ GOAL! ${tl} (${attackingTeam.name}) curls the free kick past ${kl}!`);
       } else if(o<pGoal+0.14){
-        taker.sh++; taker.sot++; if(keeperE) keeperE.sv++;
+        taker.sh++; taker.sot++; if(keeperE){ keeperE.sv++; keeperMoment(keeperE); }
         recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
         addFeed(`🎯 Free kick from ${tl} — ${kl} tips it away!`, false, undefined, {ty:'sp', tm:tid, sp:'fk'});
       } else if(o<pGoal+0.26){
@@ -6027,6 +6270,8 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
         taker.sh++; recordShot(attackingTeam, false);
         addFeed(`🎯 ${tl}'s free kick is blocked by the wall.`, false, undefined, {ty:'sp', tm:tid, sp:'fk'});
       }
+      return;
+      }, false);
       return;
     }
     // penalty
@@ -6038,6 +6283,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       const rr = Math.random();
       if(rr<0.06) L.directRed(dSide, foulE); else if(rr<0.35) L.yellow(dSide, foulE);
     }
+    queueMoment([`${tl} places the ball on the spot…`, `${kl} bounces on his line. ${tl} takes a deep breath…`], ()=>{
     const zone = PEN_ZONE_BY_ID[penWeightedKey(PEN_AI_ZONE_W)];
     const dive = penWeightedKey(PEN_AI_DIVE_W);
     const kg = L.gkEntry(dSide);
@@ -6046,7 +6292,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     if(res==='goal'){
       setPieceGoal(attackingTeam, taker, null, 'pen', `⚽ PENALTY SCORED! ${tl} (${attackingTeam.name}) sends ${kl} the wrong way — ${zone.label}.`);
     } else if(res==='saved'){
-      taker.sot++; taker.ipm = (taker.ipm||0)+1; if(kg){ kg.ips = (kg.ips||0)+1; kg.sv++; }
+      taker.sot++; taker.ipm = (taker.ipm||0)+1; if(kg){ kg.ips = (kg.ips||0)+1; kg.sv++; keeperMoment(kg); }
       recordShot(attackingTeam, true); addShotMapPoint(attackingTeam, 'saved');
       addFeed(`🧤 PENALTY SAVED! ${kl} denies ${tl} (${attackingTeam.name})!`, false, undefined, {ty:'sp', tm:tid, sp:'pen', k:1});
       nudgeMomentum(attackingTeam===m.a ? 8 : -8);
@@ -6055,10 +6301,11 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       recordShot(attackingTeam, false); addShotMapPoint(attackingTeam, res==='post'?'post':'wide');
       addFeed(`${tl} (${attackingTeam.name}) ${res==='post'?'hits the post':'blazes it wide'} from the spot!`, false, undefined, {ty:'sp', tm:tid, sp:'pen', k:1});
     }
+    }, true);
   }
 
   function maybeChance(){
-    if(Math.random()>=0.14) return;
+    if(Math.random()>=0.17) return;
     const wA = tacticMultA * modsA.att * (100-momentum) + 5;
     const wB = tacticMultB * modsB.att * momentum + 5;
     const attackingTeam = Math.random() < wA/(wA+wB) ? m.a : m.b;
@@ -6068,26 +6315,32 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     if(!attackerE) return;
     const attackerLabel = playerLabel(attackerE.p);
     const roll = Math.random();
-    const tk = L.key(aSide);
+    const lead = buildUpLines(attackingTeam, attackerE, null, false);
     if(roll<0.45){
-      const keeperE = L.gkEntry(dSide);
-      const keeperLabel = keeperE ? playerLabel(keeperE.p) : 'the keeper';
-      addFeed(saveCommentary(keeperLabel, attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
-      attackerE.sh++; attackerE.sot++; if(keeperE) keeperE.sv++;
-      recordShot(attackingTeam, true);
-      addShotMapPoint(attackingTeam, 'saved');
-      nudgeMomentum(attackingTeam===m.a ? -4 : 4);
+      queueMoment(lead, ()=>{
+        const keeperE = L.gkEntry(dSide);
+        const keeperLabel = keeperE ? playerLabel(keeperE.p) : 'the keeper';
+        addFeed(saveCommentary(keeperLabel, attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
+        attackerE.sh++; attackerE.sot++; if(keeperE){ keeperE.sv++; keeperMoment(keeperE); }
+        recordShot(attackingTeam, true);
+        addShotMapPoint(attackingTeam, 'saved');
+        nudgeMomentum(attackingTeam===m.a ? -4 : 4);
+      }, Math.random()<0.15);
     } else if(roll<0.85){
-      addFeed(wideCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
-      attackerE.sh++;
-      recordShot(attackingTeam, false);
-      addShotMapPoint(attackingTeam, 'wide');
+      queueMoment(lead, ()=>{
+        addFeed(wideCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id});
+        attackerE.sh++;
+        recordShot(attackingTeam, false);
+        addShotMapPoint(attackingTeam, 'wide');
+      }, false);
     } else {
-      addFeed(woodworkCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id, k:1});
-      attackerE.sh++;
-      recordShot(attackingTeam, false);
-      addShotMapPoint(attackingTeam, 'post');
-      nudgeMomentum(attackingTeam===m.a ? -6 : 6);
+      queueMoment(lead, ()=>{
+        addFeed(woodworkCommentary(attackerLabel, attackingTeam.name), false, undefined, {ty:'chance', tm:attackingTeam.id, k:1});
+        attackerE.sh++;
+        recordShot(attackingTeam, false);
+        addShotMapPoint(attackingTeam, 'post');
+        nudgeMomentum(attackingTeam===m.a ? -6 : 6);
+      }, true);
     }
   }
 
@@ -6098,6 +6351,9 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     else if(meta.ty==='rc') li.className='card-red';
     else if(meta.ty==='yc') li.className='card-yellow';
     else if(meta.ty==='sub' || meta.ty==='form') li.className='sub';
+    else if(meta.ty==='moment') li.className='moment';
+    else if(meta.ty==='build') li.className='build';
+    else if(meta.ty==='amb') li.className='amb';
     li.textContent = text;
     feedEl.prepend(li);
     updateCommentaryTicker(text, isGoal, scoringTeam);
@@ -6148,11 +6404,11 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   /* Credits a goal (and its assist) to real on-pitch players: whoever is actually in the
      lineup at this moment, weighted by the slot they're playing — so a substitute can score
      and a sent-off player can't. */
-  function creditGoal(team){
+  function creditGoal(team, pre){
     const side = L.side(team);
-    const e = L.pickScorer(side) || side.entries[0];
+    const e = (pre && pre.e) || L.pickScorer(side) || side.entries[0];
     e.g++; e.sh++; e.sot++;
-    const assistE = Math.random()<0.7 ? L.pickAssist(side, e) : null;
+    const assistE = pre ? pre.assistE : (Math.random()<0.7 ? L.pickAssist(side, e) : null);
     if(assistE) assistE.a++;
     creditBoot(team, e.p.number);
     return {entry:e, label:playerLabel(e.p), number:e.p.number, assistE,
@@ -6166,6 +6422,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     matchEvents.push({minute, teamRef:team, scorer: `${g.label} (${tag||'God Mode'})`, playerNumber: g.number,
       assist: g.assistLabel||undefined, assistNumber: g.assistE ? g.assistE.p.number : undefined});
     addFeed(`${tag||'GOD MODE'}: ${team.name} — ${g.label}!${g.assistLabel?` (assist ${g.assistLabel})`:''}`, true, team);
+    momentsAfterGoal(team, g.entry, g.assistE);
     nudgeMomentum(team===m.a ? -22 : 22);
     recordShot(team, true);
     addShotMapPoint(team, 'goal');
@@ -6223,8 +6480,8 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   godTacticA.onchange = ()=>applyLiveTactic(m.a, godTacticA.value);
   godTacticB.onchange = ()=>applyLiveTactic(m.b, godTacticB.value);
 
-  function applyGoal(ev){
-    const g = creditGoal(ev.teamRef);
+  function applyGoal(ev, pre){
+    const g = creditGoal(ev.teamRef, pre);
     if(ev.teamRef===m.a){ liveScoreA++; scoreAEl.textContent=liveScoreA; }
     else { liveScoreB++; scoreBEl.textContent=liveScoreB; }
     matchEvents.push({minute: ev.minute, teamRef: ev.teamRef, scorer: g.label, playerNumber: g.number,
@@ -6234,6 +6491,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
       ? lateDramaGoalCommentary(ev.teamRef.name, g.label, ev.minute)
       : goalCommentary(ev.teamRef.name, g.label, ev.minute);
     addFeed(commentaryText + (g.assistLabel ? `  ·  Assist: ${g.assistLabel}` : ''), true, ev.teamRef);
+    momentsAfterGoal(ev.teamRef, g.entry, g.assistE);
     nudgeMomentum(ev.teamRef===m.a ? -20 : 20);
     recordShot(ev.teamRef, true);
     addShotMapPoint(ev.teamRef, 'goal');
@@ -6267,6 +6525,7 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     if(state.dramaEnabled) maybeDrama();
     L.tickDiscipline(min);
     L.aiTick(min);
+    maybeAmbient();
     maybeChance();
     maybeSetPiece();
     momentum += (50-momentum)*0.05 + (tacticMultB-tacticMultA)*1.1 + (Math.random()-0.5)*3;
@@ -6295,25 +6554,37 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
     refreshMods();
     const goldenActive = isExtraTime && (decisive || isTieDecidingLeg) && state.extraTime && state.goldenGoal;
     while(currentMin <= currentHalfEndMin){
-      while(paused && !skipRequested){ await wait(120); }
-      clockEl.textContent = clockLabel(currentMin);
-      while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){
-        applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++;
-        if(goldenActive){
-          addFeed(`GOLDEN GOAL! ${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true, liveScoreA>liveScoreB?m.a:m.b, {ty:'goldengoal', k:1});
-          matchLive = false;
-          return;
+      // each game minute is played out in sub-steps so the clock runs smoothly through the seconds
+      const STEPS = skipRequested ? 1 : (SPEEDS[speedIndex]>=1500 ? 30 : SPEEDS[speedIndex]>=800 ? 20 : SPEEDS[speedIndex]>=400 ? 15 : SPEEDS[speedIndex]>=200 ? 10 : 5);
+      const fireAt = Math.floor(Math.random()*STEPS);   // goals and incidents land at a random second
+      for(let st=0; st<STEPS; st++){
+        while(paused && !skipRequested){ await wait(120); }
+        clockEl.textContent = liveClockText(currentMin, Math.floor(60*st/STEPS));
+        if(st===fireAt){
+          while(currentHalfEi<currentHalfEvents.length && currentHalfEvents[currentHalfEi].minute===currentMin){
+            curSec = Math.floor(60*st/STEPS);
+            await runMoment(goalMoment(currentHalfEvents[currentHalfEi])); currentHalfEi++;
+            if(goldenActive){
+              addFeed(`GOLDEN GOAL! ${liveScoreA>liveScoreB?m.a.name:m.b.name} win it in sudden death!`, true, liveScoreA>liveScoreB?m.a:m.b, {ty:'goldengoal', k:1});
+              matchLive = false;
+              return;
+            }
+          }
+          if(goldenGoalEnded){ matchLive=false; return; }
+          curSec = Math.floor(60*st/STEPS);
+          tickMinute(currentMin);
+          await flushMoments();
         }
+        if(!skipRequested) await wait(SPEEDS[speedIndex]/STEPS);
       }
-      if(goldenGoalEnded){ matchLive=false; return; }
-      tickMinute(currentMin);
-      if(!skipRequested) await wait(SPEEDS[speedIndex]);
       currentMin++;
       currentHalfEndMin = endMin+halfEndBonus;
     }
     while(currentHalfEi<currentHalfEvents.length){ applyGoal(currentHalfEvents[currentHalfEi]); currentHalfEi++; }
     matchLive = false;
   }
+
+  const rivalLines = rivalryIntro(m.a, m.b, m);
 
   /* ---------- team sheet (pre-match) ---------- */
   phaseEl.textContent = "Team sheet";
@@ -6339,6 +6610,8 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   addFeed(kickoffCommentary(m.a.name, m.b.name), false, undefined, {ty:'ko'});
   addFeed(`Formations: ${m.a.name} ${startFormA} · ${m.b.name} ${startFormB}.`, false, undefined, {ty:'form'});
   addFeed(`Approach: ${m.a.name} ${STYLE_DEFS[L.sa.style].label.toLowerCase()} · ${m.b.name} ${STYLE_DEFS[L.sb.style].label.toLowerCase()}.`, false, undefined, {ty:'form'});
+  rivalLines.forEach(momentLine);
+  playerSpotlights(L).forEach(momentLine);
   const stoppage1 = 1+Math.floor(Math.random()*3);
   const h1EventsA = simulateHalfGoals(m.a, m.b, 1, 45+stoppage1, teamMult(m.a), 45);
   const h1EventsB = simulateHalfGoals(m.b, m.a, 1, 45+stoppage1, teamMult(m.b), 45);
@@ -6409,6 +6682,16 @@ async function watchMatchInner(m, decisive=true, roundLabelOverride=null){
   } else {
     winner = liveScoreA>liveScoreB ? m.a : m.b;
     addFeed(fulltimeCommentary(winner.name, liveScoreA, liveScoreB), false, undefined, {ty:'ft', k:1, tm:winner.id});
+  }
+  {
+    // rivalry callback: how this result moves the head-to-head series
+    const S = h2hSummary(m.a, m.b, m);
+    if(S.n>=1){
+      const w = winner || (liveScoreA>liveScoreB ? m.a : liveScoreB>liveScoreA ? m.b : null);
+      if(w===m.a) S.aw++; else if(w===m.b) S.bw++; else S.d++;
+      S.n++;
+      momentLine(`⚔ After meeting number ${S.n}, ${seriesText(m.a, m.b, S)}.`);
+    }
   }
 
   const suspSnapA = state.suspensions[m.a.id] ? new Set(state.suspensions[m.a.id]) : undefined;
@@ -7259,7 +7542,7 @@ document.getElementById('presetSelect').addEventListener('change', ev=>{
   const v = ev.target.value;
   pendingPreset = v;
   const pr = getPreset(v);
-  document.getElementById('presetHint').textContent = pr.desc;
+  document.getElementById('presetHint').textContent = pr.desc + (pr.pool ? ' Field: only '+pr.pool.map(t=>POOL_LABEL[t]).join(' then ')+' nations.' : '');
   if(v==='custom') return;
   pendingFormat = pr.format; pendingSize = pr.size; pendingSeeding = pr.seeding; pendingPairing = pr.pairing; pendingLegs = pr.legs;
   pendingExtraTime = pr.extraTime;
